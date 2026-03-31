@@ -1,0 +1,164 @@
+<!--
+ AI Church Broadcast
+ © 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Studio | AI Church Broadcast</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8dfc00">
+    <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
+</head>
+<body>
+    <div class="page-shell">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <header id="navbar"></header>
+
+        <main>
+            <section class="hero-section" id="studio">
+                <div class="hero-copy reveal">
+                    <p class="eyebrow">Web Studio</p>
+                    <h1>Church Media Workflow</h1>
+                    <p class="hero-text">Capture sermons, prepare scripture, organize service media, and archive every session.</p>
+                    <p class="hero-subtext">Built as a browser-based twin of the Android app, with local auth, live note capture, and church-ready presentation prep.</p>
+
+                    <div class="feature-strip">
+                        <div class="feature-pill">
+                            <strong>Continuous Mic</strong>
+                            <span>Browser speech recognition</span>
+                        </div>
+                        <div class="feature-pill">
+                            <strong>Service Planner</strong>
+                            <span>Volunteer-ready checklist</span>
+                        </div>
+                        <div class="feature-pill">
+                            <strong>Presentation Hub</strong>
+                            <span>Overlay copy and promo snippets</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a class="button-primary" href="studio.html">Open Studio</a>
+                        <a class="button-secondary" href="#about">Explore Features</a>
+                        <button class="button-secondary install-button" id="installBtn" type="button" style="display:none;">Install App</button>
+                    </div>
+                </div>
+
+                <aside class="auth-panel reveal" id="authPanel">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" id="showLogin" type="button">Login</button>
+                        <button class="auth-tab" id="showSignup" type="button">Sign Up</button>
+                    </div>
+
+                    <form id="signupForm" class="auth-form is-hidden">
+                        <label>
+                            <span>Full name</span>
+                            <input id="signupName" name="fullName" type="text" autocomplete="name" required>
+                        </label>
+                        <label>
+                            <span>Email address</span>
+                            <input id="signupEmail" name="email" type="email" autocomplete="email" required>
+                        </label>
+                        <label>
+                            <span>Password</span>
+                            <input id="signupPassword" name="password" type="password" autocomplete="new-password" required>
+                        </label>
+                        <label>
+                            <span>Confirm password</span>
+                            <input id="signupConfirm" name="confirmPassword" type="password" autocomplete="new-password" required>
+                        </label>
+                        <button class="button-primary auth-submit" type="submit">Create Account</button>
+                    </form>
+
+                    <form id="loginForm" class="auth-form">
+                        <label>
+                            <span>Email address</span>
+                            <input id="loginEmail" name="email" type="email" autocomplete="email" required>
+                        </label>
+                        <label>
+                            <span>Password</span>
+                            <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
+                        </label>
+                        <button class="button-primary auth-submit" type="submit">Login</button>
+                    </form>
+
+                    <div class="auth-session is-hidden" id="authSessionCard">
+                        <p class="auth-session-label">Studio access is active</p>
+                        <h2 id="sessionUserName">Welcome</h2>
+                        <p id="sessionUserEmail"></p>
+                        <button class="button-secondary" id="logoutButton" type="button">Logout</button>
+                    </div>
+
+                    <p class="auth-message" id="authMessage" aria-live="polite"></p>
+                </aside>
+            </section>
+
+            <section class="info-section" id="about">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">About The Product</p>
+                    <h2>A church broadcast workspace built for notes, scripture, planning, and presentation prep.</h2>
+                    <p>This web app mirrors the Android version while staying lightweight enough for volunteers, media desks, and pastors using a laptop or browser.</p>
+                </div>
+
+                <div class="info-grid">
+                    <article class="info-card reveal">
+                        <h3>What It Does</h3>
+                        <ul>
+                            <li>Continuous mic listening in supported browsers</li>
+                            <li>Editable sermon notes with download and share</li>
+                            <li>Bible verse lookup for overlays</li>
+                            <li>Session archive for sermon history</li>
+                            <li>Service planner for media execution</li>
+                            <li>Presentation preparation tools</li>
+                        </ul>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Best Use Case</h3>
+                        <ul>
+                            <li>Small to mid-sized church media teams</li>
+                            <li>Pastor sermon capture and note prep</li>
+                            <li>Volunteer broadcast coordination</li>
+                            <li>Scripture and content prep before OBS integration</li>
+                        </ul>
+                    </article>
+                    <article class="info-card reveal" id="contact">
+                        <h3>Support</h3>
+                        <p>Need onboarding, troubleshooting, or custom church setup support?</p>
+                        <p>Use the contact channels below for product help, media workflow setup, and rollout questions.</p>
+                        <div class="support-list">
+                            <p><strong>Email</strong><span>support@aichurchbroadcast.app</span></p>
+                            <p><strong>Phone</strong><span>+234 800 000 0000</span></p>
+                            <p><strong>Hours</strong><span>Mon - Sat, 8:00 AM - 6:00 PM WAT</span></p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+        <footer class="site-footer">
+            <div class="footer-panel reveal">
+                <div class="footer-copy">
+                    <p>© 2026 AI Church Broadcast. All rights reserved.</p>
+                    <p>Developed by Samuel Olasunkanmi Abatan.</p>
+                    <p>Uses microphone access for live speech capture and internet access for scripture lookup and related connected services.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

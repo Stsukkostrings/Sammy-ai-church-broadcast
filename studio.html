@@ -1,0 +1,153 @@
+<!--
+ AI Church Broadcast
+ © 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio | AI Church Broadcast</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8dfc00">
+    <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
+</head>
+<body>
+    <div class="page-shell">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <header id="navbar"></header>
+
+        <main>
+            <section class="workspace-section studio-page" id="workspace">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Competitor-Ready Studio</p>
+                    <h2 id="workspaceGreeting">Welcome</h2>
+                    <p>Capture the sermon, shape the summary, prepare scripture, track your service flow, and build an archive from one browser workspace.</p>
+                </div>
+
+                <div class="stats-row reveal">
+                    <article class="stat-card">
+                        <span class="stat-title">Ready</span>
+                        <strong id="micStatus">Mic status</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-title">Saved</span>
+                        <strong><span id="archiveCount">0</span> Archive</strong>
+                    </article>
+                    <article class="stat-card">
+                        <span class="stat-title">Checklist</span>
+                        <strong><span id="plannerProgress">0/5</span> done</strong>
+                    </article>
+                </div>
+
+                <div class="studio-tabs reveal">
+                    <a href="#workspace">Overview</a>
+                    <a href="#plannerSection">Planner</a>
+                    <a href="#archiveSection">Archive</a>
+                    <a href="#presentationSection">Present</a>
+                </div>
+
+                <div class="workspace-grid">
+                    <article class="studio-card transcript-card reveal">
+                        <div class="card-header">
+                            <div>
+                                <p class="card-eyebrow">Live Transcript</p>
+                                <h3 id="speechText">Waiting...</h3>
+                            </div>
+                            <span class="status-chip" id="speechHint">Listening... waiting for the next phrase.</span>
+                        </div>
+                        <canvas id="waveCanvas" width="720" height="120"></canvas>
+                        <div class="card-actions">
+                            <button class="button-primary" id="listenButton" type="button">Start Listening</button>
+                            <button class="button-secondary" id="clearNotesButton" type="button">Clear Notes</button>
+                        </div>
+                    </article>
+
+                    <article class="studio-card insights-card reveal">
+                        <p class="card-eyebrow">AI Sermon Insights</p>
+                        <h3>Local smart helpers</h3>
+                        <input id="sessionTitle" class="session-title-input" type="text" value="Untitled Service Session" aria-label="Session title">
+                        <p id="summaryText">Start listening or type sermon notes to generate a summary.</p>
+                        <p class="detected-refs">Detected references: <span id="detectedReferences">none yet</span></p>
+                    </article>
+
+                    <article class="studio-card notes-card reveal">
+                        <div class="card-header">
+                            <div>
+                                <p class="card-eyebrow">Generated Notes</p>
+                                <h3>Editable workspace</h3>
+                            </div>
+                            <span class="status-chip">Captured sermon notes appear here. Edit freely before download.</span>
+                        </div>
+                        <textarea id="notesBox" placeholder="Captured sermon notes appear here. Edit freely before download."></textarea>
+                        <div class="card-actions">
+                            <button class="button-primary" id="downloadButton" type="button">Download</button>
+                            <button class="button-secondary" id="shareButton" type="button">Share</button>
+                            <button class="button-secondary" id="archiveButton" type="button">Archive</button>
+                        </div>
+                    </article>
+
+                    <article class="studio-card scripture-card reveal">
+                        <p class="card-eyebrow">Scripture Overlay</p>
+                        <h3>Bible API</h3>
+                        <div class="inline-form">
+                            <input id="verseInput" type="text" placeholder="Type John 3:16">
+                            <button class="button-primary" id="verseButton" type="button">Show Verse</button>
+                        </div>
+                        <div id="overlayText" class="overlay-preview">Fetched scripture will appear here for display.</div>
+                    </article>
+
+                    <article class="studio-card planner-card reveal" id="plannerSection">
+                        <p class="card-eyebrow">Service Planner</p>
+                        <h3>Media checklist</h3>
+                        <div id="plannerList" class="planner-list"></div>
+                    </article>
+
+                    <article class="studio-card archive-card reveal" id="archiveSection">
+                        <p class="card-eyebrow">Sermon Archive</p>
+                        <h3>Saved sessions</h3>
+                        <div id="archiveList" class="archive-list"></div>
+                    </article>
+
+                    <article class="studio-card presentation-card reveal" id="presentationSection">
+                        <p class="card-eyebrow">Presentation Hub</p>
+                        <h3>Broadcast prep</h3>
+                        <ul class="presentation-list">
+                            <li>Prepare scripture overlay copy for lower thirds</li>
+                            <li>Generate promo snippet for social recap or service promo</li>
+                            <li>Stage sermon highlights before future OBS integration</li>
+                        </ul>
+                        <div class="promo-box">
+                            <p class="card-eyebrow">Promo Snippet</p>
+                            <h4>Local generated copy</h4>
+                            <p id="promoSnippet">Tonight's message is centered on a powerful word for the church. Key takeaway: Start listening or type sermon notes to generate a summary.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+        <footer class="site-footer">
+            <div class="footer-panel reveal">
+                <div class="footer-copy">
+                    <p>© 2026 AI Church Broadcast. All rights reserved.</p>
+                    <p>Developed by Samuel Olasunkanmi Abatan.</p>
+                    <p>Microphone and internet features are used for speech capture, scripture lookup, and related broadcast workflows.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

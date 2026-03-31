@@ -1,0 +1,66 @@
+<!--
+ AI Church Broadcast
+ © 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Church Broadcast</title>
+    <link rel="stylesheet" href="style.css">
+	<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#995302">
+</head>
+<body class="home-body">
+    
+<!-- NAVBAR -->
+<div id="navbar"></div>
+
+<!-- HERO SECTION -->
+<main class="home-main">
+<div class="hero home-hero">
+    
+  <div class="hero-content home-hero-content">
+<button id="installBtn" style="display:none;">Install App</button>
+    <h1>AI Church Broadcast PRO</h1>
+        <p>Smart sermon automation, Bible detection & live streaming</p>
+        <div class="home-launch-wrap">
+            <button class="button-primary home-launch-button" onClick="goApp()" type="button">Launch App</button>
+        </div>
+    </div>
+
+</div>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-panel">
+        <div class="footer-copy">
+            <p>© 2026 AI Church Broadcast. All rights reserved.</p>
+            <p>Developed by Samuel Olasunkanmi Abatan.</p>
+        </div>
+        <div class="footer-links">
+            <a href="about.html">About</a>
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+        </div>
+    </div>
+</footer>
+
+<script src="navbar.js"></script>
+
+<script>
+function goApp(){
+    if(localStorage.getItem("user_id")){
+        window.location = "index.html";
+    }else{
+        alert("Please login first");
+        window.location = "signup/login.html";
+    }
+}
+</script>
+
+<script src="app.js"></script>
+
+</body>
+</html>
