@@ -28,6 +28,10 @@ function getAuthApiUrl(action) {
     return `${getBasePath()}/api/auth?action=${encodeURIComponent(action)}`;
 }
 
+function getNetlifyFunctionUrl(action) {
+    return `${getBasePath()}/.netlify/functions/auth?action=${encodeURIComponent(action)}`;
+}
+
 function getPhpAuthApiUrl(action) {
     return `${getBasePath()}/backend/auth.php?action=${encodeURIComponent(action)}`;
 }
@@ -41,6 +45,14 @@ async function postAuth(action, payload) {
     try {
         return await postAuthToUrl(getAuthApiUrl(action), payload);
     } catch (error) {
+        try {
+            return await postAuthToUrl(getNetlifyFunctionUrl(action), payload);
+        } catch (netlifyFunctionError) {
+            if (!isLocalDevelopment()) {
+                throw netlifyFunctionError;
+            }
+        }
+
         if (!isLocalDevelopment()) {
             throw error;
         }
