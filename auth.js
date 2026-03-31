@@ -1,24 +1,12 @@
 /*
  AI Church Broadcast
- © 2026 Samuel Olasunkanmi
+ Â© 2026 Samuel Olasunkanmi
  Unauthorized use is prohibited
 */
 
 const AUTH_STORAGE_KEY = "ai_cb_auth_session";
-const USERS_STORAGE_KEY = "ai_cb_local_users_v2";
-
-function readLocalUsers() {
-    try {
-        return JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || "[]");
-    } catch (err) {
-        console.warn("Failed to read local users:", err);
-        return [];
-    }
-}
-
-function writeLocalUsers(users) {
-    localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-}
+const PENDING_VERIFICATION_KEY = "ai_cb_pending_verification_email";
+const LEGACY_USERS_STORAGE_KEY = "ai_cb_local_users_v2";
 
 function normalizeEmail(email) {
     return String(email || "").trim().toLowerCase();
@@ -29,11 +17,73 @@ function getBasePath() {
 }
 
 function getAppPath() {
-    return `${getBasePath()}/studio.html`;
+    return `${getBasePath()}/home.html`;
 }
 
 function getHomePath() {
-    return `${getBasePath()}/home.html`;
+    return `${getBasePath()}/index.html`;
+}
+
+function getAuthApiUrl(action) {
+    return `${getBasePath()}/api/auth?action=${encodeURIComponent(action)}`;
+}
+
+function getPhpAuthApiUrl(action) {
+    return `${getBasePath()}/backend/auth.php?action=${encodeURIComponent(action)}`;
+}
+
+function isLocalDevelopment() {
+    const hostname = window.location.hostname || "";
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "";
+}
+
+async function postAuth(action, payload) {
+    try {
+        return await postAuthToUrl(getAuthApiUrl(action), payload);
+    } catch (error) {
+        if (!isLocalDevelopment()) {
+            throw error;
+        }
+
+        return postAuthToUrl(getPhpAuthApiUrl(action), payload);
+    }
+}
+
+async function postAuthToUrl(url, payload) {
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload || {})
+    });
+
+    let data;
+    try {
+        data = await response.json();
+    } catch (err) {
+        throw new Error("Authentication service returned an invalid response.");
+    }
+
+    if (!response.ok || !data?.success) {
+        const error = new Error(data?.error || "Authentication request failed.");
+        if (data?.pendingVerification) {
+            error.pendingVerification = true;
+            error.email = data.email || normalizeEmail(payload?.email);
+        }
+        throw error;
+    }
+
+    return data;
+}
+
+function readLegacyLocalUsers() {
+    try {
+        return JSON.parse(localStorage.getItem(LEGACY_USERS_STORAGE_KEY) || "[]");
+    } catch (err) {
+        console.warn("Failed to read legacy local users:", err);
+        return [];
+    }
 }
 
 function getSession() {
@@ -65,18 +115,29 @@ function clearSession() {
     localStorage.removeItem("username");
 }
 
+function getPendingVerificationEmail() {
+    return sessionStorage.getItem(PENDING_VERIFICATION_KEY) || "";
+}
+
+function setPendingVerificationEmail(email) {
+    const normalized = normalizeEmail(email);
+    if (!normalized) {
+        sessionStorage.removeItem(PENDING_VERIFICATION_KEY);
+        return "";
+    }
+
+    sessionStorage.setItem(PENDING_VERIFICATION_KEY, normalized);
+    return normalized;
+}
+
+function clearPendingVerificationEmail() {
+    sessionStorage.removeItem(PENDING_VERIFICATION_KEY);
+}
+
 async function sha256(text) {
     const payload = new TextEncoder().encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", payload);
     return Array.from(new Uint8Array(hashBuffer))
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
-}
-
-function randomSalt() {
-    const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes)
         .map((byte) => byte.toString(16).padStart(2, "0"))
         .join("");
 }
@@ -90,25 +151,14 @@ async function register(payload) {
         throw new Error("Full name, email, and password are required.");
     }
 
-    const users = readLocalUsers();
-    if (users.some((user) => normalizeEmail(user.email) === email)) {
-        throw new Error("An account already exists for this email.");
-    }
-
-    const salt = randomSalt();
-    const passwordHash = await sha256(`${salt}:${password}`);
-    const user = {
-        id: Date.now(),
-        fullName,
-        email,
-        salt,
-        passwordHash,
-        createdAt: new Date().toISOString()
+    const response = await postAuth("register-start", { fullName, email, password });
+    setPendingVerificationEmail(response.email || email);
+    return {
+        pendingVerification: true,
+        email: response.email || email,
+        expiresAt: response.expiresAt || null,
+        message: response.message || "A verification code has been sent to your email."
     };
-
-    users.push(user);
-    writeLocalUsers(users);
-    return saveSession(user);
 }
 
 function normalizeRegisterPayload(payloadOrEmail, maybePassword) {
@@ -136,23 +186,72 @@ function normalizeLoginPayload(payloadOrEmail, maybePassword) {
     };
 }
 
+async function verifyEmail(payload) {
+    const email = normalizeEmail(payload.email || getPendingVerificationEmail());
+    const code = String(payload.code || "").trim();
+
+    if (!email || !code) {
+        throw new Error("Email and verification code are required.");
+    }
+
+    const response = await postAuth("verify-email", { email, code });
+    clearPendingVerificationEmail();
+    return saveSession(response.user);
+}
+
+async function resendVerification(email) {
+    const normalizedEmail = normalizeEmail(email || getPendingVerificationEmail());
+    if (!normalizedEmail) {
+        throw new Error("Enter the email address you used to sign up.");
+    }
+
+    const response = await postAuth("resend-verification", { email: normalizedEmail });
+    setPendingVerificationEmail(response.email || normalizedEmail);
+    return response;
+}
+
 async function login(payloadOrEmail, maybePassword) {
     const payload = normalizeLoginPayload(payloadOrEmail, maybePassword);
     const email = normalizeEmail(payload.email);
     const password = String(payload.password || "");
-    const users = readLocalUsers();
+
+    try {
+        const response = await postAuth("login", { email, password });
+        clearPendingVerificationEmail();
+        return saveSession(response.user);
+    } catch (error) {
+        if (!isLocalDevelopment() || error.pendingVerification) {
+            throw error;
+        }
+
+        const legacySession = await loginLegacyLocalUser(email, password);
+        if (!legacySession) {
+            throw error;
+        }
+
+        clearPendingVerificationEmail();
+        return legacySession;
+    }
+}
+
+async function loginLegacyLocalUser(email, password) {
+    const users = readLegacyLocalUsers();
     const user = users.find((entry) => normalizeEmail(entry.email) === email);
 
-    if (!user) {
-        throw new Error("Invalid email or password.");
+    if (!user || !user.salt || !user.passwordHash) {
+        return null;
     }
 
     const passwordHash = await sha256(`${user.salt}:${password}`);
     if (passwordHash !== user.passwordHash) {
-        throw new Error("Invalid email or password.");
+        return null;
     }
 
-    return saveSession(user);
+    return saveSession({
+        id: user.id,
+        fullName: user.fullName || user.email,
+        email: user.email
+    });
 }
 
 function logout() {
@@ -180,11 +279,16 @@ function requireAuth() {
 window.AuthStore = {
     register,
     signup: (payloadOrEmail, maybePassword) => register(normalizeRegisterPayload(payloadOrEmail, maybePassword)),
+    verifyEmail,
+    resendVerification,
     login,
     logout,
     getSession,
     redirectIfAuthenticated,
     requireAuth,
     getAppPath,
-    getHomePath
+    getHomePath,
+    getPendingVerificationEmail,
+    setPendingVerificationEmail,
+    clearPendingVerificationEmail
 };

@@ -65,12 +65,16 @@ const dom = {
     logoutButton: document.getElementById("logoutButton"),
     loginForm: document.getElementById("loginForm"),
     signupForm: document.getElementById("signupForm"),
+    verifyForm: document.getElementById("verifyForm"),
     showLogin: document.getElementById("showLogin"),
     showSignup: document.getElementById("showSignup"),
     signupName: document.getElementById("signupName"),
     signupEmail: document.getElementById("signupEmail"),
     signupPassword: document.getElementById("signupPassword"),
     signupConfirm: document.getElementById("signupConfirm"),
+    verifyEmail: document.getElementById("verifyEmail"),
+    verifyCode: document.getElementById("verifyCode"),
+    resendCodeButton: document.getElementById("resendCodeButton"),
     loginEmail: document.getElementById("loginEmail"),
     loginPassword: document.getElementById("loginPassword"),
     downloadButton: document.getElementById("downloadButton"),
@@ -80,6 +84,7 @@ const dom = {
 
 const canvasContext = dom.canvas ? dom.canvas.getContext("2d") : null;
 const obs = typeof OBSWebSocket !== "undefined" ? new OBSWebSocket() : null;
+let authMode = window.AuthStore?.getPendingVerificationEmail?.() ? "verify" : "login";
 
 init();
 
@@ -112,17 +117,43 @@ function bindAuth() {
         }
 
         try {
-            state.session = await window.AuthStore.register({
+            const result = await window.AuthStore.register({
                 fullName: dom.signupName.value.trim(),
                 email: dom.signupEmail.value.trim(),
                 password: dom.signupPassword.value
             });
-            setAuthMessage("Account created. Studio access is ready.");
+            showVerificationStep(result.email);
+            setAuthMessage(result.message || "Enter the verification code sent to your email.");
+        } catch (err) {
+            setAuthMessage(err.message || "Unable to create account.", true);
+        }
+    });
+
+    dom.verifyForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        try {
+            state.session = await window.AuthStore.verifyEmail({
+                email: dom.verifyEmail?.value.trim(),
+                code: dom.verifyCode?.value.trim()
+            });
+            authMode = "login";
+            setAuthMessage("Email verified. Studio access is ready.");
             window.renderNavbar?.();
             renderAuthState();
             refreshWorkspace();
         } catch (err) {
-            setAuthMessage(err.message || "Unable to create account.", true);
+            setAuthMessage(err.message || "Unable to verify your email.", true);
+        }
+    });
+
+    dom.resendCodeButton?.addEventListener("click", async () => {
+        try {
+            const result = await window.AuthStore.resendVerification(dom.verifyEmail?.value.trim());
+            showVerificationStep(result.email);
+            setAuthMessage(result.message || "A new verification code has been sent.");
+        } catch (err) {
+            setAuthMessage(err.message || "Unable to resend verification code.", true);
         }
     });
 
@@ -134,11 +165,17 @@ function bindAuth() {
                 email: dom.loginEmail.value.trim(),
                 password: dom.loginPassword.value
             });
+            authMode = "login";
             setAuthMessage("Logged in successfully.");
             window.renderNavbar?.();
             renderAuthState();
             refreshWorkspace();
         } catch (err) {
+            if (err.pendingVerification) {
+                showVerificationStep(err.email || dom.loginEmail.value.trim());
+                setAuthMessage(err.message || "Verify your email before logging in.", true);
+                return;
+            }
             setAuthMessage(err.message || "Unable to log in.", true);
         }
     });
@@ -148,9 +185,10 @@ function bindAuth() {
         state.session = null;
         setAuthMessage("You have been logged out.");
         window.renderNavbar?.();
+        authMode = window.AuthStore?.getPendingVerificationEmail?.() ? "verify" : "login";
         renderAuthState();
         refreshWorkspace();
-        window.location.href = window.AuthStore?.getHomePath?.() || "home.html";
+            window.location.href = window.AuthStore?.getHomePath?.() || "index.html";
     });
 }
 
@@ -179,23 +217,44 @@ function bindWorkspace() {
 }
 
 function toggleAuthMode(mode) {
-    const loginMode = mode === "login";
-    dom.showLogin?.classList.toggle("active", loginMode);
-    dom.showSignup?.classList.toggle("active", !loginMode);
-    dom.loginForm?.classList.toggle("is-hidden", !loginMode);
-    dom.signupForm?.classList.toggle("is-hidden", loginMode);
+    authMode = mode;
+    renderAuthState();
+}
+
+function showVerificationStep(email) {
+    authMode = "verify";
+    const normalizedEmail = window.AuthStore?.setPendingVerificationEmail?.(email) || email;
+
+    if (dom.verifyEmail) {
+        dom.verifyEmail.value = normalizedEmail || "";
+    }
+
+    if (dom.verifyCode) {
+        dom.verifyCode.value = "";
+        dom.verifyCode.focus();
+    }
+
+    renderAuthState();
 }
 
 function renderAuthState() {
     const session = state.session;
     const loggedIn = !!session;
-    const loginTabActive = dom.showLogin?.classList.contains("active") !== false;
+    const loginTabActive = authMode === "login";
+    const verifyMode = authMode === "verify";
 
     dom.authSessionCard?.classList.toggle("is-hidden", !loggedIn);
     dom.loginForm?.classList.toggle("is-hidden", loggedIn || !loginTabActive);
-    dom.signupForm?.classList.toggle("is-hidden", loggedIn || loginTabActive);
+    dom.signupForm?.classList.toggle("is-hidden", loggedIn || loginTabActive || verifyMode);
+    dom.verifyForm?.classList.toggle("is-hidden", loggedIn || !verifyMode);
     dom.showLogin?.classList.toggle("is-hidden", loggedIn);
     dom.showSignup?.classList.toggle("is-hidden", loggedIn);
+    dom.showLogin?.classList.toggle("active", authMode === "login");
+    dom.showSignup?.classList.toggle("active", authMode !== "login");
+
+    if (!loggedIn && dom.verifyEmail && !dom.verifyEmail.value) {
+        dom.verifyEmail.value = window.AuthStore?.getPendingVerificationEmail?.() || "";
+    }
 
     if (loggedIn) {
         const firstName = session.fullName.split(" ")[0] || session.fullName;
