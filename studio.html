@@ -14,9 +14,6 @@
     <meta name="theme-color" content="#8dfc00">
     <link rel="stylesheet" href="style.css">
     <script src="auth.js"></script>
-    <script>
-        window.AuthStore.requireAuth();
-    </script>
 </head>
 <body>
     <div class="page-shell">
@@ -101,6 +98,7 @@
                             <input id="verseInput" type="text" placeholder="Type John 3:16">
                             <button class="button-primary" id="verseButton" type="button">Show Verse</button>
                         </div>
+                        <p class="detected-refs">Live reference: <span id="currentReference">none yet</span></p>
                         <div id="overlayText" class="overlay-preview">Fetched scripture will appear here for display.</div>
                     </article>
 
@@ -124,6 +122,15 @@
                             <li>Generate promo snippet for social recap or service promo</li>
                             <li>Stage sermon highlights before future OBS integration</li>
                         </ul>
+                        <div class="promo-box">
+                            <p class="card-eyebrow">OBS Browser Source URL</p>
+                            <h4>Copy into OBS</h4>
+                            <p id="obsOverlayUrl" class="obs-url-box">Generating browser source URL...</p>
+                            <div class="card-actions">
+                                <button class="button-primary" id="copyObsUrlButton" type="button">Copy OBS URL</button>
+                                <a class="button-secondary" id="openObsOverlayLink" href="lower-third.html" target="_blank" rel="noreferrer">Open Lower Third</a>
+                            </div>
+                        </div>
                         <div class="promo-box">
                             <p class="card-eyebrow">Promo Snippet</p>
                             <h4>Local generated copy</h4>

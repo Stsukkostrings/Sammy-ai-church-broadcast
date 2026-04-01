@@ -52,64 +52,17 @@
                 </div>
 
                 <aside class="auth-panel reveal" id="authPanel">
-                    <div class="auth-tabs">
-                        <button class="auth-tab active" id="showLogin" type="button">Login</button>
-                        <button class="auth-tab" id="showSignup" type="button">Sign Up</button>
+                    <p class="eyebrow">Instant Access</p>
+                    <h3>Open the studio without login</h3>
+                    <p>Start listening right away, capture scripture references in real time, and send the lower-third browser source into OBS.</p>
+                    <div class="auth-form">
+                        <a class="button-primary auth-submit" href="studio.html">Open Workspace</a>
+                        <a class="button-secondary auth-submit" href="studio.html#presentationSection">Setup OBS Lower Third</a>
                     </div>
-
-                    <form id="signupForm" class="auth-form is-hidden">
-                        <label>
-                            <span>Full name</span>
-                            <input id="signupName" name="fullName" type="text" autocomplete="name" required>
-                        </label>
-                        <label>
-                            <span>Email address</span>
-                            <input id="signupEmail" name="email" type="email" autocomplete="email" required>
-                        </label>
-                        <label>
-                            <span>Password</span>
-                            <input id="signupPassword" name="password" type="password" autocomplete="new-password" required>
-                        </label>
-                        <label>
-                            <span>Confirm password</span>
-                            <input id="signupConfirm" name="confirmPassword" type="password" autocomplete="new-password" required>
-                        </label>
-                        <button class="button-primary auth-submit" type="submit">Create Account</button>
-                    </form>
-
-                    <form id="verifyForm" class="auth-form is-hidden">
-                        <label>
-                            <span>Email address</span>
-                            <input id="verifyEmail" name="email" type="email" autocomplete="email" required>
-                        </label>
-                        <label>
-                            <span>Verification code</span>
-                            <input id="verifyCode" name="code" type="text" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required>
-                        </label>
-                        <button class="button-primary auth-submit" type="submit">Verify Email</button>
-                        <button class="button-secondary auth-submit" id="resendCodeButton" type="button">Resend Code</button>
-                    </form>
-
-                    <form id="loginForm" class="auth-form">
-                        <label>
-                            <span>Email address</span>
-                            <input id="loginEmail" name="email" type="email" autocomplete="email" required>
-                        </label>
-                        <label>
-                            <span>Password</span>
-                            <input id="loginPassword" name="password" type="password" autocomplete="current-password" required>
-                        </label>
-                        <button class="button-primary auth-submit" type="submit">Login</button>
-                    </form>
-
-                    <div class="auth-session is-hidden" id="authSessionCard">
-                        <p class="auth-session-label">Studio access is active</p>
-                        <h2 id="sessionUserName">Welcome</h2>
-                        <p id="sessionUserEmail"></p>
-                        <button class="button-secondary" id="logoutButton" type="button">Logout</button>
+                    <div class="overlay-preview">
+                        <strong>Live workflow</strong>
+                        <p>As the preacher speaks a reference like John 3:16, the verse is fetched automatically and pushed to the Scripture Overlay and OBS lower-third page.</p>
                     </div>
-
-                    <p class="auth-message" id="authMessage" aria-live="polite"></p>
                 </aside>
             </section>
 

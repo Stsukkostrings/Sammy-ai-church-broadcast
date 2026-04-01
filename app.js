@@ -17,7 +17,8 @@ let deferredPrompt = null;
 
 const STORAGE_KEYS = {
     archive: "ai_cb_archive_sessions_v2",
-    planner: "ai_cb_planner_progress_v2"
+    planner: "ai_cb_planner_progress_v2",
+    liveOverlay: "ai_cb_live_overlay_v1"
 };
 
 const DEFAULT_PLANNER = [
@@ -29,9 +30,11 @@ const DEFAULT_PLANNER = [
 ];
 
 const state = {
-    session: window.AuthStore ? window.AuthStore.getSession() : null,
+    session: { id: "guest", fullName: "Broadcast Team", email: "" },
     sermonNotes: [],
     references: [],
+    currentReference: "",
+    currentVerseText: "",
     archive: readStorage(STORAGE_KEYS.archive, []),
     plannerDone: readStorage(STORAGE_KEYS.planner, [])
 };
@@ -58,25 +61,10 @@ const dom = {
     micStatus: document.getElementById("micStatus"),
     sessionTitle: document.getElementById("sessionTitle"),
     workspaceGreeting: document.getElementById("workspaceGreeting"),
-    authMessage: document.getElementById("authMessage"),
-    authSessionCard: document.getElementById("authSessionCard"),
-    sessionUserName: document.getElementById("sessionUserName"),
-    sessionUserEmail: document.getElementById("sessionUserEmail"),
-    logoutButton: document.getElementById("logoutButton"),
-    loginForm: document.getElementById("loginForm"),
-    signupForm: document.getElementById("signupForm"),
-    verifyForm: document.getElementById("verifyForm"),
-    showLogin: document.getElementById("showLogin"),
-    showSignup: document.getElementById("showSignup"),
-    signupName: document.getElementById("signupName"),
-    signupEmail: document.getElementById("signupEmail"),
-    signupPassword: document.getElementById("signupPassword"),
-    signupConfirm: document.getElementById("signupConfirm"),
-    verifyEmail: document.getElementById("verifyEmail"),
-    verifyCode: document.getElementById("verifyCode"),
-    resendCodeButton: document.getElementById("resendCodeButton"),
-    loginEmail: document.getElementById("loginEmail"),
-    loginPassword: document.getElementById("loginPassword"),
+    currentReference: document.getElementById("currentReference"),
+    obsOverlayUrl: document.getElementById("obsOverlayUrl"),
+    copyObsUrlButton: document.getElementById("copyObsUrlButton"),
+    openObsOverlayLink: document.getElementById("openObsOverlayLink"),
     downloadButton: document.getElementById("downloadButton"),
     shareButton: document.getElementById("shareButton"),
     installButton: document.getElementById("installBtn")
@@ -84,13 +72,11 @@ const dom = {
 
 const canvasContext = dom.canvas ? dom.canvas.getContext("2d") : null;
 const obs = typeof OBSWebSocket !== "undefined" ? new OBSWebSocket() : null;
-let authMode = window.AuthStore?.getPendingVerificationEmail?.() ? "verify" : "login";
+let lastFetchedReference = "";
 
 init();
 
 function init() {
-    renderAuthState();
-    bindAuth();
     setupPwaInstall();
 
     if (!dom.appRoot) {
@@ -101,95 +87,10 @@ function init() {
     renderPlanner();
     renderArchive();
     syncNotesFromTextarea();
+    renderObsOverlayUrl();
+    setWorkspaceHeading();
     refreshWorkspace();
     connectOBS();
-}
-
-function bindAuth() {
-    dom.showLogin?.addEventListener("click", () => toggleAuthMode("login"));
-    dom.showSignup?.addEventListener("click", () => toggleAuthMode("signup"));
-
-    dom.signupForm?.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (dom.signupPassword.value !== dom.signupConfirm.value) {
-            setAuthMessage("Passwords do not match.", true);
-            return;
-        }
-
-        try {
-            const result = await window.AuthStore.register({
-                fullName: dom.signupName.value.trim(),
-                email: dom.signupEmail.value.trim(),
-                password: dom.signupPassword.value
-            });
-            showVerificationStep(result.email);
-            setAuthMessage(result.message || "Enter the verification code sent to your email.");
-        } catch (err) {
-            setAuthMessage(err.message || "Unable to create account.", true);
-        }
-    });
-
-    dom.verifyForm?.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        try {
-            state.session = await window.AuthStore.verifyEmail({
-                email: dom.verifyEmail?.value.trim(),
-                code: dom.verifyCode?.value.trim()
-            });
-            authMode = "login";
-            setAuthMessage("Email verified. Studio access is ready.");
-            window.renderNavbar?.();
-            renderAuthState();
-            refreshWorkspace();
-        } catch (err) {
-            setAuthMessage(err.message || "Unable to verify your email.", true);
-        }
-    });
-
-    dom.resendCodeButton?.addEventListener("click", async () => {
-        try {
-            const result = await window.AuthStore.resendVerification(dom.verifyEmail?.value.trim());
-            showVerificationStep(result.email);
-            setAuthMessage(result.message || "A new verification code has been sent.");
-        } catch (err) {
-            setAuthMessage(err.message || "Unable to resend verification code.", true);
-        }
-    });
-
-    dom.loginForm?.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        try {
-            state.session = await window.AuthStore.login({
-                email: dom.loginEmail.value.trim(),
-                password: dom.loginPassword.value
-            });
-            authMode = "login";
-            setAuthMessage("Logged in successfully.");
-            window.renderNavbar?.();
-            renderAuthState();
-            refreshWorkspace();
-        } catch (err) {
-            if (err.pendingVerification) {
-                showVerificationStep(err.email || dom.loginEmail.value.trim());
-                setAuthMessage(err.message || "Verify your email before logging in.", true);
-                return;
-            }
-            setAuthMessage(err.message || "Unable to log in.", true);
-        }
-    });
-
-    dom.logoutButton?.addEventListener("click", () => {
-        window.AuthStore.logout();
-        state.session = null;
-        setAuthMessage("You have been logged out.");
-        window.renderNavbar?.();
-        authMode = window.AuthStore?.getPendingVerificationEmail?.() ? "verify" : "login";
-        renderAuthState();
-        refreshWorkspace();
-            window.location.href = window.AuthStore?.getHomePath?.() || "index.html";
-    });
 }
 
 function bindWorkspace() {
@@ -208,78 +109,13 @@ function bindWorkspace() {
     dom.archiveButton?.addEventListener("click", archiveCurrentSession);
     dom.downloadButton?.addEventListener("click", downloadNotes);
     dom.shareButton?.addEventListener("click", shareNotes);
+    dom.copyObsUrlButton?.addEventListener("click", copyObsOverlayUrl);
     dom.sessionTitle?.addEventListener("input", updateGeneratedContent);
 
     dom.notesBox?.addEventListener("input", () => {
         syncNotesFromTextarea();
         updateGeneratedContent();
     });
-}
-
-function toggleAuthMode(mode) {
-    authMode = mode;
-    renderAuthState();
-}
-
-function showVerificationStep(email) {
-    authMode = "verify";
-    const normalizedEmail = window.AuthStore?.setPendingVerificationEmail?.(email) || email;
-
-    if (dom.verifyEmail) {
-        dom.verifyEmail.value = normalizedEmail || "";
-    }
-
-    if (dom.verifyCode) {
-        dom.verifyCode.value = "";
-        dom.verifyCode.focus();
-    }
-
-    renderAuthState();
-}
-
-function renderAuthState() {
-    const session = state.session;
-    const loggedIn = !!session;
-    const loginTabActive = authMode === "login";
-    const verifyMode = authMode === "verify";
-
-    dom.authSessionCard?.classList.toggle("is-hidden", !loggedIn);
-    dom.loginForm?.classList.toggle("is-hidden", loggedIn || !loginTabActive);
-    dom.signupForm?.classList.toggle("is-hidden", loggedIn || loginTabActive || verifyMode);
-    dom.verifyForm?.classList.toggle("is-hidden", loggedIn || !verifyMode);
-    dom.showLogin?.classList.toggle("is-hidden", loggedIn);
-    dom.showSignup?.classList.toggle("is-hidden", loggedIn);
-    dom.showLogin?.classList.toggle("active", authMode === "login");
-    dom.showSignup?.classList.toggle("active", authMode !== "login");
-
-    if (!loggedIn && dom.verifyEmail && !dom.verifyEmail.value) {
-        dom.verifyEmail.value = window.AuthStore?.getPendingVerificationEmail?.() || "";
-    }
-
-    if (loggedIn) {
-        const firstName = session.fullName.split(" ")[0] || session.fullName;
-        if (dom.sessionUserName) {
-            dom.sessionUserName.textContent = `Welcome ${firstName}`;
-        }
-        if (dom.sessionUserEmail) {
-            dom.sessionUserEmail.textContent = session.email;
-        }
-        if (dom.workspaceGreeting) {
-            dom.workspaceGreeting.textContent = `Welcome ${firstName}`;
-        }
-    } else if (dom.workspaceGreeting) {
-        dom.workspaceGreeting.textContent = "Welcome Guest";
-    }
-}
-
-function setAuthMessage(message, isError = false) {
-    if (!dom.authMessage) {
-        return;
-    }
-
-    dom.authMessage.textContent = message || "";
-    dom.authMessage.classList.toggle("error", !!message && isError);
-    dom.authMessage.classList.toggle("success", !!message && !isError);
 }
 
 async function connectOBS() {
@@ -335,6 +171,7 @@ async function ensureNativeSpeechListeners() {
         if (transcript) {
             dom.speechText.textContent = transcript;
             dom.speechHint.textContent = "Listening... waiting for the next phrase.";
+            scanLiveReference(transcript);
         }
     });
 
@@ -506,6 +343,7 @@ async function startSpeech() {
 
         dom.speechText.textContent = (interimText || finalText || "Waiting...").trim();
         dom.speechHint.textContent = "Listening... waiting for the next phrase.";
+        scanLiveReference(interimText || finalText);
     };
 
     recognition.onerror = (event) => {
@@ -541,8 +379,15 @@ function saveNote(text) {
 function clearNotes() {
     state.sermonNotes = [];
     state.references = [];
+    state.currentReference = "";
+    state.currentVerseText = "";
+    lastFetchedReference = "";
     dom.notesBox.value = "";
     dom.overlayText.textContent = "Fetched scripture will appear here for display.";
+    if (dom.currentReference) {
+        dom.currentReference.textContent = "none yet";
+    }
+    broadcastOverlay("", "");
     updateGeneratedContent();
 }
 
@@ -556,22 +401,12 @@ function syncNotesFromTextarea() {
 }
 
 function detectBible(text) {
-    const regex = /\b([1-3]?\s?[A-Za-z]+)\s+(\d+):(\d+)\b/gi;
-    let match;
-    while ((match = regex.exec(text)) !== null) {
-        let book = match[1].toLowerCase().replace(/\s+/g, " ").trim();
-        if (book === "mathew") {
-            book = "matthew";
-        }
-        if (book === "johnn") {
-            book = "john";
-        }
-
-        const reference = `${capitalizeWords(book)} ${match[2]}:${match[3]}`;
+    extractReferences(text).forEach((reference) => {
         if (!state.references.includes(reference)) {
             state.references.push(reference);
         }
-    }
+        triggerLiveReference(reference);
+    });
     renderReferences();
 }
 
@@ -591,9 +426,16 @@ async function fetchVerse(reference) {
     try {
         const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
         const payload = await response.json();
-        dom.overlayText.textContent = payload?.text ? payload.text.trim() : "Verse not found.";
+        const verseText = payload?.text ? payload.text.trim() : "Verse not found.";
+        state.currentReference = reference;
+        state.currentVerseText = verseText;
+        dom.overlayText.textContent = verseText;
+        if (dom.currentReference) {
+            dom.currentReference.textContent = reference;
+        }
+        broadcastOverlay(reference, payload?.text ? verseText : "");
         if (payload?.text) {
-            await sendToOBS(payload.text.trim());
+            await sendToOBS(verseText);
         }
     } catch (err) {
         dom.overlayText.textContent = "Error fetching verse.";
@@ -624,6 +466,45 @@ function manualFetch() {
     }
 
     fetchVerse(reference);
+}
+
+function scanLiveReference(text) {
+    const references = extractReferences(text);
+    if (references.length) {
+        triggerLiveReference(references[references.length - 1]);
+    }
+}
+
+function triggerLiveReference(reference) {
+    if (!reference || reference === lastFetchedReference) {
+        return;
+    }
+
+    lastFetchedReference = reference;
+    if (dom.verseInput) {
+        dom.verseInput.value = reference;
+    }
+    fetchVerse(reference);
+}
+
+function extractReferences(text) {
+    const references = [];
+    const regex = /\b((?:[1-3]\s)?(?:[A-Za-z]+(?:\s+[A-Za-z]+){0,2}))\s+(\d+):(\d+)\b/gi;
+    let match;
+
+    while ((match = regex.exec(String(text || ""))) !== null) {
+        let book = match[1].toLowerCase().replace(/\s+/g, " ").trim();
+        if (book === "mathew") {
+            book = "matthew";
+        }
+        if (book === "johnn") {
+            book = "john";
+        }
+
+        references.push(`${capitalizeWords(book)} ${match[2]}:${match[3]}`);
+    }
+
+    return references;
 }
 
 function updateGeneratedContent() {
@@ -739,11 +620,11 @@ function refreshPlannerStats() {
 }
 
 function refreshWorkspace() {
-    renderAuthState();
     updateGeneratedContent();
     renderArchive();
     refreshPlannerStats();
     refreshMicUi(micStream || recognition || usingNativeSpeech ? "Listening" : "Mic status");
+    setWorkspaceHeading();
 }
 
 function refreshMicUi(statusText) {
@@ -797,6 +678,50 @@ async function shareNotes() {
         alert("Notes copied to clipboard.");
     } catch (err) {
         alert("Unable to share notes on this device.");
+    }
+}
+
+function getObsOverlayUrl() {
+    return new URL("lower-third.html", window.location.href).toString();
+}
+
+function renderObsOverlayUrl() {
+    const url = getObsOverlayUrl();
+    if (dom.obsOverlayUrl) {
+        dom.obsOverlayUrl.textContent = url;
+    }
+    if (dom.openObsOverlayLink) {
+        dom.openObsOverlayLink.href = url;
+    }
+}
+
+async function copyObsOverlayUrl() {
+    const url = getObsOverlayUrl();
+    try {
+        await navigator.clipboard.writeText(url);
+        if (dom.copyObsUrlButton) {
+            const originalText = dom.copyObsUrlButton.textContent;
+            dom.copyObsUrlButton.textContent = "Copied";
+            setTimeout(() => {
+                dom.copyObsUrlButton.textContent = originalText;
+            }, 1600);
+        }
+    } catch (err) {
+        alert(`Copy this OBS Browser Source URL:\n${url}`);
+    }
+}
+
+function broadcastOverlay(reference, text) {
+    writeStorage(STORAGE_KEYS.liveOverlay, {
+        reference,
+        text,
+        updatedAt: new Date().toISOString()
+    });
+}
+
+function setWorkspaceHeading() {
+    if (dom.workspaceGreeting) {
+        dom.workspaceGreeting.textContent = "Welcome to Studio";
     }
 }
 

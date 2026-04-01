@@ -465,6 +465,19 @@ canvas {
     padding: 1rem;
 }
 
+.obs-url-box {
+    margin: 0;
+    padding: 0.85rem 1rem;
+    border-radius: 16px;
+    border: 1px dashed var(--line);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--accent);
+    font-family: "Courier New", monospace;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    word-break: break-all;
+}
+
 .planner-item.done {
     border-color: rgba(143, 224, 161, 0.35);
     background: rgba(143, 224, 161, 0.08);
