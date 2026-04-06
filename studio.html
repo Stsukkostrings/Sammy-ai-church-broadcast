@@ -35,6 +35,10 @@
                         <strong id="micStatus">Mic status</strong>
                     </article>
                     <article class="stat-card">
+                        <span class="stat-title">Recorder</span>
+                        <strong id="recordingStatus">Ready to record</strong>
+                    </article>
+                    <article class="stat-card">
                         <span class="stat-title">Saved</span>
                         <strong><span id="archiveCount">0</span> Archive</strong>
                     </article>
@@ -46,6 +50,7 @@
 
                 <div class="studio-tabs reveal">
                     <a href="#workspace">Overview</a>
+                    <a href="#studyToolsSection">Study Tools</a>
                     <a href="#plannerSection">Planner</a>
                     <a href="#archiveSection">Archive</a>
                     <a href="#presentationSection">Present</a>
@@ -63,8 +68,11 @@
                         <canvas id="waveCanvas" width="720" height="120"></canvas>
                         <div class="card-actions">
                             <button class="button-primary" id="listenButton" type="button">Start Listening</button>
+                            <button class="button-secondary" id="recordButton" type="button">Start Recording</button>
+                            <button class="button-secondary" id="downloadAudioButton" type="button" disabled>Download Audio</button>
                             <button class="button-secondary" id="clearNotesButton" type="button">Clear Notes</button>
                         </div>
+                        <audio id="recordingPlayback" class="recording-playback" controls></audio>
                     </article>
 
                     <article class="studio-card insights-card reveal">
@@ -100,6 +108,26 @@
                         </div>
                         <p class="detected-refs">Live reference: <span id="currentReference">none yet</span></p>
                         <div id="overlayText" class="overlay-preview">Fetched scripture will appear here for display.</div>
+                    </article>
+
+                    <article class="studio-card study-card reveal" id="studyToolsSection">
+                        <p class="card-eyebrow">Study Tools</p>
+                        <h3>Bible Dictionary</h3>
+                        <div class="inline-form">
+                            <input id="dictionaryInput" type="text" placeholder="Search covenant, grace, tabernacle">
+                            <button class="button-primary" id="dictionaryButton" type="button">Search</button>
+                        </div>
+                        <div id="dictionaryResult" class="overlay-preview tool-result">Search a Bible term to see a quick ministry-friendly explanation.</div>
+                    </article>
+
+                    <article class="studio-card study-card reveal">
+                        <p class="card-eyebrow">Original Language Helper</p>
+                        <h3>Hebrew words translation</h3>
+                        <div class="inline-form">
+                            <input id="hebrewInput" type="text" placeholder="Search shalom, hesed, ruach">
+                            <button class="button-primary" id="hebrewButton" type="button">Translate</button>
+                        </div>
+                        <div id="hebrewResult" class="overlay-preview tool-result">Search a Hebrew word or English meaning to view transliteration and translation.</div>
                     </article>
 
                     <article class="studio-card planner-card reveal" id="plannerSection">

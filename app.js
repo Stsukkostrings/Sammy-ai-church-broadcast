@@ -14,12 +14,42 @@ let nativeSpeechListenersAttached = false;
 let speechStoppedManually = false;
 let animationFrameId = null;
 let deferredPrompt = null;
+let mediaRecorder = null;
+let recordingChunks = [];
+let recordingUrl = "";
+let recordingMimeType = "";
 
 const STORAGE_KEYS = {
     archive: "ai_cb_archive_sessions_v2",
     planner: "ai_cb_planner_progress_v2",
     liveOverlay: "ai_cb_live_overlay_v1"
 };
+
+const BIBLE_DICTIONARY = {
+    covenant: "A covenant is a binding promise that defines relationship and responsibility. In Scripture, God uses covenants to reveal His faithfulness to His people.",
+    grace: "Grace is God's undeserved favor and empowering kindness. It is central to salvation and the believer's daily walk with Christ.",
+    tabernacle: "The tabernacle was Israel's mobile place of worship in the wilderness, symbolizing God's holy presence among His people.",
+    justification: "Justification is God's declaration that a sinner is righteous through faith in Jesus Christ, not by human works.",
+    sanctification: "Sanctification is the ongoing work of God that shapes believers into Christlike holiness through the Spirit.",
+    redemption: "Redemption means deliverance by payment of a price. In the gospel, Christ redeems people from sin through His sacrifice.",
+    passover: "Passover remembers God's deliverance of Israel from Egypt and points forward to Jesus Christ as the Lamb who saves.",
+    disciple: "A disciple is a learner and follower of Jesus who is being formed by His teaching, character, and mission.",
+    gospel: "The gospel is the good news that Jesus lived, died, rose again, and offers forgiveness and new life to all who believe.",
+    kingdom: "The kingdom of God is God's reign and rule, revealed in Jesus and advancing through His people until its full completion."
+};
+
+const HEBREW_WORDS = [
+    { term: "shalom", transliteration: "sha-LOHM", meaning: "peace, wholeness, well-being", note: "Used for peace that includes harmony, safety, and completeness." },
+    { term: "hesed", transliteration: "HEH-sed", meaning: "steadfast love, covenant mercy", note: "Describes God's loyal, enduring love toward His people." },
+    { term: "ruach", transliteration: "roo-AKH", meaning: "spirit, breath, wind", note: "Often used for breath, wind, or the Spirit of God." },
+    { term: "bara", transliteration: "bah-RAH", meaning: "to create", note: "Commonly used in Genesis 1 to describe God's creative act." },
+    { term: "hallelujah", transliteration: "hal-le-loo-YAH", meaning: "praise Yahweh", note: "A call to worship and praise the Lord." },
+    { term: "emunah", transliteration: "eh-moo-NAH", meaning: "faithfulness, steadfastness", note: "Carries the idea of firmness, reliability, and faithful trust." },
+    { term: "adonai", transliteration: "ah-doe-NYE", meaning: "Lord, Master", note: "A reverent title used in place of the divine name." },
+    { term: "torah", transliteration: "toe-RAH", meaning: "instruction, law", note: "Refers to God's teaching, especially the first books of Scripture." },
+    { term: "mashiach", transliteration: "mah-SHEE-akh", meaning: "anointed one, messiah", note: "The title pointing to the promised deliverer." },
+    { term: "amen", transliteration: "ah-MEN", meaning: "truly, so be it", note: "A spoken agreement affirming truth and confidence." }
+];
 
 const DEFAULT_PLANNER = [
     { id: "welcome-loop", title: "Welcome Loop + Opening Lower Third", role: "Media Desk", time: "08:45" },
@@ -67,7 +97,17 @@ const dom = {
     openObsOverlayLink: document.getElementById("openObsOverlayLink"),
     downloadButton: document.getElementById("downloadButton"),
     shareButton: document.getElementById("shareButton"),
-    installButton: document.getElementById("installBtn")
+    installButton: document.getElementById("installBtn"),
+    dictionaryInput: document.getElementById("dictionaryInput"),
+    dictionaryButton: document.getElementById("dictionaryButton"),
+    dictionaryResult: document.getElementById("dictionaryResult"),
+    hebrewInput: document.getElementById("hebrewInput"),
+    hebrewButton: document.getElementById("hebrewButton"),
+    hebrewResult: document.getElementById("hebrewResult"),
+    recordButton: document.getElementById("recordButton"),
+    downloadAudioButton: document.getElementById("downloadAudioButton"),
+    recordingStatus: document.getElementById("recordingStatus"),
+    recordingPlayback: document.getElementById("recordingPlayback")
 };
 
 const canvasContext = dom.canvas ? dom.canvas.getContext("2d") : null;
@@ -111,10 +151,28 @@ function bindWorkspace() {
     dom.shareButton?.addEventListener("click", shareNotes);
     dom.copyObsUrlButton?.addEventListener("click", copyObsOverlayUrl);
     dom.sessionTitle?.addEventListener("input", updateGeneratedContent);
+    dom.dictionaryButton?.addEventListener("click", searchDictionary);
+    dom.hebrewButton?.addEventListener("click", searchHebrewWord);
+    dom.recordButton?.addEventListener("click", toggleRecording);
+    dom.downloadAudioButton?.addEventListener("click", downloadRecording);
 
     dom.notesBox?.addEventListener("input", () => {
         syncNotesFromTextarea();
         updateGeneratedContent();
+    });
+
+    dom.dictionaryInput?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchDictionary();
+        }
+    });
+
+    dom.hebrewInput?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            searchHebrewWord();
+        }
     });
 }
 
@@ -198,17 +256,7 @@ function firstTranscript(matches) {
 
 async function startMic() {
     try {
-        if (!navigator.mediaDevices?.getUserMedia) {
-            throw new Error("This browser does not support microphone access.");
-        }
-
-        micStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
-            }
-        });
+        micStream = await getOrCreateMicStream();
 
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) {
@@ -252,8 +300,10 @@ async function stopMic() {
     }
 
     recognition = null;
-    micStream?.getTracks().forEach((track) => track.stop());
-    micStream = null;
+
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        releaseMicStream();
+    }
 
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -384,6 +434,12 @@ function clearNotes() {
     lastFetchedReference = "";
     dom.notesBox.value = "";
     dom.overlayText.textContent = "Fetched scripture will appear here for display.";
+    if (dom.dictionaryResult) {
+        dom.dictionaryResult.textContent = "Search a Bible term to see a quick ministry-friendly explanation.";
+    }
+    if (dom.hebrewResult) {
+        dom.hebrewResult.textContent = "Search a Hebrew word or English meaning to view transliteration and translation.";
+    }
     if (dom.currentReference) {
         dom.currentReference.textContent = "none yet";
     }
@@ -624,6 +680,7 @@ function refreshWorkspace() {
     renderArchive();
     refreshPlannerStats();
     refreshMicUi(micStream || recognition || usingNativeSpeech ? "Listening" : "Mic status");
+    refreshRecordingUi();
     setWorkspaceHeading();
 }
 
@@ -650,6 +707,152 @@ function downloadNotes() {
     link.download = "sermon_notes.txt";
     link.click();
     URL.revokeObjectURL(url);
+}
+
+function searchDictionary() {
+    const query = normalizeLookup(dom.dictionaryInput?.value);
+    if (!query) {
+        if (dom.dictionaryResult) {
+            dom.dictionaryResult.textContent = "Type a Bible term like grace, covenant, or redemption.";
+        }
+        return;
+    }
+
+    const entry = Object.entries(BIBLE_DICTIONARY).find(([term]) => term.includes(query) || query.includes(term));
+    if (!dom.dictionaryResult) {
+        return;
+    }
+
+    if (!entry) {
+        dom.dictionaryResult.textContent = `No local dictionary entry for "${query}" yet. Try grace, covenant, disciple, gospel, or tabernacle.`;
+        return;
+    }
+
+    dom.dictionaryResult.innerHTML = `<strong>${capitalizeWords(entry[0])}</strong><p>${escapeHtml(entry[1])}</p>`;
+}
+
+function searchHebrewWord() {
+    const query = normalizeLookup(dom.hebrewInput?.value);
+    if (!query) {
+        if (dom.hebrewResult) {
+            dom.hebrewResult.textContent = "Type a Hebrew word like shalom, hesed, or ruach.";
+        }
+        return;
+    }
+
+    const match = HEBREW_WORDS.find((entry) => {
+        return entry.term.includes(query) || entry.meaning.includes(query) || entry.note.toLowerCase().includes(query);
+    });
+
+    if (!dom.hebrewResult) {
+        return;
+    }
+
+    if (!match) {
+        dom.hebrewResult.textContent = `No local Hebrew entry for "${query}" yet. Try shalom, hesed, ruach, torah, or mashiach.`;
+        return;
+    }
+
+    dom.hebrewResult.innerHTML = `
+        <strong>${escapeHtml(match.term)}</strong>
+        <p><strong>Transliteration:</strong> ${escapeHtml(match.transliteration)}</p>
+        <p><strong>Meaning:</strong> ${escapeHtml(match.meaning)}</p>
+        <p>${escapeHtml(match.note)}</p>
+    `;
+}
+
+async function toggleRecording() {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        stopRecording();
+        return;
+    }
+
+    await startRecording();
+}
+
+async function startRecording() {
+    if (!window.MediaRecorder) {
+        alert("Audio recording is not supported in this browser.");
+        return;
+    }
+
+    try {
+        const stream = await getOrCreateMicStream();
+        const mimeType = getSupportedRecordingMimeType();
+        recordingChunks = [];
+        mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        recordingMimeType = mediaRecorder.mimeType || mimeType || "audio/webm";
+
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+            if (event.data && event.data.size > 0) {
+                recordingChunks.push(event.data);
+            }
+        });
+
+        mediaRecorder.addEventListener("stop", handleRecordingStop);
+        mediaRecorder.start();
+        refreshRecordingUi();
+    } catch (err) {
+        alert(getMicErrorMessage(err));
+        refreshRecordingUi();
+    }
+}
+
+function stopRecording() {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+    }
+}
+
+function handleRecordingStop() {
+    const mimeType = recordingMimeType || mediaRecorder?.mimeType || "audio/webm";
+    const blob = new Blob(recordingChunks, { type: mimeType });
+
+    if (recordingUrl) {
+        URL.revokeObjectURL(recordingUrl);
+    }
+
+    recordingUrl = URL.createObjectURL(blob);
+    if (dom.recordingPlayback) {
+        dom.recordingPlayback.src = recordingUrl;
+    }
+
+    mediaRecorder = null;
+    recordingChunks = [];
+
+    if (!recognition && !usingNativeSpeech) {
+        releaseMicStream();
+    }
+
+    refreshRecordingUi();
+}
+
+function downloadRecording() {
+    if (!recordingUrl) {
+        alert("Record a sermon audio clip first.");
+        return;
+    }
+
+    const link = document.createElement("a");
+    link.href = recordingUrl;
+    link.download = `${slugify(dom.sessionTitle?.value || "sermon-recording")}.${getRecordingFileExtension()}`;
+    link.click();
+}
+
+function refreshRecordingUi() {
+    const isRecording = !!mediaRecorder && mediaRecorder.state === "recording";
+
+    if (dom.recordButton) {
+        dom.recordButton.textContent = isRecording ? "Stop Recording" : "Start Recording";
+    }
+
+    if (dom.downloadAudioButton) {
+        dom.downloadAudioButton.disabled = !recordingUrl;
+    }
+
+    if (dom.recordingStatus) {
+        dom.recordingStatus.textContent = isRecording ? "Recording in progress" : (recordingUrl ? "Audio ready to download" : "Ready to record");
+    }
 }
 
 async function shareNotes() {
@@ -756,6 +959,31 @@ function setupPwaInstall() {
     });
 }
 
+async function getOrCreateMicStream() {
+    if (micStream) {
+        return micStream;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error("This browser does not support microphone access.");
+    }
+
+    micStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true
+        }
+    });
+
+    return micStream;
+}
+
+function releaseMicStream() {
+    micStream?.getTracks().forEach((track) => track.stop());
+    micStream = null;
+}
+
 function readStorage(key, fallback) {
     try {
         return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
@@ -775,6 +1003,35 @@ function truncateText(text, maxLength) {
 
 function capitalizeWords(text) {
     return String(text || "").split(" ").map((part) => part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : "").join(" ");
+}
+
+function normalizeLookup(text) {
+    return String(text || "").trim().toLowerCase();
+}
+
+function slugify(text) {
+    const clean = String(text || "sermon-recording").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return clean || "sermon-recording";
+}
+
+function getSupportedRecordingMimeType() {
+    if (!window.MediaRecorder?.isTypeSupported) {
+        return "";
+    }
+
+    const options = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
+    return options.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+}
+
+function getRecordingFileExtension() {
+    const mimeType = recordingMimeType || mediaRecorder?.mimeType || "";
+    if (mimeType.includes("mp4")) {
+        return "mp4";
+    }
+    if (mimeType.includes("ogg")) {
+        return "ogg";
+    }
+    return "webm";
 }
 
 function formatArchiveDate(isoString) {

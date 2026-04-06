@@ -402,6 +402,7 @@ textarea {
 
 .insights-card,
 .scripture-card,
+.study-card,
 .planner-card,
 .archive-card {
     grid-column: span 4;
@@ -421,6 +422,7 @@ textarea {
 .planner-item,
 .archive-item,
 .archive-empty,
+.tool-result,
 canvas {
     border-radius: 22px;
     border: 1px solid var(--line);
@@ -476,6 +478,25 @@ canvas {
     font-size: 0.92rem;
     line-height: 1.55;
     word-break: break-all;
+}
+
+.tool-result {
+    min-height: 170px;
+}
+
+.tool-result p {
+    margin: 0.65rem 0 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.recording-playback {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.recording-playback:not([src]) {
+    display: none;
 }
 
 .planner-item.done {
