@@ -5,49 +5,132 @@
 -->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>OmniCast AI</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Studio | OmniCast AI</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#995302">
+    <meta name="theme-color" content="#8dfc00">
+    <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
 </head>
-<body class="home-body">
-<div id="navbar"></div>
+<body>
+    <div class="page-shell">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <header id="navbar"></header>
 
-<main class="home-main">
-    <div class="hero home-hero">
-        <div class="hero-content home-hero-content">
-            <button id="installBtn" style="display:none;">Install App</button>
-            <h1>OmniCast AI</h1>
-            <p>AI-assisted communication, live broadcasting, media workflow, and multi-channel publishing.</p>
-            <div class="home-launch-wrap">
-                <button class="button-primary home-launch-button" onClick="goApp()" type="button">Open OmniCast Studio</button>
+        <main>
+            <section class="hero-section" id="studio">
+                <div class="hero-copy reveal">
+                    <p class="eyebrow">Web Studio</p>
+                    <h1>AI Communication and Broadcast Studio</h1>
+                    <p class="hero-text">Capture live sessions, generate communication assets, manage media workflows, and publish across channels.</p>
+                    <p class="hero-subtext">Built for churches, schools, NGOs, companies, event teams, and public organizations that need fast, reliable content production and audience engagement.</p>
+
+                    <div class="feature-strip">
+                        <div class="feature-pill">
+                            <strong>Live Capture</strong>
+                            <span>Browser speech recognition</span>
+                        </div>
+                        <div class="feature-pill">
+                            <strong>Specialized Tools</strong>
+                            <span>Faith, event, and communication workflows</span>
+                        </div>
+                        <div class="feature-pill">
+                            <strong>Publishing Hub</strong>
+                            <span>Overlays, recording, downloads, sharing</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a class="button-primary" href="studio.html">Open Workspace</a>
+                        <a class="button-secondary" href="#about">Explore Features</a>
+                        <button class="button-secondary install-button" id="installBtn" type="button" style="display:none;">Install App</button>
+                    </div>
+                </div>
+
+                <aside class="auth-panel reveal" id="authPanel">
+                    <p class="eyebrow">Instant Access</p>
+                    <h3>Open the studio without login</h3>
+                    <p>Start listening right away, capture live notes in real time, prepare overlays, and send browser-source output into OBS.</p>
+                    <div class="auth-form">
+                        <a class="button-primary auth-submit" href="studio.html">Open Workspace</a>
+                        <a class="button-secondary auth-submit" href="studio.html#presentationSection">Setup OBS Overlay</a>
+                    </div>
+                    <div class="overlay-preview">
+                        <strong>Live workflow</strong>
+                        <p>As a speaker presents, OmniCast AI can capture notes, detect references, prepare overlays, generate summaries, and support downstream publishing for your team.</p>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="info-section" id="about">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">About The Product</p>
+                    <h2>A communication and media workspace built for live capture, planning, publishing, and audience engagement.</h2>
+                    <p>This web app mirrors the Android experience while staying lightweight enough for production desks, communications teams, presenters, and field operators using a laptop or browser.</p>
+                </div>
+
+                <div class="info-grid">
+                    <article class="info-card reveal">
+                        <h3>What It Does</h3>
+                        <ul>
+                            <li>Continuous mic listening in supported browsers</li>
+                            <li>Editable live session notes with download and share</li>
+                            <li>Session audio recording with download support</li>
+                            <li>Overlay and presentation preparation tools</li>
+                            <li>Session archive for reusable history</li>
+                            <li>Planner for live production execution</li>
+                            <li>AI-ready summaries and promo snippets</li>
+                            <li>Optional scripture and faith-study tools</li>
+                            <li>Foundation for social and media publishing workflows</li>
+                        </ul>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Best Use Cases</h3>
+                        <ul>
+                            <li>Church and faith media teams</li>
+                            <li>Corporate communications departments</li>
+                            <li>Schools, universities, and training events</li>
+                            <li>NGOs and advocacy organizations</li>
+                            <li>Conference and event production crews</li>
+                            <li>Studios, livestream teams, and media desks</li>
+                        </ul>
+                    </article>
+                    <article class="info-card reveal" id="contact">
+                        <h3>Support</h3>
+                        <p>Need onboarding, troubleshooting, or custom deployment support?</p>
+                        <p>Use the contact channels below for product help, workflow setup, and rollout questions.</p>
+                        <div class="support-list">
+                            <p><strong>Email</strong><span>support@omnicastai.app</span></p>
+                            <p><strong>Phone</strong><span>+234 800 000 0000</span></p>
+                            <p><strong>Hours</strong><span>Mon - Sat, 8:00 AM - 6:00 PM WAT</span></p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-panel reveal">
+                <div class="footer-copy">
+                    <p>© 2026 OmniCast AI. All rights reserved.</p>
+                    <p>Developed by Sammy G Concept.</p>
+                    <p>Uses microphone access for live speech capture and internet access for connected lookups, publishing, and related services.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
             </div>
-        </div>
+        </footer>
     </div>
-</main>
 
-<footer class="site-footer">
-    <div class="footer-panel">
-        <div class="footer-copy">
-            <p>© 2026 OmniCast AI. All rights reserved.</p>
-            <p>Developed by Sammy G Concept.</p>
-        </div>
-        <div class="footer-links">
-            <a href="about.html">About</a>
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
-        </div>
-    </div>
-</footer>
-
-<script src="navbar.js"></script>
-<script>
-function goApp() {
-    window.location = "index.html";
-}
-</script>
-<script src="app.js"></script>
+    <script src="navbar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

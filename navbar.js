@@ -19,10 +19,10 @@ function renderNavbar() {
         pathname.endsWith("/omnicast-ai") ||
         pathname.endsWith("/ai-church-broadcast");
 
-    const studioLink = isLandingPage ? "index.html" : isHomePage ? "index.html" : "index.html";
+    const studioLink = isLandingPage ? "home.html" : isHomePage ? "studio.html" : "home.html";
     const studioLabel = isLandingPage ? "Launch OmniCast Studio" : isStudioPage ? "Open Workspace" : "Open Studio";
-    const aboutLink = isStudioPage ? "about.html" : isHomePage ? "about.html" : "about.html";
-    const contactLink = isStudioPage ? "home.html#contact" : isHomePage ? "#contact" : "home.html#contact";
+    const aboutLink = isStudioPage ? "about.html" : isHomePage ? "about.html" : "index.html";
+    const contactLink = isStudioPage ? "home.html#contact" : isHomePage ? "#contact" : "index.html#contact";
     const logoLink = isStudioPage ? "index.html" : isHomePage ? "home.html#studio" : "index.html";
 
     navMount.innerHTML = `
@@ -33,8 +33,8 @@ function renderNavbar() {
             <a href="${studioLink}">${studioLabel}</a>
             <a href="${aboutLink}">About</a>
             <a href="${contactLink}">Contact Us</a>
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
+            <a href="#privacy.html">Privacy</a>
+            <a href="#terms.html">Terms</a>
         </div>
     </div>
     `;
