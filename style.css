@@ -639,3 +639,32 @@ canvas {
         font-size: clamp(2.2rem, 10vw, 3.4rem);
     }
 }
+
+#socialCaptionInput {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.social-share-button {
+    min-width: 120px;
+}
+
+.about-container {
+    width: min(920px, calc(100% - 2rem));
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+}
+
+.about-container h2,
+.about-container h3,
+.about-container p {
+    color: var(--text);
+}
+
+.about-container p {
+    line-height: 1.7;
+}

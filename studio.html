@@ -1,5 +1,5 @@
 <!--
- AI Church Broadcast
+ OmniCast AI
  © 2026 Samuel Olasunkanmi
  Unauthorized use is prohibited
 -->
@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Studio | AI Church Broadcast</title>
+    <title>Studio | OmniCast AI</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8dfc00">
     <link rel="stylesheet" href="style.css">
@@ -24,9 +24,9 @@
         <main>
             <section class="workspace-section studio-page" id="workspace">
                 <div class="section-heading reveal">
-                    <p class="eyebrow">Competitor-Ready Studio</p>
+                    <p class="eyebrow">OmniCast Studio</p>
                     <h2 id="workspaceGreeting">Welcome</h2>
-                    <p>Capture the sermon, shape the summary, prepare scripture, track your service flow, and build an archive from one browser workspace.</p>
+                    <p>Capture live sessions, shape summaries, prepare overlays, organize workflow, and publish content from one browser workspace.</p>
                 </div>
 
                 <div class="stats-row reveal">
@@ -54,6 +54,7 @@
                     <a href="#plannerSection">Planner</a>
                     <a href="#archiveSection">Archive</a>
                     <a href="#presentationSection">Present</a>
+                    <a href="#socialPublishSection">Publish</a>
                 </div>
 
                 <div class="workspace-grid">
@@ -76,10 +77,10 @@
                     </article>
 
                     <article class="studio-card insights-card reveal">
-                        <p class="card-eyebrow">AI Sermon Insights</p>
+                        <p class="card-eyebrow">AI Session Insights</p>
                         <h3>Local smart helpers</h3>
-                        <input id="sessionTitle" class="session-title-input" type="text" value="Untitled Service Session" aria-label="Session title">
-                        <p id="summaryText">Start listening or type sermon notes to generate a summary.</p>
+                        <input id="sessionTitle" class="session-title-input" type="text" value="Untitled Session" aria-label="Session title">
+                        <p id="summaryText">Start listening or type session notes to generate a summary.</p>
                         <p class="detected-refs">Detected references: <span id="detectedReferences">none yet</span></p>
                     </article>
 
@@ -89,9 +90,9 @@
                                 <p class="card-eyebrow">Generated Notes</p>
                                 <h3>Editable workspace</h3>
                             </div>
-                            <span class="status-chip">Captured sermon notes appear here. Edit freely before download.</span>
+                            <span class="status-chip">Captured session notes appear here. Edit freely before download.</span>
                         </div>
-                        <textarea id="notesBox" placeholder="Captured sermon notes appear here. Edit freely before download."></textarea>
+                        <textarea id="notesBox" placeholder="Captured session notes appear here. Edit freely before download."></textarea>
                         <div class="card-actions">
                             <button class="button-primary" id="downloadButton" type="button">Download</button>
                             <button class="button-secondary" id="shareButton" type="button">Share</button>
@@ -100,8 +101,8 @@
                     </article>
 
                     <article class="studio-card scripture-card reveal">
-                        <p class="card-eyebrow">Scripture Overlay</p>
-                        <h3>Bible API</h3>
+                        <p class="card-eyebrow">Faith Workflow Tool</p>
+                        <h3>Scripture Overlay</h3>
                         <div class="inline-form">
                             <input id="verseInput" type="text" placeholder="Type John 3:16">
                             <button class="button-primary" id="verseButton" type="button">Show Verse</button>
@@ -117,7 +118,7 @@
                             <input id="dictionaryInput" type="text" placeholder="Search covenant, grace, tabernacle">
                             <button class="button-primary" id="dictionaryButton" type="button">Search</button>
                         </div>
-                        <div id="dictionaryResult" class="overlay-preview tool-result">Search a Bible term to see a quick ministry-friendly explanation.</div>
+                        <div id="dictionaryResult" class="overlay-preview tool-result">Search a Bible term to see a quick explanation.</div>
                     </article>
 
                     <article class="studio-card study-card reveal">
@@ -131,13 +132,13 @@
                     </article>
 
                     <article class="studio-card planner-card reveal" id="plannerSection">
-                        <p class="card-eyebrow">Service Planner</p>
+                        <p class="card-eyebrow">Production Planner</p>
                         <h3>Media checklist</h3>
                         <div id="plannerList" class="planner-list"></div>
                     </article>
 
                     <article class="studio-card archive-card reveal" id="archiveSection">
-                        <p class="card-eyebrow">Sermon Archive</p>
+                        <p class="card-eyebrow">Session Archive</p>
                         <h3>Saved sessions</h3>
                         <div id="archiveList" class="archive-list"></div>
                     </article>
@@ -146,9 +147,9 @@
                         <p class="card-eyebrow">Presentation Hub</p>
                         <h3>Broadcast prep</h3>
                         <ul class="presentation-list">
-                            <li>Prepare scripture overlay copy for lower thirds</li>
-                            <li>Generate promo snippet for social recap or service promo</li>
-                            <li>Stage sermon highlights before future OBS integration</li>
+                            <li>Prepare overlay copy for lower thirds</li>
+                            <li>Generate promo snippets for recap or campaign posts</li>
+                            <li>Stage live highlights before broadcast or publishing</li>
                         </ul>
                         <div class="promo-box">
                             <p class="card-eyebrow">OBS Browser Source URL</p>
@@ -162,7 +163,32 @@
                         <div class="promo-box">
                             <p class="card-eyebrow">Promo Snippet</p>
                             <h4>Local generated copy</h4>
-                            <p id="promoSnippet">Tonight's message is centered on a powerful word for the church. Key takeaway: Start listening or type sermon notes to generate a summary.</p>
+                            <p id="promoSnippet">Here is a concise highlight from this live session. Key takeaway: Start listening or type session notes to generate a summary.</p>
+                        </div>
+                    </article>
+
+                    <article class="studio-card presentation-card reveal" id="socialPublishSection">
+                        <p class="card-eyebrow">Social Publishing</p>
+                        <h3>Share generated media</h3>
+                        <div class="inline-form">
+                            <input id="mediaLinkInput" type="url" placeholder="Paste media URL or file link">
+                        </div>
+                        <div class="inline-form">
+                            <textarea id="socialCaptionInput" placeholder="Write or edit a caption for social publishing"></textarea>
+                        </div>
+                        <div class="card-actions">
+                            <button class="button-primary" id="fillCaptionButton" type="button">Use Promo Snippet</button>
+                            <button class="button-secondary" id="copyCaptionButton" type="button">Copy Caption</button>
+                        </div>
+                        <div class="feature-strip">
+                            <button class="button-secondary social-share-button" id="shareFacebookButton" type="button">Facebook</button>
+                            <button class="button-secondary social-share-button" id="shareXButton" type="button">X</button>
+                            <button class="button-secondary social-share-button" id="shareLinkedInButton" type="button">LinkedIn</button>
+                            <button class="button-secondary social-share-button" id="shareWhatsAppButton" type="button">WhatsApp</button>
+                            <button class="button-secondary social-share-button" id="shareTelegramButton" type="button">Telegram</button>
+                        </div>
+                        <div class="overlay-preview tool-result" id="publishStatus">
+                            Add a media link and caption, then use the share buttons to publish through social apps.
                         </div>
                     </article>
                 </div>
@@ -171,9 +197,9 @@
         <footer class="site-footer">
             <div class="footer-panel reveal">
                 <div class="footer-copy">
-                    <p>© 2026 AI Church Broadcast. All rights reserved.</p>
+                    <p>© 2026 OmniCast AI. All rights reserved.</p>
                     <p>Developed by Sammy G Concept.</p>
-                    <p>Microphone and internet features are used for speech capture, scripture lookup, and related broadcast workflows.</p>
+                    <p>Microphone and internet features are used for speech capture, lookup, sharing, and related media workflows.</p>
                 </div>
                 <div class="footer-links">
                     <a href="about.html">About</a>

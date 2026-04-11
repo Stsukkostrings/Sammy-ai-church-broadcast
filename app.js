@@ -1,5 +1,5 @@
 /*
- AI Church Broadcast
+ OmniCast AI
  © 2026 Samuel Olasunkanmi
  Unauthorized use is prohibited
 */
@@ -20,9 +20,9 @@ let recordingUrl = "";
 let recordingMimeType = "";
 
 const STORAGE_KEYS = {
-    archive: "ai_cb_archive_sessions_v2",
-    planner: "ai_cb_planner_progress_v2",
-    liveOverlay: "ai_cb_live_overlay_v1"
+    archive: "omnicast_archive_sessions_v2",
+    planner: "omnicast_planner_progress_v2",
+    liveOverlay: "omnicast_live_overlay_v1"
 };
 
 const BIBLE_DICTIONARY = {
@@ -54,14 +54,14 @@ const HEBREW_WORDS = [
 const DEFAULT_PLANNER = [
     { id: "welcome-loop", title: "Welcome Loop + Opening Lower Third", role: "Media Desk", time: "08:45" },
     { id: "worship-set", title: "Worship Set Graphics", role: "Lyrics Operator", time: "09:00" },
-    { id: "sermon-capture", title: "Sermon Capture + Notes", role: "Broadcast Lead", time: "09:35" },
-    { id: "prayer-response", title: "Prayer / Response Screen", role: "Stage Display", time: "10:20" },
+    { id: "session-capture", title: "Live Session Capture + Notes", role: "Broadcast Lead", time: "09:35" },
+    { id: "response-screen", title: "Response Screen + Overlay", role: "Stage Display", time: "10:20" },
     { id: "announcements", title: "Announcements + Outro", role: "Media Desk", time: "10:35" }
 ];
 
 const state = {
-    session: { id: "guest", fullName: "Broadcast Team", email: "" },
-    sermonNotes: [],
+    session: { id: "guest", fullName: "OmniCast Team", email: "" },
+    sessionNotes: [],
     references: [],
     currentReference: "",
     currentVerseText: "",
@@ -107,7 +107,17 @@ const dom = {
     recordButton: document.getElementById("recordButton"),
     downloadAudioButton: document.getElementById("downloadAudioButton"),
     recordingStatus: document.getElementById("recordingStatus"),
-    recordingPlayback: document.getElementById("recordingPlayback")
+    recordingPlayback: document.getElementById("recordingPlayback"),
+    mediaLinkInput: document.getElementById("mediaLinkInput"),
+    socialCaptionInput: document.getElementById("socialCaptionInput"),
+    fillCaptionButton: document.getElementById("fillCaptionButton"),
+    copyCaptionButton: document.getElementById("copyCaptionButton"),
+    shareFacebookButton: document.getElementById("shareFacebookButton"),
+    shareXButton: document.getElementById("shareXButton"),
+    shareLinkedInButton: document.getElementById("shareLinkedInButton"),
+    shareWhatsAppButton: document.getElementById("shareWhatsAppButton"),
+    shareTelegramButton: document.getElementById("shareTelegramButton"),
+    publishStatus: document.getElementById("publishStatus")
 };
 
 const canvasContext = dom.canvas ? dom.canvas.getContext("2d") : null;
@@ -155,6 +165,14 @@ function bindWorkspace() {
     dom.hebrewButton?.addEventListener("click", searchHebrewWord);
     dom.recordButton?.addEventListener("click", toggleRecording);
     dom.downloadAudioButton?.addEventListener("click", downloadRecording);
+
+    dom.fillCaptionButton?.addEventListener("click", fillSocialCaption);
+    dom.copyCaptionButton?.addEventListener("click", copySocialCaption);
+    dom.shareFacebookButton?.addEventListener("click", () => shareToPlatform("facebook"));
+    dom.shareXButton?.addEventListener("click", () => shareToPlatform("x"));
+    dom.shareLinkedInButton?.addEventListener("click", () => shareToPlatform("linkedin"));
+    dom.shareWhatsAppButton?.addEventListener("click", () => shareToPlatform("whatsapp"));
+    dom.shareTelegramButton?.addEventListener("click", () => shareToPlatform("telegram"));
 
     dom.notesBox?.addEventListener("input", () => {
         syncNotesFromTextarea();
@@ -317,9 +335,18 @@ async function stopMic() {
     audioContext = null;
     analyser = null;
     dataArray = null;
-    canvasContext?.clearRect(0, 0, dom.canvas.width, dom.canvas.height);
-    dom.speechHint.textContent = "Listening paused.";
-    dom.listenButton.textContent = "Start Listening";
+
+    if (canvasContext && dom.canvas) {
+        canvasContext.clearRect(0, 0, dom.canvas.width, dom.canvas.height);
+    }
+
+    if (dom.speechHint) {
+        dom.speechHint.textContent = "Listening paused.";
+    }
+
+    if (dom.listenButton) {
+        dom.listenButton.textContent = "Start Listening";
+    }
 }
 
 function drawWave() {
@@ -342,6 +369,7 @@ function drawWave() {
 
     const sliceWidth = dom.canvas.width / dataArray.length;
     let x = 0;
+
     for (let i = 0; i < dataArray.length; i++) {
         const y = (dataArray[i] / 128.0) * (dom.canvas.height / 2);
         if (i === 0) {
@@ -368,7 +396,9 @@ async function startSpeech() {
 
     const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionClass) {
-        dom.speechHint.textContent = "Mic is active, but speech recognition is not supported on this device.";
+        if (dom.speechHint) {
+            dom.speechHint.textContent = "Mic is active, but speech recognition is not supported on this device.";
+        }
         return;
     }
 
@@ -391,13 +421,19 @@ async function startSpeech() {
             }
         }
 
-        dom.speechText.textContent = (interimText || finalText || "Waiting...").trim();
-        dom.speechHint.textContent = "Listening... waiting for the next phrase.";
+        if (dom.speechText) {
+            dom.speechText.textContent = (interimText || finalText || "Waiting...").trim();
+        }
+        if (dom.speechHint) {
+            dom.speechHint.textContent = "Listening... waiting for the next phrase.";
+        }
         scanLiveReference(interimText || finalText);
     };
 
     recognition.onerror = (event) => {
-        dom.speechHint.textContent = event.error || "Speech recognition failed.";
+        if (dom.speechHint) {
+            dom.speechHint.textContent = event.error || "Speech recognition failed.";
+        }
     };
 
     recognition.onend = () => {
@@ -420,22 +456,31 @@ function saveNote(text) {
     }
 
     const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    state.sermonNotes.push(`[${time}] ${cleanText}`);
-    dom.notesBox.value = state.sermonNotes.join("\n");
+    state.sessionNotes.push(`[${time}] ${cleanText}`);
+
+    if (dom.notesBox) {
+        dom.notesBox.value = state.sessionNotes.join("\n");
+    }
+
     detectBible(cleanText);
     updateGeneratedContent();
 }
 
 function clearNotes() {
-    state.sermonNotes = [];
+    state.sessionNotes = [];
     state.references = [];
     state.currentReference = "";
     state.currentVerseText = "";
     lastFetchedReference = "";
-    dom.notesBox.value = "";
-    dom.overlayText.textContent = "Fetched scripture will appear here for display.";
+
+    if (dom.notesBox) {
+        dom.notesBox.value = "";
+    }
+    if (dom.overlayText) {
+        dom.overlayText.textContent = "Fetched scripture will appear here for display.";
+    }
     if (dom.dictionaryResult) {
-        dom.dictionaryResult.textContent = "Search a Bible term to see a quick ministry-friendly explanation.";
+        dom.dictionaryResult.textContent = "Search a Bible term to see a quick explanation.";
     }
     if (dom.hebrewResult) {
         dom.hebrewResult.textContent = "Search a Hebrew word or English meaning to view transliteration and translation.";
@@ -443,6 +488,7 @@ function clearNotes() {
     if (dom.currentReference) {
         dom.currentReference.textContent = "none yet";
     }
+
     broadcastOverlay("", "");
     updateGeneratedContent();
 }
@@ -452,7 +498,11 @@ function syncNotesFromTextarea() {
         return;
     }
 
-    state.sermonNotes = dom.notesBox.value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    state.sessionNotes = dom.notesBox.value
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
     rebuildDetectedReferences();
 }
 
@@ -463,12 +513,13 @@ function detectBible(text) {
         }
         triggerLiveReference(reference);
     });
+
     renderReferences();
 }
 
 function rebuildDetectedReferences() {
     state.references = [];
-    state.sermonNotes.forEach((line) => detectBible(line));
+    state.sessionNotes.forEach((line) => detectBible(line));
     renderReferences();
 }
 
@@ -483,18 +534,26 @@ async function fetchVerse(reference) {
         const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
         const payload = await response.json();
         const verseText = payload?.text ? payload.text.trim() : "Verse not found.";
+
         state.currentReference = reference;
         state.currentVerseText = verseText;
-        dom.overlayText.textContent = verseText;
+
+        if (dom.overlayText) {
+            dom.overlayText.textContent = verseText;
+        }
         if (dom.currentReference) {
             dom.currentReference.textContent = reference;
         }
+
         broadcastOverlay(reference, payload?.text ? verseText : "");
+
         if (payload?.text) {
             await sendToOBS(verseText);
         }
     } catch (err) {
-        dom.overlayText.textContent = "Error fetching verse.";
+        if (dom.overlayText) {
+            dom.overlayText.textContent = "Error fetching verse.";
+        }
     }
 }
 
@@ -515,7 +574,7 @@ async function sendToOBS(text) {
 }
 
 function manualFetch() {
-    const reference = dom.verseInput.value.trim();
+    const reference = dom.verseInput?.value.trim();
     if (!reference) {
         alert("Type a Bible reference first.");
         return;
@@ -565,6 +624,7 @@ function extractReferences(text) {
 
 function updateGeneratedContent() {
     renderReferences();
+
     const summary = generateSummary();
     if (dom.summaryText) {
         dom.summaryText.textContent = summary;
@@ -575,40 +635,42 @@ function updateGeneratedContent() {
 }
 
 function generateSummary() {
-    if (!state.sermonNotes.length) {
-        return "Start listening or type sermon notes to generate a summary.";
+    if (!state.sessionNotes.length) {
+        return "Start listening or type session notes to generate a summary.";
     }
 
-    const joined = state.sermonNotes.join(" ").replace(/\[[^\]]+\]\s*/g, "");
+    const joined = state.sessionNotes.join(" ").replace(/\[[^\]]+\]\s*/g, "");
     const lower = joined.toLowerCase();
     const themeWords = ["faith", "grace", "hope", "love", "worship", "jesus", "truth", "church", "prayer", "spirit"];
     const themes = themeWords.filter((word) => lower.includes(word));
-    const title = dom.sessionTitle.value.trim() || "Untitled Service Session";
+    const title = dom.sessionTitle?.value.trim() || "Untitled Session";
     const preview = truncateText(joined, 180);
     const themeText = themes.length ? ` Key themes: ${themes.slice(0, 4).join(", ")}.` : "";
+
     return `${title}: ${preview}.${themeText}`;
 }
 
 function generatePromo(summary) {
-    const base = summary === "Start listening or type sermon notes to generate a summary."
-        ? summary
-        : summary.replace(/^.*?:\s*/, "");
-    return `Tonight's message is centered on a powerful word for the church. Key takeaway: ${truncateText(base, 160)}`;
+    const emptyMessage = "Start listening or type session notes to generate a summary.";
+    const base = summary === emptyMessage ? summary : summary.replace(/^.*?:\s*/, "");
+    return `Here is a concise highlight from this live session. Key takeaway: ${truncateText(base, 160)}`;
 }
 
 function archiveCurrentSession() {
     syncNotesFromTextarea();
-    if (!state.sermonNotes.length) {
-        alert("Add sermon notes before archiving a session.");
+
+    if (!state.sessionNotes.length) {
+        alert("Add session notes before archiving a session.");
         return;
     }
 
     state.archive.unshift({
         id: Date.now(),
-        title: dom.sessionTitle.value.trim() || "Untitled Service Session",
+        title: dom.sessionTitle?.value.trim() || "Untitled Session",
         summary: generateSummary(),
         createdAt: new Date().toISOString()
     });
+
     writeStorage(STORAGE_KEYS.archive, state.archive);
     renderArchive();
 }
@@ -618,9 +680,12 @@ function renderArchive() {
         return;
     }
 
-    dom.archiveCount.textContent = String(state.archive.length);
+    if (dom.archiveCount) {
+        dom.archiveCount.textContent = String(state.archive.length);
+    }
+
     if (!state.archive.length) {
-        dom.archiveList.innerHTML = '<div class="archive-empty"><strong>Archive Empty</strong><p>Save a sermon session from Overview to populate your history.</p></div>';
+        dom.archiveList.innerHTML = '<div class="archive-empty"><strong>Archive Empty</strong><p>Save a session from Overview to populate your history.</p></div>';
         return;
     }
 
@@ -695,16 +760,17 @@ function refreshMicUi(statusText) {
 
 function downloadNotes() {
     syncNotesFromTextarea();
-    if (!state.sermonNotes.length) {
+
+    if (!state.sessionNotes.length) {
         alert("No notes to download.");
         return;
     }
 
-    const blob = new Blob([state.sermonNotes.join("\n")], { type: "text/plain" });
+    const blob = new Blob([state.sessionNotes.join("\n")], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "sermon_notes.txt";
+    link.download = "session_notes.txt";
     link.click();
     URL.revokeObjectURL(url);
 }
@@ -740,9 +806,11 @@ function searchHebrewWord() {
         return;
     }
 
-    const match = HEBREW_WORDS.find((entry) => {
-        return entry.term.includes(query) || entry.meaning.includes(query) || entry.note.toLowerCase().includes(query);
-    });
+    const match = HEBREW_WORDS.find((entry) => (
+        entry.term.includes(query) ||
+        entry.meaning.includes(query) ||
+        entry.note.toLowerCase().includes(query)
+    ));
 
     if (!dom.hebrewResult) {
         return;
@@ -813,6 +881,7 @@ function handleRecordingStop() {
     }
 
     recordingUrl = URL.createObjectURL(blob);
+
     if (dom.recordingPlayback) {
         dom.recordingPlayback.src = recordingUrl;
     }
@@ -829,13 +898,13 @@ function handleRecordingStop() {
 
 function downloadRecording() {
     if (!recordingUrl) {
-        alert("Record a sermon audio clip first.");
+        alert("Record an audio clip first.");
         return;
     }
 
     const link = document.createElement("a");
     link.href = recordingUrl;
-    link.download = `${slugify(dom.sessionTitle?.value || "sermon-recording")}.${getRecordingFileExtension()}`;
+    link.download = `${slugify(dom.sessionTitle?.value || "session-recording")}.${getRecordingFileExtension()}`;
     link.click();
 }
 
@@ -857,14 +926,15 @@ function refreshRecordingUi() {
 
 async function shareNotes() {
     syncNotesFromTextarea();
-    if (!state.sermonNotes.length) {
+
+    if (!state.sessionNotes.length) {
         alert("No notes to share.");
         return;
     }
 
     const payload = {
-        title: dom.sessionTitle.value.trim() || "Service Session",
-        text: state.sermonNotes.join("\n")
+        title: dom.sessionTitle?.value.trim() || "Live Session",
+        text: state.sessionNotes.join("\n")
     };
 
     if (navigator.share) {
@@ -900,6 +970,7 @@ function renderObsOverlayUrl() {
 
 async function copyObsOverlayUrl() {
     const url = getObsOverlayUrl();
+
     try {
         await navigator.clipboard.writeText(url);
         if (dom.copyObsUrlButton) {
@@ -924,7 +995,7 @@ function broadcastOverlay(reference, text) {
 
 function setWorkspaceHeading() {
     if (dom.workspaceGreeting) {
-        dom.workspaceGreeting.textContent = "Welcome to Studio";
+        dom.workspaceGreeting.textContent = "Welcome to OmniCast Studio";
     }
 }
 
@@ -984,6 +1055,93 @@ function releaseMicStream() {
     micStream = null;
 }
 
+function fillSocialCaption() {
+    const promo = dom.promoSnippet?.textContent?.trim() || "";
+    const summary = dom.summaryText?.textContent?.trim() || "";
+    const title = dom.sessionTitle?.value?.trim() || "Untitled Session";
+    const nextCaption = promo || `${title}\n\n${summary}`.trim();
+
+    if (dom.socialCaptionInput) {
+        dom.socialCaptionInput.value = nextCaption;
+    }
+
+    setPublishStatus("Caption updated from generated content.");
+}
+
+async function copySocialCaption() {
+    const caption = getSocialCaption();
+    if (!caption) {
+        setPublishStatus("Add or generate a caption first.");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(caption);
+        setPublishStatus("Caption copied to clipboard.");
+    } catch (err) {
+        setPublishStatus("Unable to copy caption on this device.");
+    }
+}
+
+function getSocialCaption() {
+    return String(dom.socialCaptionInput?.value || "").trim();
+}
+
+function getMediaLink() {
+    return String(dom.mediaLinkInput?.value || "").trim();
+}
+
+function setPublishStatus(message) {
+    if (dom.publishStatus) {
+        dom.publishStatus.textContent = message;
+    }
+}
+
+function shareToPlatform(platform) {
+    const caption = getSocialCaption();
+    const mediaLink = getMediaLink();
+
+    if (!caption && !mediaLink) {
+        setPublishStatus("Add a caption or media link before sharing.");
+        return;
+    }
+
+    const shareText = [caption, mediaLink].filter(Boolean).join("\n\n");
+    let shareUrl = "";
+
+    switch (platform) {
+        case "facebook":
+            if (!mediaLink) {
+                setPublishStatus("Facebook sharing needs a media or page URL.");
+                return;
+            }
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(mediaLink)}`;
+            break;
+        case "x":
+            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(caption)}${mediaLink ? `&url=${encodeURIComponent(mediaLink)}` : ""}`;
+            break;
+        case "linkedin":
+            if (!mediaLink) {
+                setPublishStatus("LinkedIn sharing needs a media or page URL.");
+                return;
+            }
+            shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(mediaLink)}`;
+            break;
+        case "whatsapp":
+            shareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+            break;
+        case "telegram":
+            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(mediaLink || window.location.href)}&text=${encodeURIComponent(caption)}`;
+            break;
+        default:
+            setPublishStatus("Unsupported platform selected.");
+            return;
+    }
+
+    window.open(shareUrl, "_blank", "noopener,noreferrer");
+    setPublishStatus(`Opened ${capitalizeWords(platform)} sharing window.`);
+}
+
 function readStorage(key, fallback) {
     try {
         return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
@@ -1002,7 +1160,10 @@ function truncateText(text, maxLength) {
 }
 
 function capitalizeWords(text) {
-    return String(text || "").split(" ").map((part) => part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : "").join(" ");
+    return String(text || "")
+        .split(" ")
+        .map((part) => (part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : ""))
+        .join(" ");
 }
 
 function normalizeLookup(text) {
@@ -1010,8 +1171,12 @@ function normalizeLookup(text) {
 }
 
 function slugify(text) {
-    const clean = String(text || "sermon-recording").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-    return clean || "sermon-recording";
+    const clean = String(text || "session-recording")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    return clean || "session-recording";
 }
 
 function getSupportedRecordingMimeType() {
@@ -1036,7 +1201,12 @@ function getRecordingFileExtension() {
 
 function formatArchiveDate(isoString) {
     try {
-        return new Date(isoString).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+        return new Date(isoString).toLocaleString([], {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
     } catch (err) {
         return isoString;
     }
