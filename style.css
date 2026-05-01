@@ -77,6 +77,37 @@ body {
     min-width: 220px;
 }
 
+.ad-container {
+    width: min(1180px, calc(100% - 2rem));
+    margin: 1.5rem auto;
+    position: relative;
+    z-index: 1;
+}
+
+.ad-slot {
+    display: block;
+    width: 100%;
+    min-height: 90px;
+    overflow: hidden;
+    border-radius: 18px;
+}
+
+.ad-slot-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--line);
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--muted);
+    font-size: 0.84rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ad-container.compact .ad-slot {
+    min-height: 72px;
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -637,6 +668,10 @@ canvas {
 
     .hero-copy h1 {
         font-size: clamp(2.2rem, 10vw, 3.4rem);
+    }
+
+    .ad-container {
+        margin: 1rem auto;
     }
 }
 
