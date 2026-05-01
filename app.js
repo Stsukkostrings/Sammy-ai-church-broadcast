@@ -9,6 +9,7 @@ let analyser;
 let dataArray;
 let micStream;
 let recognition;
+let listeningActive = false;
 let usingNativeSpeech = false;
 let nativeSpeechListenersAttached = false;
 let speechStoppedManually = false;
@@ -22,8 +23,11 @@ let recordingMimeType = "";
 const STORAGE_KEYS = {
     archive: "omnicast_archive_sessions_v2",
     planner: "omnicast_planner_progress_v2",
-    liveOverlay: "omnicast_live_overlay_v1"
+    liveOverlay: "omnicast_live_overlay_v1",
+    verseCache: "omnicast_verse_cache_v1"
 };
+
+const DISPLAY_DURATION_MS = 40000;
 
 const BIBLE_DICTIONARY = {
     covenant: "A covenant is a binding promise that defines relationship and responsibility. In Scripture, God uses covenants to reveal His faithfulness to His people.",
@@ -51,6 +55,43 @@ const HEBREW_WORDS = [
     { term: "amen", transliteration: "ah-MEN", meaning: "truly, so be it", note: "A spoken agreement affirming truth and confidence." }
 ];
 
+const LYRIC_KEYWORDS = [
+    "hallelujah", "hosanna", "glory", "worship", "praise", "worthy", "holy", "amen",
+    "jesus", "lord", "savior", "spirit", "mercy", "grace", "love", "faithful",
+    "alpha", "omega", "yahweh", "adonai", "redeemer"
+];
+
+const ENGLISH_DICTIONARY_FALLBACK = {
+    broadcast: "To transmit audio or video content to an audience by radio, television, or the internet.",
+    studio: "A room or workspace equipped for recording, broadcasting, design, or creative production.",
+    archive: "A collection of records preserved for future reference.",
+    sermon: "A spoken religious address, usually based on scripture and delivered to a congregation.",
+    worship: "The act of showing reverence, honor, or devotion."
+};
+
+const BIBLE_BOOKS = new Set([
+    "genesis", "exodus", "leviticus", "numbers", "deuteronomy", "joshua", "judges", "ruth",
+    "1 samuel", "2 samuel", "1 kings", "2 kings", "1 chronicles", "2 chronicles", "ezra", "nehemiah", "esther",
+    "job", "psalms", "psalm", "proverbs", "ecclesiastes", "song of solomon", "song of songs", "isaiah", "jeremiah",
+    "lamentations", "ezekiel", "daniel", "hosea", "joel", "amos", "obadiah", "jonah", "micah", "nahum", "habakkuk",
+    "zephaniah", "haggai", "zechariah", "malachi", "matthew", "mark", "luke", "john", "acts", "romans",
+    "1 corinthians", "2 corinthians", "galatians", "ephesians", "philippians", "colossians", "1 thessalonians",
+    "2 thessalonians", "1 timothy", "2 timothy", "titus", "philemon", "hebrews", "james", "1 peter", "2 peter",
+    "1 john", "2 john", "3 john", "jude", "revelation"
+]);
+
+const BIBLE_BOOK_PATTERN = Array.from(BIBLE_BOOKS)
+    .sort((a, b) => b.length - a.length)
+    .map((book) => book.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+
+const NUMBER_WORDS = {
+    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+    eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
+    eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60,
+    seventy: 70, eighty: 80, ninety: 90
+};
+
 const DEFAULT_PLANNER = [
     { id: "welcome-loop", title: "Welcome Loop + Opening Lower Third", role: "Media Desk", time: "08:45" },
     { id: "worship-set", title: "Worship Set Graphics", role: "Lyrics Operator", time: "09:00" },
@@ -66,8 +107,12 @@ const state = {
     currentReference: "",
     currentVerseText: "",
     archive: readStorage(STORAGE_KEYS.archive, []),
-    plannerDone: readStorage(STORAGE_KEYS.planner, [])
+    plannerDone: readStorage(STORAGE_KEYS.planner, []),
+    verseCache: readStorage(STORAGE_KEYS.verseCache, {})
 };
+
+const pagePath = window.location.pathname || "";
+const isChurchStudioPage = pagePath.endsWith("/church_studio.html");
 
 const dom = {
     appRoot: document.getElementById("workspace"),
@@ -92,6 +137,9 @@ const dom = {
     sessionTitle: document.getElementById("sessionTitle"),
     workspaceGreeting: document.getElementById("workspaceGreeting"),
     currentReference: document.getElementById("currentReference"),
+    previewReference: document.getElementById("previewReference"),
+    previewText: document.getElementById("previewText"),
+    liveVisibilityButton: document.getElementById("liveVisibilityButton"),
     obsOverlayUrl: document.getElementById("obsOverlayUrl"),
     copyObsUrlButton: document.getElementById("copyObsUrlButton"),
     openObsOverlayLink: document.getElementById("openObsOverlayLink"),
@@ -117,12 +165,41 @@ const dom = {
     shareLinkedInButton: document.getElementById("shareLinkedInButton"),
     shareWhatsAppButton: document.getElementById("shareWhatsAppButton"),
     shareTelegramButton: document.getElementById("shareTelegramButton"),
-    publishStatus: document.getElementById("publishStatus")
+    publishStatus: document.getElementById("publishStatus"),
+    lyricAutoToggle: document.getElementById("lyricAutoToggle"),
+    detectedLyricsList: document.getElementById("detectedLyricsList"),
+    lyricsBox: document.getElementById("lyricsBox"),
+    lyricDetectStatus: document.getElementById("lyricDetectStatus"),
+    clearLyricsButton: document.getElementById("clearLyricsButton"),
+    copyLyricsButton: document.getElementById("copyLyricsButton"),
+    lyricCopyStatus: document.getElementById("lyricCopyStatus")
 };
 
 const canvasContext = dom.canvas ? dom.canvas.getContext("2d") : null;
-const obs = typeof OBSWebSocket !== "undefined" ? new OBSWebSocket() : null;
+const obs = createObsClient();
+const liveOverlayChannel = createLiveOverlayChannel();
 let lastFetchedReference = "";
+let displayClearTimer = null;
+let displayClearToken = 0;
+let detectedLyricLines = [];
+let recentLyricCandidates = [];
+
+function createLiveOverlayChannel() {
+    try {
+        return typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(STORAGE_KEYS.liveOverlay) : null;
+    } catch (err) {
+        return null;
+    }
+}
+
+function createObsClient() {
+    try {
+        return typeof OBSWebSocket !== "undefined" ? new OBSWebSocket() : null;
+    } catch (err) {
+        console.warn("OBS client unavailable:", err);
+        return null;
+    }
+}
 
 init();
 
@@ -145,7 +222,7 @@ function init() {
 
 function bindWorkspace() {
     dom.listenButton?.addEventListener("click", async () => {
-        if (micStream || recognition || usingNativeSpeech) {
+        if (listeningActive) {
             await stopMic();
             refreshMicUi("Mic status");
             return;
@@ -165,6 +242,13 @@ function bindWorkspace() {
     dom.hebrewButton?.addEventListener("click", searchHebrewWord);
     dom.recordButton?.addEventListener("click", toggleRecording);
     dom.downloadAudioButton?.addEventListener("click", downloadRecording);
+    dom.plannerList?.addEventListener("click", (event) => {
+        const button = event.target.closest(".planner-toggle");
+        if (!button) {
+            return;
+        }
+        togglePlanner(button.dataset.plannerId);
+    });
 
     dom.fillCaptionButton?.addEventListener("click", fillSocialCaption);
     dom.copyCaptionButton?.addEventListener("click", copySocialCaption);
@@ -173,10 +257,15 @@ function bindWorkspace() {
     dom.shareLinkedInButton?.addEventListener("click", () => shareToPlatform("linkedin"));
     dom.shareWhatsAppButton?.addEventListener("click", () => shareToPlatform("whatsapp"));
     dom.shareTelegramButton?.addEventListener("click", () => shareToPlatform("telegram"));
+    dom.lyricAutoToggle?.addEventListener("change", updateLyricStatus);
+    dom.clearLyricsButton?.addEventListener("click", clearDetectedLyrics);
+    dom.copyLyricsButton?.addEventListener("click", copyDetectedLyrics);
+    dom.lyricsBox?.addEventListener("input", syncLyricsFromTextarea);
 
     dom.notesBox?.addEventListener("input", () => {
         syncNotesFromTextarea();
         updateGeneratedContent();
+        detectLyricsFromText(dom.notesBox.value, false);
     });
 
     dom.dictionaryInput?.addEventListener("keydown", (event) => {
@@ -247,7 +336,7 @@ async function ensureNativeSpeechListeners() {
         if (transcript) {
             dom.speechText.textContent = transcript;
             dom.speechHint.textContent = "Listening... waiting for the next phrase.";
-            scanLiveReference(transcript);
+            processRecognizedSpeech(transcript, false);
         }
     });
 
@@ -259,6 +348,7 @@ async function ensureNativeSpeechListeners() {
 
         saveNote(transcript);
         dom.speechText.textContent = transcript;
+        processRecognizedSpeech(transcript, true);
     });
 
     await plugin.addListener("error", (event) => {
@@ -274,6 +364,8 @@ function firstTranscript(matches) {
 
 async function startMic() {
     try {
+        listeningActive = true;
+        refreshMicUi("Listening");
         micStream = await getOrCreateMicStream();
 
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -287,17 +379,17 @@ async function startMic() {
         audioContext.createMediaStreamSource(micStream).connect(analyser);
         dataArray = new Uint8Array(analyser.frequencyBinCount);
         speechStoppedManually = false;
-        refreshMicUi("Listening");
         drawWave();
         await startSpeech();
     } catch (err) {
-        alert(getMicErrorMessage(err));
-        refreshMicUi("Mic status");
+        await resetMicSession();
+        showMicError(err);
     }
 }
 
 async function stopMic() {
     speechStoppedManually = true;
+    listeningActive = false;
 
     if (usingNativeSpeech) {
         try {
@@ -344,9 +436,41 @@ async function stopMic() {
         dom.speechHint.textContent = "Listening paused.";
     }
 
-    if (dom.listenButton) {
-        dom.listenButton.textContent = "Start Listening";
+    refreshMicUi("Mic status");
+}
+
+async function resetMicSession() {
+    speechStoppedManually = true;
+    listeningActive = false;
+    recognition = null;
+    usingNativeSpeech = false;
+
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
     }
+
+    if (audioContext && audioContext.state !== "closed") {
+        await audioContext.close().catch(() => {});
+    }
+
+    audioContext = null;
+    analyser = null;
+    dataArray = null;
+    releaseMicStream();
+}
+
+function showMicError(err) {
+    const message = getMicErrorMessage(err);
+
+    if (dom.speechHint) {
+        dom.speechHint.textContent = message;
+    }
+    if (dom.speechText) {
+        dom.speechText.textContent = "Waiting for transcription...";
+    }
+
+    refreshMicUi("Mic not connected");
 }
 
 function drawWave() {
@@ -416,8 +540,10 @@ async function startSpeech() {
             if (event.results[i].isFinal) {
                 finalText += `${transcript} `;
                 saveNote(transcript);
+                processRecognizedSpeech(transcript, true);
             } else {
                 interimText += `${transcript} `;
+                processRecognizedSpeech(transcript, false);
             }
         }
 
@@ -427,20 +553,24 @@ async function startSpeech() {
         if (dom.speechHint) {
             dom.speechHint.textContent = "Listening... waiting for the next phrase.";
         }
-        scanLiveReference(interimText || finalText);
+        scanLiveReference(`${finalText} ${interimText}`);
     };
 
     recognition.onerror = (event) => {
+        listeningActive = false;
         if (dom.speechHint) {
             dom.speechHint.textContent = event.error || "Speech recognition failed.";
         }
+        refreshMicUi("Mic status");
     };
 
     recognition.onend = () => {
-        if (!speechStoppedManually) {
+        if (!speechStoppedManually && listeningActive) {
             try {
                 recognition.start();
             } catch (err) {
+                listeningActive = false;
+                refreshMicUi("Mic status");
                 console.warn("Speech restart failed:", err);
             }
         }
@@ -463,6 +593,7 @@ function saveNote(text) {
     }
 
     detectBible(cleanText);
+    detectLyricsFromText(cleanText, true);
     updateGeneratedContent();
 }
 
@@ -472,6 +603,7 @@ function clearNotes() {
     state.currentReference = "";
     state.currentVerseText = "";
     lastFetchedReference = "";
+    cancelDisplayClearTimer();
 
     if (dom.notesBox) {
         dom.notesBox.value = "";
@@ -485,10 +617,12 @@ function clearNotes() {
     if (dom.hebrewResult) {
         dom.hebrewResult.textContent = "Search a Hebrew word or English meaning to view transliteration and translation.";
     }
+    clearDetectedLyrics();
     if (dom.currentReference) {
         dom.currentReference.textContent = "none yet";
     }
 
+    updateChurchPreview("", "");
     broadcastOverlay("", "");
     updateGeneratedContent();
 }
@@ -530,22 +664,36 @@ function renderReferences() {
 }
 
 async function fetchVerse(reference) {
+    const requestedReference = normalizeReference(reference);
+    if (!requestedReference) {
+        updateChurchPreview("", "", "Type or speak a Bible reference first.");
+        return;
+    }
+
+    updateChurchPreview(requestedReference, "", "Loading scripture...");
+    const cacheKey = getVerseCacheKey(requestedReference);
+    const cachedVerse = state.verseCache[cacheKey];
+    if (cachedVerse?.text) {
+        displayFetchedVerse(cachedVerse.reference || requestedReference, cachedVerse.text, true);
+        return;
+    }
+
     try {
-        const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
+        const response = await fetch(`https://bible-api.com/${encodeURIComponent(requestedReference)}`);
         const payload = await response.json();
         const verseText = payload?.text ? payload.text.trim() : "Verse not found.";
+        const resolvedReference = payload?.reference || requestedReference;
 
-        state.currentReference = reference;
-        state.currentVerseText = verseText;
-
-        if (dom.overlayText) {
-            dom.overlayText.textContent = verseText;
+        if (payload?.text) {
+            state.verseCache[cacheKey] = {
+                reference: resolvedReference,
+                text: verseText,
+                cachedAt: new Date().toISOString()
+            };
+            writeStorage(STORAGE_KEYS.verseCache, state.verseCache);
         }
-        if (dom.currentReference) {
-            dom.currentReference.textContent = reference;
-        }
 
-        broadcastOverlay(reference, payload?.text ? verseText : "");
+        displayFetchedVerse(resolvedReference, verseText, !!payload?.text);
 
         if (payload?.text) {
             await sendToOBS(verseText);
@@ -554,6 +702,26 @@ async function fetchVerse(reference) {
         if (dom.overlayText) {
             dom.overlayText.textContent = "Error fetching verse.";
         }
+        updateChurchPreview(requestedReference, "Error fetching verse.");
+    }
+}
+
+function displayFetchedVerse(reference, verseText, shouldAutoClear) {
+    state.currentReference = reference;
+    state.currentVerseText = verseText;
+
+    if (dom.overlayText) {
+        dom.overlayText.textContent = verseText;
+    }
+    if (dom.currentReference) {
+        dom.currentReference.textContent = reference;
+    }
+
+    updateChurchPreview(reference, verseText);
+    broadcastOverlay(reference, verseText);
+
+    if (isChurchStudioPage && shouldAutoClear) {
+        scheduleDisplayClear(reference);
     }
 }
 
@@ -574,9 +742,9 @@ async function sendToOBS(text) {
 }
 
 function manualFetch() {
-    const reference = dom.verseInput?.value.trim();
+    const reference = normalizeReference(dom.verseInput?.value || document.getElementById("chapterSearchInput")?.value);
     if (!reference) {
-        alert("Type a Bible reference first.");
+        updateChurchPreview("", "", "Type or speak a Bible reference first.");
         return;
     }
 
@@ -590,6 +758,32 @@ function scanLiveReference(text) {
     }
 }
 
+function processRecognizedSpeech(text, isFinal) {
+    const transcript = String(text || "").trim();
+    if (!transcript) {
+        return;
+    }
+
+    detectLyricsFromText(transcript, isFinal);
+
+    const references = extractReferences(transcript);
+    if (!references.length) {
+        return;
+    }
+
+    const reference = references[references.length - 1];
+    if (!state.references.includes(reference)) {
+        state.references.push(reference);
+        renderReferences();
+    }
+
+    if (dom.speechHint) {
+        dom.speechHint.textContent = `Detected ${reference}${isFinal ? "" : " from live speech"}.`;
+    }
+
+    triggerLiveReference(reference);
+}
+
 function triggerLiveReference(reference) {
     if (!reference || reference === lastFetchedReference) {
         return;
@@ -599,27 +793,303 @@ function triggerLiveReference(reference) {
     if (dom.verseInput) {
         dom.verseInput.value = reference;
     }
+    if (isChurchStudioPage) {
+        setChurchLiveState(true);
+    }
     fetchVerse(reference);
+}
+
+function normalizeReference(reference) {
+    return String(reference || "").trim().replace(/\s+/g, " ");
+}
+
+function getVerseCacheKey(reference) {
+    return normalizeReference(reference).toLowerCase();
+}
+
+function updateChurchPreview(reference, text, fallbackText) {
+    if (!isChurchStudioPage) {
+        return;
+    }
+
+    const cleanReference = normalizeReference(reference);
+    const cleanText = String(text || "").trim();
+    const previewText = cleanText || fallbackText || "Search for a verse to see it here first";
+
+    if (dom.previewReference) {
+        dom.previewReference.textContent = cleanReference || "Ready to preview";
+    }
+    if (dom.previewText) {
+        dom.previewText.textContent = previewText;
+    }
+    if (dom.currentReference) {
+        dom.currentReference.textContent = cleanReference || "none yet";
+    }
+    if (dom.overlayText) {
+        dom.overlayText.textContent = cleanText || fallbackText || "Fetched scripture will appear here for display.";
+    }
+    if (dom.verseInput && cleanReference) {
+        dom.verseInput.value = cleanReference;
+    }
+    if (cleanReference && !state.references.includes(cleanReference)) {
+        state.references.push(cleanReference);
+        renderReferences();
+    }
+
+    broadcastOverlay(cleanReference, cleanText);
+}
+
+function scheduleDisplayClear(reference) {
+    cancelDisplayClearTimer();
+    const token = ++displayClearToken;
+    const expectedReference = normalizeReference(reference);
+
+    displayClearTimer = setTimeout(() => {
+        if (token !== displayClearToken) {
+            return;
+        }
+        clearDisplayedVerse(expectedReference);
+    }, DISPLAY_DURATION_MS);
+}
+
+function cancelDisplayClearTimer() {
+    if (displayClearTimer) {
+        clearTimeout(displayClearTimer);
+        displayClearTimer = null;
+    }
+    displayClearToken += 1;
+}
+
+function clearDisplayedVerse(expectedReference) {
+    if (!isChurchStudioPage) {
+        return;
+    }
+
+    if (expectedReference && normalizeReference(state.currentReference) !== expectedReference) {
+        return;
+    }
+
+    state.currentReference = "";
+    state.currentVerseText = "";
+    lastFetchedReference = "";
+    updateChurchPreview("", "");
+    setChurchLiveState(false);
+    broadcastOverlay("", "");
+}
+
+function toggleChurchLivePreview() {
+    if (!isChurchStudioPage || !dom.liveVisibilityButton) {
+        return;
+    }
+
+    const isLive = dom.liveVisibilityButton.textContent.trim().toLowerCase() !== "live";
+    setChurchLiveState(isLive);
+    broadcastOverlay(state.currentReference, state.currentVerseText);
+}
+
+function setChurchLiveState(isLive) {
+    if (!isChurchStudioPage || !dom.liveVisibilityButton) {
+        return;
+    }
+
+    document.getElementById("autoPreviewToggle")?.classList.toggle("active", isLive);
+    dom.liveVisibilityButton.textContent = isLive ? "LIVE" : "HIDDEN";
+    dom.liveVisibilityButton.classList.toggle("is-live", isLive);
+    dom.liveVisibilityButton.setAttribute("aria-pressed", String(isLive));
+}
+
+function detectLyricsFromText(text, isFinal) {
+    if (!isChurchStudioPage || !dom.lyricAutoToggle?.checked) {
+        updateLyricStatus();
+        return;
+    }
+
+    splitLyricCandidates(text).forEach((line) => {
+        const normalizedLine = normalizeLyricLine(line);
+        if (!normalizedLine || extractReferences(normalizedLine).length) {
+            return;
+        }
+
+        const lowerLine = normalizedLine.toLowerCase();
+        const keywordHit = LYRIC_KEYWORDS.some((keyword) => lowerLine.includes(keyword));
+        const repeatHit = recentLyricCandidates.includes(lowerLine);
+        const worshipPhraseHit = /\b(i|we)\s+(worship|praise|lift|sing|exalt|adore|surrender|bow|love|need|trust)\b/i.test(normalizedLine);
+        const lineLooksSingable = normalizedLine.split(/\s+/).length <= 16 && /[aeiou]/i.test(normalizedLine);
+
+        if ((keywordHit || repeatHit || (isFinal && worshipPhraseHit)) && lineLooksSingable) {
+            addDetectedLyric(normalizedLine);
+        }
+
+        recentLyricCandidates = [lowerLine, ...recentLyricCandidates.filter((candidate) => candidate !== lowerLine)].slice(0, 12);
+    });
+
+    updateLyricStatus();
+}
+
+function splitLyricCandidates(text) {
+    return String(text || "")
+        .replace(/\[[^\]]+\]/g, " ")
+        .split(/\r?\n|[.!?;]+/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+}
+
+function normalizeLyricLine(line) {
+    return String(line || "")
+        .replace(/\s+/g, " ")
+        .replace(/^[-:,\s]+|[-:,\s]+$/g, "")
+        .trim();
+}
+
+function addDetectedLyric(line) {
+    if (!line || detectedLyricLines.some((item) => item.toLowerCase() === line.toLowerCase())) {
+        return;
+    }
+
+    detectedLyricLines = [...detectedLyricLines, line].slice(-40);
+    renderDetectedLyrics();
+}
+
+function renderDetectedLyrics() {
+    if (dom.detectedLyricsList) {
+        dom.detectedLyricsList.innerHTML = detectedLyricLines.length
+            ? detectedLyricLines.map((line) => `<div class="lyric-line">${escapeHtml(line)}</div>`).join("")
+            : '<div class="lyric-empty">No lyrics detected yet.</div>';
+    }
+
+    if (dom.lyricsBox) {
+        dom.lyricsBox.value = detectedLyricLines.join("\n");
+    }
+
+    updateLyricStatus();
+}
+
+function syncLyricsFromTextarea() {
+    detectedLyricLines = String(dom.lyricsBox?.value || "")
+        .split(/\r?\n/)
+        .map(normalizeLyricLine)
+        .filter(Boolean)
+        .slice(-40);
+    renderDetectedLyrics();
+}
+
+function clearDetectedLyrics() {
+    detectedLyricLines = [];
+    recentLyricCandidates = [];
+    renderDetectedLyrics();
+    if (dom.lyricCopyStatus) {
+        dom.lyricCopyStatus.textContent = "Ready";
+    }
+}
+
+async function copyDetectedLyrics() {
+    const lyrics = String(dom.lyricsBox?.value || detectedLyricLines.join("\n")).trim();
+    if (!lyrics) {
+        if (dom.lyricCopyStatus) {
+            dom.lyricCopyStatus.textContent = "No lyrics";
+        }
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(lyrics);
+        if (dom.lyricCopyStatus) {
+            dom.lyricCopyStatus.textContent = "Copied";
+        }
+    } catch (err) {
+        if (dom.lyricCopyStatus) {
+            dom.lyricCopyStatus.textContent = "Copy failed";
+        }
+    }
+}
+
+function updateLyricStatus() {
+    if (!dom.lyricDetectStatus) {
+        return;
+    }
+
+    if (!dom.lyricAutoToggle?.checked) {
+        dom.lyricDetectStatus.textContent = "Off";
+        return;
+    }
+
+    dom.lyricDetectStatus.textContent = detectedLyricLines.length ? `${detectedLyricLines.length}` : "Auto";
 }
 
 function extractReferences(text) {
     const references = [];
+    const source = String(text || "");
     const regex = /\b((?:[1-3]\s)?(?:[A-Za-z]+(?:\s+[A-Za-z]+){0,2}))\s+(\d+):(\d+)\b/gi;
     let match;
 
-    while ((match = regex.exec(String(text || ""))) !== null) {
-        let book = match[1].toLowerCase().replace(/\s+/g, " ").trim();
-        if (book === "mathew") {
-            book = "matthew";
-        }
-        if (book === "johnn") {
-            book = "john";
-        }
+    while ((match = regex.exec(source)) !== null) {
+        addReference(references, match[1], match[2], match[3]);
+    }
 
-        references.push(`${capitalizeWords(book)} ${match[2]}:${match[3]}`);
+    const numberToken = "(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:[-\\s](?:one|two|three|four|five|six|seven|eight|nine))?";
+    const spokenRegex = new RegExp(`\\b(?:book\\s+of\\s+)?(${BIBLE_BOOK_PATTERN})\\s+(?:chapter\\s+|chapter\\s+number\\s+)?(${numberToken})\\s+(?:verse\\s+|verses\\s+|verse\\s+number\\s+|colon\\s+)(${numberToken})\\b`, "gi");
+
+    while ((match = spokenRegex.exec(source)) !== null) {
+        addReference(references, match[1], parseSpokenNumber(match[2]), parseSpokenNumber(match[3]));
+    }
+
+    const compactSpeechRegex = new RegExp(`\\b(?:book\\s+of\\s+)?(${BIBLE_BOOK_PATTERN})\\s+(${numberToken})\\s+(${numberToken})\\b`, "gi");
+
+    while ((match = compactSpeechRegex.exec(source)) !== null) {
+        addReference(references, match[1], parseSpokenNumber(match[2]), parseSpokenNumber(match[3]));
+    }
+
+    const compactDigitRegex = new RegExp(`\\b(?:book\\s+of\\s+)?(${BIBLE_BOOK_PATTERN})\\s+(\\d{3,4})\\b`, "gi");
+
+    while ((match = compactDigitRegex.exec(source)) !== null) {
+        const digits = match[2];
+        addReference(references, match[1], digits.slice(0, -2), digits.slice(-2));
     }
 
     return references;
+}
+
+function addReference(references, bookText, chapter, verse) {
+    const book = normalizeBibleBook(bookText);
+    const chapterNumber = Number(chapter);
+    const verseNumber = Number(verse);
+
+    if (!book || !chapterNumber || !verseNumber) {
+        return;
+    }
+
+    const reference = `${capitalizeWords(book)} ${chapterNumber}:${verseNumber}`;
+    if (!references.includes(reference)) {
+        references.push(reference);
+    }
+}
+
+function normalizeBibleBook(bookText) {
+    let book = String(bookText || "").toLowerCase().replace(/\s+/g, " ").trim();
+    const replacements = {
+        mathew: "matthew",
+        johnn: "john",
+        revelation: "revelation",
+        revelations: "revelation",
+        psalm: "psalm",
+        psalms: "psalms"
+    };
+
+    book = replacements[book] || book;
+    return BIBLE_BOOKS.has(book) ? book : "";
+}
+
+function parseSpokenNumber(value) {
+    if (value === null || value === undefined) {
+        return 0;
+    }
+
+    const raw = String(value).toLowerCase().replace(/-/g, " ").trim();
+    if (/^\d+$/.test(raw)) {
+        return Number(raw);
+    }
+
+    return raw.split(/\s+/).reduce((total, part) => total + (NUMBER_WORDS[part] || 0), 0);
 }
 
 function updateGeneratedContent() {
@@ -716,9 +1186,7 @@ function renderPlanner() {
         `;
     }).join("");
 
-    dom.plannerList.querySelectorAll(".planner-toggle").forEach((button) => {
-        button.addEventListener("click", () => togglePlanner(button.dataset.plannerId));
-    });
+    dom.plannerList.dataset.ready = "true";
 
     refreshPlannerStats();
 }
@@ -744,9 +1212,24 @@ function refreshWorkspace() {
     updateGeneratedContent();
     renderArchive();
     refreshPlannerStats();
-    refreshMicUi(micStream || recognition || usingNativeSpeech ? "Listening" : "Mic status");
+    refreshMicUi(listeningActive ? "Listening" : "Mic status");
+    refreshSpeechIdleUi();
     refreshRecordingUi();
     setWorkspaceHeading();
+}
+
+function refreshSpeechIdleUi() {
+    if (listeningActive) {
+        return;
+    }
+
+    if (dom.speechHint) {
+        dom.speechHint.textContent = "Listening paused.";
+    }
+
+    if (dom.speechText && /microphone unavailable|mic unavailable|no microphone/i.test(dom.speechText.textContent || "")) {
+        dom.speechText.textContent = "Waiting for transcription...";
+    }
 }
 
 function refreshMicUi(statusText) {
@@ -754,7 +1237,13 @@ function refreshMicUi(statusText) {
         dom.micStatus.textContent = statusText;
     }
     if (dom.listenButton) {
-        dom.listenButton.textContent = micStream || recognition || usingNativeSpeech ? "Stop Listening" : "Start Listening";
+        const label = listeningActive ? "Stop Listening" : "Start Listening";
+        if (isChurchStudioPage) {
+            dom.listenButton.setAttribute("aria-label", label);
+            dom.listenButton.title = label;
+        } else {
+            dom.listenButton.textContent = label;
+        }
     }
 }
 
@@ -775,7 +1264,16 @@ function downloadNotes() {
     URL.revokeObjectURL(url);
 }
 
-function searchDictionary() {
+async function searchDictionary() {
+    if (isChurchStudioPage) {
+        searchBibleDictionary();
+        return;
+    }
+
+    await searchEnglishDictionary();
+}
+
+function searchBibleDictionary() {
     const query = normalizeLookup(dom.dictionaryInput?.value);
     if (!query) {
         if (dom.dictionaryResult) {
@@ -795,6 +1293,57 @@ function searchDictionary() {
     }
 
     dom.dictionaryResult.innerHTML = `<strong>${capitalizeWords(entry[0])}</strong><p>${escapeHtml(entry[1])}</p>`;
+}
+
+async function searchEnglishDictionary() {
+    const query = normalizeLookup(dom.dictionaryInput?.value);
+    if (!query) {
+        if (dom.dictionaryResult) {
+            dom.dictionaryResult.textContent = "Type any English word to look up its meaning.";
+        }
+        return;
+    }
+
+    if (!dom.dictionaryResult) {
+        return;
+    }
+
+    dom.dictionaryResult.textContent = "Looking up definition...";
+
+    try {
+        const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(query)}`);
+        if (!response.ok) {
+            throw new Error("Definition not found.");
+        }
+
+        const payload = await response.json();
+        const entry = Array.isArray(payload) ? payload[0] : null;
+        const phonetic = entry?.phonetic || entry?.phonetics?.find((item) => item.text)?.text || "";
+        const meanings = (entry?.meanings || [])
+            .flatMap((meaning) => (meaning.definitions || []).slice(0, 2).map((definition) => ({
+                partOfSpeech: meaning.partOfSpeech,
+                definition: definition.definition,
+                example: definition.example
+            })))
+            .slice(0, 4);
+
+        if (!meanings.length) {
+            throw new Error("Definition not found.");
+        }
+
+        dom.dictionaryResult.innerHTML = `
+            <strong>${escapeHtml(capitalizeWords(query))}${phonetic ? ` <span class="dictionary-phonetic">${escapeHtml(phonetic)}</span>` : ""}</strong>
+            ${meanings.map((meaning) => `
+                <p><strong>${escapeHtml(meaning.partOfSpeech || "definition")}:</strong> ${escapeHtml(meaning.definition)}</p>
+                ${meaning.example ? `<p><em>Example:</em> ${escapeHtml(meaning.example)}</p>` : ""}
+            `).join("")}
+        `;
+    } catch (err) {
+        const fallback = ENGLISH_DICTIONARY_FALLBACK[query];
+        dom.dictionaryResult.innerHTML = fallback
+            ? `<strong>${escapeHtml(capitalizeWords(query))}</strong><p>${escapeHtml(fallback)}</p>`
+            : `No English dictionary definition found for "${escapeHtml(query)}". Check the spelling and try again.`;
+    }
 }
 
 function searchHebrewWord() {
@@ -840,7 +1389,10 @@ async function toggleRecording() {
 
 async function startRecording() {
     if (!window.MediaRecorder) {
-        alert("Audio recording is not supported in this browser.");
+        const message = "Audio recording is not supported in this browser.";
+        if (dom.recordingStatus) {
+            dom.recordingStatus.textContent = message;
+        }
         return;
     }
 
@@ -861,7 +1413,7 @@ async function startRecording() {
         mediaRecorder.start();
         refreshRecordingUi();
     } catch (err) {
-        alert(getMicErrorMessage(err));
+        showMicError(err);
         refreshRecordingUi();
     }
 }
@@ -912,11 +1464,22 @@ function refreshRecordingUi() {
     const isRecording = !!mediaRecorder && mediaRecorder.state === "recording";
 
     if (dom.recordButton) {
-        dom.recordButton.textContent = isRecording ? "Stop Recording" : "Start Recording";
+        const label = isRecording ? "Stop Recording" : "Start Recording";
+        if (isChurchStudioPage) {
+            dom.recordButton.setAttribute("aria-label", label);
+            dom.recordButton.title = label;
+        } else {
+            dom.recordButton.textContent = label;
+        }
     }
 
     if (dom.downloadAudioButton) {
         dom.downloadAudioButton.disabled = !recordingUrl;
+        if (isChurchStudioPage) {
+            const label = recordingUrl ? "Download Audio" : "Record audio before downloading";
+            dom.downloadAudioButton.setAttribute("aria-label", label);
+            dom.downloadAudioButton.title = label;
+        }
     }
 
     if (dom.recordingStatus) {
@@ -986,11 +1549,14 @@ async function copyObsOverlayUrl() {
 }
 
 function broadcastOverlay(reference, text) {
-    writeStorage(STORAGE_KEYS.liveOverlay, {
+    const payload = {
         reference,
         text,
         updatedAt: new Date().toISOString()
-    });
+    };
+
+    writeStorage(STORAGE_KEYS.liveOverlay, payload);
+    liveOverlayChannel?.postMessage(payload);
 }
 
 function setWorkspaceHeading() {
@@ -1223,21 +1789,43 @@ function escapeHtml(text) {
 
 function getMicErrorMessage(err) {
     if (!err) {
-        return "Microphone error.";
+        return "Connect a microphone to use live listening.";
     }
 
     switch (err.name) {
         case "NotAllowedError":
         case "PermissionDeniedError":
         case "SecurityError":
-            return "Microphone permission denied. Allow microphone access and try again.";
+            return "Allow microphone access in the browser to use live listening.";
         case "NotFoundError":
         case "DevicesNotFoundError":
-            return "No microphone was found. Connect a microphone and try again.";
+            return "Connect a microphone to use live listening.";
         case "NotReadableError":
         case "TrackStartError":
-            return "The microphone is already in use by another app or cannot be accessed.";
+            return "Close other apps using the microphone, then try live listening again.";
         default:
-            return `Mic error: ${err.message || err.name || "Unknown error"}`;
+            return "Live listening is paused. Check microphone permissions or connect a microphone.";
     }
 }
+
+window.omnicastChurchActions = {
+    archiveCurrentSession,
+    clearDetectedLyrics,
+    clearNotes,
+    copyDetectedLyrics,
+    copyObsOverlayUrl,
+    copySocialCaption,
+    downloadNotes,
+    downloadRecording,
+    fillSocialCaption,
+    toggleRecording,
+    async toggleListening() {
+        if (listeningActive) {
+            await stopMic();
+            refreshMicUi("Mic status");
+            return;
+        }
+
+        await startMic();
+    }
+};

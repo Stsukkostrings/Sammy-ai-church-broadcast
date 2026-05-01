@@ -1,60 +1,145 @@
 <!--
  OmniCast AI
- © 2026 Samuel Olasunkanmi
+ (c) 2026 Samuel Olasunkanmi
  Unauthorized use is prohibited
 -->
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>OmniCast AI</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OmniCast AI | Communication and Broadcast Studio</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#995302">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108904240723527"
-     crossorigin="anonymous"></script>
+    <meta name="theme-color" content="#8dfc00">
+    <link rel="stylesheet" href="style.css">
+    <script src="auth.js"></script>
 </head>
-<body class="home-body">
-<div id="navbar"></div>
+<body>
+    <div class="page-shell">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <header id="navbar"></header>
 
-<main class="home-main">
-    <div class="hero home-hero">
-        <div class="hero-content home-hero-content">
-            <button id="installBtn" style="display:none;">Install App</button>
-            <h1>OmniCast AI</h1>
-            <p>AI-assisted communication, live broadcasting, media workflow, and multi-channel publishing.</p>
-            <div class="home-launch-wrap">
-                <button class="button-primary home-launch-button" onClick="goApp()" type="button">Open OmniCast Studio</button>
+        <main>
+            <section class="hero-section" id="studio">
+                <div class="hero-copy reveal">
+                    <h2 class="eyebrow">OmniCast AI</h2>
+                    <h1>AI Communication and Broadcast Studio</h1>
+                    <p class="hero-text">Capture live speech, generate structured notes, prepare overlays, record audio, and manage content for distribution across digital channels.</p>
+                    <p class="hero-subtext">Built for churches, schools, universities, NGOs, businesses, government institutions, event organizers, livestream teams, and media desks.</p>
+
+                    <div class="feature-strip">
+                        <div class="feature-pill">
+                            <strong>Live Capture</strong>
+                            <span>Browser speech recognition and editable notes</span>
+                        </div>
+                        <div class="feature-pill">
+                            <strong>Broadcast Tools</strong>
+                            <span>OBS lower thirds, audio recording, and session archive</span>
+                        </div>
+                        <div class="feature-pill">
+                            <strong>Publishing Hub</strong>
+                            <span>Summaries, captions, sharing, and reusable workflow assets</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-actions">
+                        <a class="button-primary" href="church_studio.html">Open Church Studio</a>
+                        <a class="button-secondary" href="studio.html">Open Main Studio</a>
+                        <a class="button-secondary" href="#about">About The App</a>
+                        <button class="button-secondary install-button" id="installBtn" type="button" style="display:none;">Install App</button>
+                    </div>
+                </div>
+
+                <aside class="auth-panel reveal" id="authPanel">
+                    <p class="eyebrow">Instant Access</p>
+                    <h3>Open the studio without login</h3>
+                    <p>Start listening right away, capture live notes in real time, prepare scripture overlays, detect worship lyrics, and send browser-source output into livestream software.</p>
+                    <div class="auth-form">
+                        <a class="button-primary auth-submit" href="church_studio.html">Launch Church Studio</a>
+                        <a class="button-secondary auth-submit" href="lower-third.html" target="_blank" rel="noreferrer">Preview Lower Third</a>
+                    </div>
+                    <div class="overlay-preview">
+                        <strong>Live workflow</strong>
+                        <p>As a speaker presents, OmniCast AI can capture notes, detect references, prepare overlays, generate summaries, and support downstream publishing for your team.</p>
+                    </div>
+                </aside>
+            </section>
+
+            <section class="ad-container compact" aria-label="Advertisement">
+                <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
+            </section>
+
+            <section class="info-section" id="about">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">About The App</p>
+                    <h2>Empowering organizations through intelligent communication and media automation.</h2>
+                    <p>OmniCast AI transforms live speech into structured, useful content in real time. It helps teams capture spoken sessions, generate notes and summaries, prepare overlays, record audio, and manage content for distribution across digital channels.</p>
+                </div>
+
+                <div class="info-grid">
+                    <article class="info-card reveal">
+                        <h3>What It Does</h3>
+                        <ul>
+                            <li>Continuous mic listening in supported browsers</li>
+                            <li>Editable live session notes with download and share</li>
+                            <li>Session audio recording with download support</li>
+                            <li>Livestream overlay and lower-third preparation</li>
+                            <li>Session archive for reusable history</li>
+                            <li>Planner for live production execution</li>
+                            <li>AI-ready summaries and promo snippets</li>
+                            <li>Scripture assistance and faith-study tools where needed</li>
+                            <li>Worship lyric auto-detection for church workflows</li>
+                        </ul>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Who It Serves</h3>
+                        <ul>
+                            <li>Church and faith media teams</li>
+                            <li>Corporate communications departments</li>
+                            <li>Schools, universities, and training events</li>
+                            <li>NGOs and advocacy organizations</li>
+                            <li>Government institutions and public teams</li>
+                            <li>Conference and event production crews</li>
+                            <li>Studios, livestream teams, and media desks</li>
+                        </ul>
+                    </article>
+                    <article class="info-card reveal" id="contact">
+                        <h3>Product Notes</h3>
+                        <p>The platform may use microphone access for live speech capture and internet connectivity for connected services, publishing integrations, and content lookup features.</p>
+                        <p>Users should review the privacy and terms pages for data usage, user rights, and service disclaimers.</p>
+                        <div class="support-list">
+                            <p><strong>Developer</strong><span>Sammy G Concept</span></p>
+                            <p><strong>Workflow</strong><span>Capture, lookup, overlay, archive, publish</span></p>
+                            <p><strong>Access</strong><span>Browser and installable web app</span></p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <section class="ad-container compact" aria-label="Advertisement">
+            <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
+        </section>
+
+        <footer class="site-footer">
+            <div class="footer-panel">
+                <div class="footer-copy">
+                    <p>© 2026 OmniCast AI. All rights reserved.</p>
+                    <p>Developed by Sammy G Concept.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#about">About</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                </div>
             </div>
-        </div>
+        </footer>
     </div>
-</main>
 
-<section class="ad-container compact" aria-label="Advertisement">
-    <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
-</section>
-
-<footer class="site-footer">
-    <div class="footer-panel">
-        <div class="footer-copy">
-            <p>© 2026 OmniCast AI. All rights reserved.</p>
-            <p>Developed by Sammy G Concept.</p>
-        </div>
-        <div class="footer-links">
-            <a href="#about.html">About</a>
-            <a href="#privacy.html">Privacy</a>
-            <a href="#terms.html">Terms</a>
-        </div>
-    </div>
-</footer>
-
-<script src="navbar.js"></script>
-<script>
-function goApp() {
-    window.location = "home.html";
-}
-</script>
-<script src="ads.js"></script>
-<script src="app.js"></script>
+    <script src="navbar.js"></script>
+    <script src="ads.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

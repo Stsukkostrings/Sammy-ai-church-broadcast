@@ -1,0 +1,1308 @@
+<!--
+ OmniCast AI
+ (c) 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Church Studio | OmniCast AI</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8dfc00">
+    <link rel="stylesheet" href="style.css?v=20260501-church-studio-stable-lyrics">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="auth.js"></script>
+</head>
+<body class="church-studio-body">
+    <header id="navbar"></header>
+
+    <main class="church-studio-shell" id="workspace">
+        <div class="church-window-menu" aria-label="Studio menu">
+            <details class="studio-menu">
+                <summary>File</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="new-session">New Session</button>
+                    <button type="button" data-menu-action="download-notes">Download Notes</button>
+                    <button type="button" data-menu-action="archive-session">Archive Session</button>
+                    <button type="button" data-menu-action="copy-obs-url">Copy Livestream URL</button>
+                </div>
+            </details>
+            <details class="studio-menu">
+                <summary>Edit</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="clear-notes">Clear Notes</button>
+                    <button type="button" data-menu-action="copy-caption">Copy Caption</button>
+                    <button type="button" data-menu-action="copy-lyrics">Copy Lyrics</button>
+                </div>
+            </details>
+            <details class="studio-menu">
+                <summary>View</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="focus-preview">Preview Window</button>
+                    <button type="button" data-menu-action="focus-transcription">Live Transcription</button>
+                    <button type="button" data-menu-action="focus-navigator">Chapter Navigator</button>
+                    <button type="button" data-menu-action="focus-feed">Scripture Feed</button>
+                    <button type="button" data-menu-action="toggle-fullscreen">Toggle Fullscreen</button>
+                </div>
+            </details>
+            <details class="studio-menu">
+                <summary>Audio</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="toggle-listening">Start or Stop Listening</button>
+                    <button type="button" data-menu-action="toggle-recording">Start or Stop Recording</button>
+                    <button type="button" data-menu-action="download-audio">Download Audio</button>
+                </div>
+            </details>
+            <details class="studio-menu">
+                <summary>Window</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="open-lower-third">Open Lower Third</button>
+                    <button type="button" data-menu-action="open-main-studio">Open Main Studio</button>
+                    <button type="button" data-menu-action="copy-obs-url">Copy OBS Browser Source</button>
+                </div>
+            </details>
+            <details class="studio-menu">
+                <summary>Lyric</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="open-lyrics">Open Auto Lyrics</button>
+                    <button type="button" data-menu-action="toggle-lyrics">Toggle Auto Detection</button>
+                    <button type="button" data-menu-action="clear-lyrics">Clear Lyrics</button>
+                    <button type="button" data-menu-action="copy-lyrics">Copy Lyrics</button>
+                </div>
+            </details>
+            <details class="studio-menu">
+                <summary>Help</summary>
+                <div class="studio-menu-list">
+                    <button type="button" data-menu-action="show-help">Quick Help</button>
+                    <button type="button" data-menu-action="open-lower-third">Livestream Overlay</button>
+                    <button type="button" data-menu-action="open-about">About OmniCast</button>
+                </div>
+            </details>
+            <span class="church-menu-feedback" id="churchMenuFeedback" aria-live="polite"></span>
+        </div>
+
+        <nav class="church-studio-topbar" aria-label="Church studio controls">
+            <a class="church-brand" href="index.html" aria-label="OmniCast AI home">
+                <span>OmniCast AI</span>
+            </a>
+            <span class="church-license-pill">FREE</span>
+            <div class="active-indicator">
+                <span class="active-dot"></span>
+                <span>ACTIVE: BIBLE</span>
+            </div>
+            <input id="sessionTitle" class="church-session-title" type="text" value="Church Studio Session" aria-label="Session title">
+            <div class="church-device-pill">
+                <i class="fas fa-microphone"></i>
+                <span id="micStatus">Mic status</span>
+            </div>
+            <button class="church-icon-btn" id="listenButton" type="button" title="Start listening">
+                <i class="fas fa-microphone-lines"></i>
+            </button>
+            <button class="church-icon-btn" id="recordButton" type="button" title="Start recording">
+                <i class="fas fa-record-vinyl"></i>
+            </button>
+            <button class="church-icon-btn" id="downloadAudioButton" type="button" title="Download audio" disabled>
+                <i class="fas fa-file-audio"></i>
+            </button>
+            <details class="church-nav-dropdown lyric-dropdown">
+                <summary class="church-dropdown-trigger">
+                    Auto Lyrics
+                    <span class="church-chip" id="lyricDetectStatus">Auto</span>
+                    <i class="fas fa-chevron-down"></i>
+                </summary>
+                <section class="church-panel lyric-panel church-dropdown-menu">
+                    <div class="church-panel-header">
+                        <span class="church-panel-title">Lyric Auto Detection</span>
+                        <button class="button-secondary" id="clearLyricsButton" type="button">Clear</button>
+                    </div>
+                    <label class="lyric-auto-row" for="lyricAutoToggle">
+                        <span>
+                            <strong>Detect worship lyrics from listening notes</strong>
+                            <small>Recognizes repeated phrases and worship keywords while the mic is running.</small>
+                        </span>
+                        <input id="lyricAutoToggle" type="checkbox" checked>
+                    </label>
+                    <div class="lyric-auto-list" id="detectedLyricsList">
+                        <div class="lyric-empty">No lyrics detected yet.</div>
+                    </div>
+                    <textarea id="lyricsBox" placeholder="Detected lyrics will appear here. You can edit these lines before copying."></textarea>
+                    <div class="church-actions">
+                        <button class="button-primary" id="copyLyricsButton" type="button">Copy Lyrics</button>
+                        <span class="church-chip" id="lyricCopyStatus">Ready</span>
+                    </div>
+                </section>
+            </details>
+            <details class="church-nav-dropdown">
+                <summary class="church-dropdown-trigger">
+                    Sermon Notes
+                    <i class="fas fa-chevron-down"></i>
+                </summary>
+                <article class="church-panel notes-panel church-dropdown-menu">
+                    <div class="church-panel-header">
+                        <span class="church-panel-title">Sermon Notes</span>
+                        <span class="church-chip">Editable</span>
+                    </div>
+                    <textarea id="notesBox" placeholder="Captured session notes appear here. Edit freely before download."></textarea>
+                    <div class="church-actions">
+                        <button class="button-primary" id="downloadButton" type="button">Download Note</button>
+                        <button class="button-secondary" id="shareButton" type="button">Share</button>
+                        <button class="button-secondary" id="fillCaptionButton" type="button">Use Summary</button>
+                        <button class="button-secondary" id="copyCaptionButton" type="button">Copy Caption</button>
+                    </div>
+                    <textarea id="socialCaptionInput" placeholder="Social caption"></textarea>
+                    <input id="mediaLinkInput" type="url" placeholder="Paste media URL or file link">
+                    <div class="feature-strip">
+                        <button class="button-secondary social-share-button" id="shareFacebookButton" type="button">Facebook</button>
+                        <button class="button-secondary social-share-button" id="shareXButton" type="button">X</button>
+                        <button class="button-secondary social-share-button" id="shareLinkedInButton" type="button">LinkedIn</button>
+                        <button class="button-secondary social-share-button" id="shareWhatsAppButton" type="button">WhatsApp</button>
+                        <button class="button-secondary social-share-button" id="shareTelegramButton" type="button">Telegram</button>
+                    </div>
+                    <div class="overlay-preview tool-result" id="publishStatus">Add a media link and caption, then use the share buttons.</div>
+                </article>
+            </details>
+            <details class="church-nav-dropdown">
+                <summary class="church-dropdown-trigger">
+                    Media Checklist
+                    <span class="church-chip"><span id="plannerProgress">0/5</span></span>
+                    <i class="fas fa-chevron-down"></i>
+                </summary>
+                <section class="church-panel planner-panel church-dropdown-menu">
+                    <div class="church-panel-header">
+                        <span class="church-panel-title">Media Checklist</span>
+                        <span class="church-chip">Checklist</span>
+                    </div>
+                    <div id="plannerList" class="planner-list"></div>
+                </section>
+            </details>
+            <a class="btn-lyrics" href="studio.html">
+                MAIN STUDIO
+                <i class="fas fa-display"></i>
+            </a>
+        </nav>
+
+        <section class="church-studio-grid">
+            <article class="church-panel transcription-panel">
+                <div class="church-panel-header">
+                    <span class="church-panel-title">Live Transcription</span>
+                    <span class="church-chip" id="speechHint">Listening paused.</span>
+                </div>
+                <div class="church-transcription-content">
+                    <canvas id="waveCanvas" width="520" height="100"></canvas>
+                    <h1 id="speechText">Waiting for transcription...</h1>
+                    <p>Start the microphone to capture sermon phrases, detect scripture references, and build notes.</p>
+                    <div class="church-actions">
+                        <button class="button-primary" id="clearNotesButton" type="button">Clear Notes</button>
+                        <button class="button-secondary" id="archiveButton" type="button">Archive</button>
+                    </div>
+                    <audio id="recordingPlayback" class="recording-playback" controls></audio>
+                    <span class="church-chip" id="recordingStatus">Ready to record</span>
+                </div>
+            </article>
+
+            <article class="church-panel preview-panel">
+                <div class="church-preview-toolbar">
+                    <div class="preview-label">Preview</div>
+                    <div class="church-toolbar-item">
+                        <span>Live</span>
+                        <button class="hidden-badge" id="liveVisibilityButton" type="button" onclick="toggleChurchLiveVisibility()">HIDDEN</button>
+                    </div>
+                    <label class="church-toolbar-item size-slider">
+                        <span>SIZE</span>
+                        <input id="verseSizeControl" type="range" min="0.8" max="1.6" step="0.1" value="1">
+                        <span id="verseSizeLabel">1.0x</span>
+                    </label>
+                    <button class="church-toggle active" id="autoPreviewToggle" type="button" aria-label="Toggle automatic preview"></button>
+                </div>
+                <div class="church-preview-stage">
+                    <div class="church-preview-card" id="readyPreviewCard">
+                        <div class="card-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="card-title" id="previewReference">Ready to preview</div>
+                        <div class="card-subtitle" id="previewText">Search for a verse to see it here first</div>
+                    </div>
+                    <div class="church-preview-card live-card" id="livePreviewCard">
+                        <div class="verse-ref" id="currentReference">none yet</div>
+                        <div class="verse-text" id="overlayText">Fetched scripture will appear here for display.</div>
+                    </div>
+                </div>
+                <div class="church-preview-controls">
+                    <button class="btn-display" id="verseButton" type="button"><i class="fas fa-play"></i> Display</button>
+                    <input id="verseInput" type="text" placeholder="Book chapter:verse (e.g. John 3:16)">
+                    <button class="btn-nav" id="copyObsUrlButton" type="button">Copy OBS URL</button>
+                </div>
+                <p class="obs-url-box" id="obsOverlayUrl">Generating browser source URL...</p>
+                <a class="is-hidden" id="openObsOverlayLink" href="lower-third.html" target="_blank" rel="noreferrer">Open Lower Third</a>
+            </article>
+
+            <article class="church-panel feed-panel">
+                <div class="church-panel-header">
+                    <span class="church-panel-title">Scripture Feed</span>
+                    <span class="feed-count"><span id="archiveCount">0</span> saved</span>
+                </div>
+                <div class="feed-tabs">
+                    <button class="feed-tab active" type="button" data-feed-panel="history">History</button>
+                    <button class="feed-tab" type="button" data-feed-panel="archive">Archive</button>
+                </div>
+                <div class="feed-content" id="archiveList"></div>
+            </article>
+
+            <article class="church-panel navigator-panel">
+                <div class="church-panel-header">
+                    <span class="church-panel-title">Chapter Navigator</span>
+                    <span class="version-dropdown">KJV <i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="navigator-tabs">
+                    <button class="nav-tab active" type="button">Reference</button>
+                    <button class="nav-tab" type="button">Paraphrase</button>
+                </div>
+                <div class="navigator-search">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input id="chapterSearchInput" type="text" placeholder="Search John 3:16">
+                    </div>
+                    <button class="button-secondary" id="chapterSearchButton" type="button">Search</button>
+                </div>
+                <div class="scripture-content" id="chapterResult">
+                    <div class="navigator-empty">
+                        <div class="empty-icon"><i class="fas fa-book"></i></div>
+                        <div class="empty-title">No chapter selected</div>
+                        <div class="empty-subtitle">Select or search a verse to see scripture here.</div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="church-panel detected-panel">
+                <div class="detected-tabs">
+                    <button class="nav-tab active" type="button">Detected Verses</button>
+                    <button class="nav-tab" type="button">Sermon Points</button>
+                </div>
+                <div class="detected-placeholder">
+                    <div class="info-icon"><i class="fas fa-info"></i></div>
+                    <h4>Detected references</h4>
+                    <p id="detectedReferences">none yet</p>
+                </div>
+                <div class="church-summary">
+                    <p class="card-eyebrow">Session Summary</p>
+                    <p id="summaryText">Start listening or type session notes to generate a summary.</p>
+                    <p id="promoSnippet">Here is a concise highlight from this live session. Key takeaway: Start listening or type session notes to generate a summary.</p>
+                </div>
+            </article>
+
+            <article class="church-panel matches-panel">
+                <div class="matches-header">
+                    <div class="matches-title">
+                        Study Matches
+                        <span class="ai-dot"></span>
+                    </div>
+                    <div class="matches-actions">
+                        <button class="match-action-btn live" type="button">Live</button>
+                        <button class="match-action-btn saved" type="button">Saved</button>
+                    </div>
+                </div>
+                <div class="lookup-stack">
+                    <div>
+                        <label class="church-label" for="dictionaryInput">Bible Dictionary</label>
+                        <div class="inline-form">
+                            <input id="dictionaryInput" type="text" placeholder="Search covenant, grace, tabernacle">
+                            <button class="button-primary" id="dictionaryButton" type="button">Search</button>
+                        </div>
+                        <div id="dictionaryResult" class="overlay-preview tool-result">Search a Bible term to see a quick explanation.</div>
+                    </div>
+                    <div>
+                        <label class="church-label" for="hebrewInput">Hebrew Words Translation</label>
+                        <div class="inline-form">
+                            <input id="hebrewInput" type="text" placeholder="Search shalom, hesed, ruach">
+                            <button class="button-primary" id="hebrewButton" type="button">Translate</button>
+                        </div>
+                        <div id="hebrewResult" class="overlay-preview tool-result">Search a Hebrew word or English meaning to view transliteration and translation.</div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+    </main>
+
+    <section class="ad-container compact church-bottom-ad" aria-label="Advertisement">
+        <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
+    </section>
+
+    <script src="navbar.js"></script>
+    <script src="ads.js"></script>
+    <script>
+        const verseSizeControl = document.getElementById("verseSizeControl");
+        const verseSizeLabel = document.getElementById("verseSizeLabel");
+        const livePreviewCard = document.getElementById("livePreviewCard");
+        const chapterSearchInput = document.getElementById("chapterSearchInput");
+        const chapterSearchButton = document.getElementById("chapterSearchButton");
+        const chapterResult = document.getElementById("chapterResult");
+        const liveVisibilityButton = document.getElementById("liveVisibilityButton");
+        const lyricDropdown = document.querySelector(".lyric-dropdown");
+        const liveOverlayChannel = createLiveOverlayChannel();
+        const churchMenuFeedback = document.getElementById("churchMenuFeedback");
+        let churchDisplayTimer = null;
+        let churchDisplayToken = 0;
+        let localMicStream = null;
+        let localRecognition = null;
+        let localAudioContext = null;
+        let localAnalyser = null;
+        let localWaveFrame = null;
+        let localListening = false;
+        let localStoppedManually = true;
+        let localLyricLines = [];
+        let localRecentLyricCandidates = [];
+        const localLyricKeywords = [
+            "hallelujah", "hosanna", "glory", "worship", "praise", "worthy", "holy", "amen",
+            "jesus", "lord", "savior", "spirit", "mercy", "grace", "love", "faithful",
+            "alpha", "omega", "yahweh", "adonai", "redeemer"
+        ];
+        const localBibleBooks = [
+            "genesis", "exodus", "leviticus", "numbers", "deuteronomy", "joshua", "judges", "ruth",
+            "1 samuel", "2 samuel", "1 kings", "2 kings", "1 chronicles", "2 chronicles", "ezra", "nehemiah", "esther",
+            "job", "psalms", "psalm", "proverbs", "ecclesiastes", "song of solomon", "song of songs", "isaiah", "jeremiah",
+            "lamentations", "ezekiel", "daniel", "hosea", "joel", "amos", "obadiah", "jonah", "micah", "nahum", "habakkuk",
+            "zephaniah", "haggai", "zechariah", "malachi", "matthew", "mark", "luke", "john", "acts", "romans",
+            "1 corinthians", "2 corinthians", "galatians", "ephesians", "philippians", "colossians", "1 thessalonians",
+            "2 thessalonians", "1 timothy", "2 timothy", "titus", "philemon", "hebrews", "james", "1 peter", "2 peter",
+            "1 john", "2 john", "3 john", "jude", "revelation"
+        ];
+        const localNumberWords = {
+            one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+            eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
+            eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60,
+            seventy: 70, eighty: 80, ninety: 90
+        };
+        const localBibleBookPattern = localBibleBooks
+            .sort((a, b) => b.length - a.length)
+            .map((book) => book.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+            .join("|");
+
+        function createLiveOverlayChannel() {
+            try {
+                return "BroadcastChannel" in window ? new BroadcastChannel("omnicast_live_overlay_v1") : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        const fallbackPlannerItems = [
+            { id: "welcome-loop", title: "Welcome Loop + Opening Lower Third", role: "Media Desk", time: "08:45" },
+            { id: "worship-set", title: "Worship Set Graphics", role: "Lyrics Operator", time: "09:00" },
+            { id: "session-capture", title: "Live Session Capture + Notes", role: "Broadcast Lead", time: "09:35" },
+            { id: "response-screen", title: "Response Screen + Overlay", role: "Stage Display", time: "10:20" },
+            { id: "announcements", title: "Announcements + Outro", role: "Media Desk", time: "10:35" }
+        ];
+
+        function readFallbackPlannerDone() {
+            try {
+                return JSON.parse(localStorage.getItem("omnicast_planner_progress_v2") || "[]");
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function renderFallbackPlanner(force = false) {
+            const plannerList = document.getElementById("plannerList");
+            const plannerProgress = document.getElementById("plannerProgress");
+            if (!plannerList || (!force && plannerList.dataset.ready === "true")) {
+                return;
+            }
+
+            const doneItems = readFallbackPlannerDone();
+            plannerList.innerHTML = fallbackPlannerItems.map((item) => {
+                const done = doneItems.includes(item.id);
+                return `
+                    <div class="planner-item ${done ? "done" : ""}">
+                        <div>
+                            <strong>${escapeHtml(item.title)}</strong>
+                            <div class="planner-meta">${escapeHtml(item.role)} - ${escapeHtml(item.time)}</div>
+                        </div>
+                        <button class="button-secondary planner-toggle" data-planner-id="${escapeAttribute(item.id)}" type="button">${done ? "Completed" : "Mark Done"}</button>
+                    </div>
+                `;
+            }).join("");
+            if (plannerProgress) {
+                plannerProgress.textContent = `${doneItems.length}/${fallbackPlannerItems.length}`;
+            }
+        }
+
+        document.getElementById("plannerList")?.addEventListener("click", (event) => {
+            const button = event.target.closest(".planner-toggle");
+            if (!button) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const itemId = button.dataset.plannerId;
+            const doneItems = readFallbackPlannerDone();
+            const nextDoneItems = doneItems.includes(itemId)
+                ? doneItems.filter((entry) => entry !== itemId)
+                : [...doneItems, itemId];
+            localStorage.setItem("omnicast_planner_progress_v2", JSON.stringify(nextDoneItems));
+            renderFallbackPlanner(true);
+        }, true);
+
+        renderFallbackPlanner();
+
+        document.getElementById("listenButton")?.addEventListener("click", async (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            await toggleLocalListening();
+        }, true);
+
+        async function toggleLocalListening() {
+            if (localListening) {
+                await stopLocalListening();
+                return;
+            }
+
+            await startLocalListening();
+        }
+
+        async function startLocalListening() {
+            try {
+                if (!navigator.mediaDevices?.getUserMedia) {
+                    throw new Error("Microphone access is not supported in this browser.");
+                }
+
+                localStoppedManually = false;
+                localListening = true;
+                setLocalMicUi("Listening", "Stop Listening");
+
+                localMicStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                });
+
+                startLocalWave(localMicStream);
+                startLocalSpeechRecognition();
+                setMenuFeedback("Listening started");
+            } catch (error) {
+                await stopLocalListening();
+                const message = error?.name === "NotAllowedError"
+                    ? "Allow microphone access to start listening"
+                    : (error?.message || "Microphone unavailable");
+                document.getElementById("speechHint").textContent = message;
+                document.getElementById("speechText").textContent = "Waiting for transcription...";
+                setMenuFeedback(message);
+            }
+        }
+
+        async function stopLocalListening() {
+            localStoppedManually = true;
+            localListening = false;
+
+            if (localRecognition) {
+                localRecognition.onend = null;
+                try {
+                    localRecognition.stop();
+                } catch (error) {}
+            }
+            localRecognition = null;
+
+            if (localWaveFrame) {
+                cancelAnimationFrame(localWaveFrame);
+                localWaveFrame = null;
+            }
+            if (localAudioContext && localAudioContext.state !== "closed") {
+                await localAudioContext.close().catch(() => {});
+            }
+            localAudioContext = null;
+            localAnalyser = null;
+
+            localMicStream?.getTracks().forEach((track) => track.stop());
+            localMicStream = null;
+
+            const canvas = document.getElementById("waveCanvas");
+            const context = canvas?.getContext("2d");
+            if (canvas && context) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            setLocalMicUi("Mic status", "Start Listening");
+            document.getElementById("speechHint").textContent = "Listening paused.";
+            setMenuFeedback("Listening stopped");
+        }
+
+        function setLocalMicUi(status, label) {
+            const micStatus = document.getElementById("micStatus");
+            const listenButton = document.getElementById("listenButton");
+            if (micStatus) {
+                micStatus.textContent = status;
+            }
+            if (listenButton) {
+                listenButton.title = label;
+                listenButton.setAttribute("aria-label", label);
+                listenButton.classList.toggle("is-listening", localListening);
+            }
+        }
+
+        function startLocalWave(stream) {
+            const canvas = document.getElementById("waveCanvas");
+            const context = canvas?.getContext("2d");
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!canvas || !context || !AudioContextClass) {
+                return;
+            }
+
+            localAudioContext = new AudioContextClass();
+            localAnalyser = localAudioContext.createAnalyser();
+            localAnalyser.fftSize = 256;
+            localAudioContext.createMediaStreamSource(stream).connect(localAnalyser);
+            const data = new Uint8Array(localAnalyser.frequencyBinCount);
+
+            const draw = () => {
+                localWaveFrame = requestAnimationFrame(draw);
+                localAnalyser.getByteTimeDomainData(data);
+                context.fillStyle = "#050805";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.lineWidth = 2;
+                context.strokeStyle = "#8dfc00";
+                context.beginPath();
+
+                const sliceWidth = canvas.width / data.length;
+                let x = 0;
+                data.forEach((value, index) => {
+                    const y = (value / 128) * (canvas.height / 2);
+                    if (index === 0) {
+                        context.moveTo(x, y);
+                    } else {
+                        context.lineTo(x, y);
+                    }
+                    x += sliceWidth;
+                });
+                context.stroke();
+            };
+
+            draw();
+        }
+
+        function startLocalSpeechRecognition() {
+            const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const speechHint = document.getElementById("speechHint");
+            if (!SpeechRecognitionClass) {
+                speechHint.textContent = "Mic is active, but speech recognition is not supported on this browser.";
+                return;
+            }
+
+            localRecognition = new SpeechRecognitionClass();
+            localRecognition.continuous = true;
+            localRecognition.interimResults = true;
+            localRecognition.lang = "en-US";
+
+            localRecognition.onresult = (event) => {
+                let interimText = "";
+                let finalText = "";
+
+                for (let index = event.resultIndex; index < event.results.length; index += 1) {
+                    const transcript = event.results[index][0].transcript.trim();
+                    if (event.results[index].isFinal) {
+                        finalText += `${transcript} `;
+                        appendLocalNote(transcript);
+                        detectLocalLyrics(transcript, true);
+                        detectLocalReference(transcript);
+                    } else {
+                        interimText += `${transcript} `;
+                        detectLocalLyrics(transcript, false);
+                        detectLocalReference(transcript);
+                    }
+                }
+
+                document.getElementById("speechText").textContent = (interimText || finalText || "Listening...").trim();
+                speechHint.textContent = "Listening... waiting for the next phrase.";
+            };
+
+            localRecognition.onerror = (event) => {
+                localListening = false;
+                setLocalMicUi("Mic status", "Start Listening");
+                speechHint.textContent = event.error || "Speech recognition failed.";
+            };
+
+            localRecognition.onend = () => {
+                if (!localStoppedManually && localListening) {
+                    try {
+                        localRecognition.start();
+                    } catch (error) {
+                        localListening = false;
+                        setLocalMicUi("Mic status", "Start Listening");
+                    }
+                }
+            };
+
+            localRecognition.start();
+        }
+
+        function appendLocalNote(text) {
+            const cleanText = String(text || "").trim();
+            const notesBox = document.getElementById("notesBox");
+            if (!cleanText || !notesBox) {
+                return;
+            }
+
+            const time = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            notesBox.value = `${notesBox.value ? `${notesBox.value}\n` : ""}[${time}] ${cleanText}`;
+            notesBox.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+
+        function detectLocalLyrics(text, isFinal) {
+            const lyricToggle = document.getElementById("lyricAutoToggle");
+            if (!lyricToggle?.checked) {
+                updateLocalLyricStatus();
+                return;
+            }
+
+            splitLocalLyricCandidates(text).forEach((line) => {
+                const normalizedLine = normalizeLocalLyricLine(line);
+                if (!normalizedLine || findLocalReference(normalizedLine)) {
+                    return;
+                }
+
+                const lowerLine = normalizedLine.toLowerCase();
+                const keywordHit = localLyricKeywords.some((keyword) => lowerLine.includes(keyword));
+                const repeatHit = localRecentLyricCandidates.includes(lowerLine);
+                const worshipPhraseHit = /\b(i|we)\s+(worship|praise|lift|sing|exalt|adore|surrender|bow|love|need|trust)\b/i.test(normalizedLine);
+                const lineLooksSingable = normalizedLine.split(/\s+/).length <= 16 && /[aeiou]/i.test(normalizedLine);
+
+                if ((keywordHit || repeatHit || (isFinal && worshipPhraseHit)) && lineLooksSingable) {
+                    addLocalLyricLine(normalizedLine);
+                }
+
+                localRecentLyricCandidates = [
+                    lowerLine,
+                    ...localRecentLyricCandidates.filter((candidate) => candidate !== lowerLine)
+                ].slice(0, 12);
+            });
+
+            updateLocalLyricStatus();
+        }
+
+        function splitLocalLyricCandidates(text) {
+            return String(text || "")
+                .replace(/\[[^\]]+\]/g, " ")
+                .split(/\r?\n|[.!?;]+/)
+                .map((line) => line.trim())
+                .filter(Boolean);
+        }
+
+        function normalizeLocalLyricLine(line) {
+            return String(line || "")
+                .replace(/\s+/g, " ")
+                .replace(/^[-:,\s]+|[-:,\s]+$/g, "")
+                .trim();
+        }
+
+        function addLocalLyricLine(line) {
+            const lyricsBox = document.getElementById("lyricsBox");
+            const existingLines = String(lyricsBox?.value || "")
+                .split(/\r?\n/)
+                .map(normalizeLocalLyricLine)
+                .filter(Boolean);
+            const mergedLines = [...existingLines, ...localLyricLines];
+
+            if (mergedLines.some((item) => item.toLowerCase() === line.toLowerCase())) {
+                return;
+            }
+
+            localLyricLines = [...existingLines, ...localLyricLines, line].slice(-40);
+            renderLocalLyrics();
+        }
+
+        function renderLocalLyrics() {
+            const detectedLyricsList = document.getElementById("detectedLyricsList");
+            const lyricsBox = document.getElementById("lyricsBox");
+            if (detectedLyricsList) {
+                detectedLyricsList.innerHTML = localLyricLines.length
+                    ? localLyricLines.map((line) => `<div class="lyric-line">${escapeHtml(line)}</div>`).join("")
+                    : '<div class="lyric-empty">No lyrics detected yet.</div>';
+            }
+            if (lyricsBox) {
+                lyricsBox.value = localLyricLines.join("\n");
+            }
+            updateLocalLyricStatus();
+        }
+
+        function updateLocalLyricStatus() {
+            const lyricDetectStatus = document.getElementById("lyricDetectStatus");
+            const lyricToggle = document.getElementById("lyricAutoToggle");
+            if (!lyricDetectStatus) {
+                return;
+            }
+            if (!lyricToggle?.checked) {
+                lyricDetectStatus.textContent = "Off";
+                return;
+            }
+            lyricDetectStatus.textContent = localLyricLines.length ? String(localLyricLines.length) : "Auto";
+        }
+
+        document.getElementById("lyricAutoToggle")?.addEventListener("change", updateLocalLyricStatus);
+        document.getElementById("clearLyricsButton")?.addEventListener("click", () => {
+            localLyricLines = [];
+            localRecentLyricCandidates = [];
+            renderLocalLyrics();
+            const lyricCopyStatus = document.getElementById("lyricCopyStatus");
+            if (lyricCopyStatus) {
+                lyricCopyStatus.textContent = "Ready";
+            }
+        });
+        document.getElementById("lyricsBox")?.addEventListener("input", () => {
+            localLyricLines = String(document.getElementById("lyricsBox")?.value || "")
+                .split(/\r?\n/)
+                .map(normalizeLocalLyricLine)
+                .filter(Boolean)
+                .slice(-40);
+            renderLocalLyrics();
+        });
+
+        function detectLocalReference(text) {
+            const reference = findLocalReference(text);
+            if (!reference) {
+                return;
+            }
+
+            document.getElementById("verseInput").value = reference;
+            fetchLocalVerse(reference);
+            const detectedReferences = document.getElementById("detectedReferences");
+            if (detectedReferences) {
+                const current = detectedReferences.textContent.trim();
+                detectedReferences.textContent = current && current !== "none yet" && !current.includes(reference)
+                    ? `${current}, ${reference}`
+                    : reference;
+            }
+        }
+
+        function findLocalReference(text) {
+            const source = String(text || "").toLowerCase().replace(/\s+/g, " ");
+            const numberToken = "(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:[-\\s](?:one|two|three|four|five|six|seven|eight|nine))?";
+
+            let match = source.match(new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(\\d+):(\\d+)\\b`, "i"));
+            if (match) {
+                return formatLocalReference(match[1], match[2], match[3]);
+            }
+
+            match = source.match(new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(?:chapter\\s+|chapter\\s+number\\s+)?(${numberToken})\\s+(?:verse\\s+|verses\\s+|verse\\s+number\\s+|colon\\s+)(${numberToken})\\b`, "i"));
+            if (match) {
+                return formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]));
+            }
+
+            match = source.match(new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(${numberToken})\\s+(${numberToken})\\b`, "i"));
+            if (match) {
+                return formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]));
+            }
+
+            return "";
+        }
+
+        function formatLocalReference(book, chapter, verse) {
+            const chapterNumber = Number(chapter);
+            const verseNumber = Number(verse);
+            if (!book || !chapterNumber || !verseNumber) {
+                return "";
+            }
+
+            return `${String(book).replace(/\b\w/g, (char) => char.toUpperCase())} ${chapterNumber}:${verseNumber}`;
+        }
+
+        function parseLocalNumber(value) {
+            const rawValue = String(value || "").toLowerCase().trim();
+            if (/^\d+$/.test(rawValue)) {
+                return Number(rawValue);
+            }
+
+            return rawValue.split(/[-\s]+/).reduce((total, part) => total + (localNumberWords[part] || 0), 0);
+        }
+
+        async function fetchLocalVerse(reference) {
+            const cleanReference = String(reference || "").trim();
+            if (!cleanReference) {
+                return;
+            }
+
+            updateChurchPreviewPanel(cleanReference, "Loading scripture...");
+
+            try {
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(cleanReference)}`);
+                const payload = await response.json();
+                const resolvedReference = payload.reference || cleanReference;
+                const verseText = payload.text ? payload.text.trim() : "Verse not found.";
+
+                updateChurchPreviewPanel(resolvedReference, verseText);
+                if (payload.text) {
+                    scheduleChurchDisplayClear(resolvedReference);
+                }
+            } catch (error) {
+                updateChurchPreviewPanel(cleanReference, "Error fetching verse.");
+            }
+        }
+
+        document.querySelectorAll(".studio-menu").forEach((menu) => {
+            menu.addEventListener("toggle", () => {
+                if (!menu.open) {
+                    return;
+                }
+                document.querySelectorAll(".studio-menu").forEach((item) => {
+                    if (item !== menu) {
+                        item.open = false;
+                    }
+                });
+            });
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".church-window-menu")) {
+                document.querySelectorAll(".studio-menu[open]").forEach((menu) => {
+                    menu.open = false;
+                });
+            }
+        });
+
+        document.querySelector(".church-window-menu")?.addEventListener("click", (event) => {
+            const menuItem = event.target.closest("[data-menu-action]");
+            if (!menuItem) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            runStudioMenuAction(menuItem.dataset.menuAction);
+            menuItem.closest(".studio-menu")?.removeAttribute("open");
+        });
+
+        function setMenuFeedback(message) {
+            if (!churchMenuFeedback) {
+                return;
+            }
+            churchMenuFeedback.textContent = message;
+            churchMenuFeedback.classList.add("is-visible");
+            clearTimeout(setMenuFeedback.timer);
+            setMenuFeedback.timer = setTimeout(() => {
+                churchMenuFeedback.classList.remove("is-visible");
+            }, 1800);
+        }
+
+        function getChurchActions() {
+            return window.omnicastChurchActions || {};
+        }
+
+        function getNotesText() {
+            return document.getElementById("notesBox")?.value?.trim() || "";
+        }
+
+        function downloadTextFile(filename, text) {
+            const blob = new Blob([text], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        function localClearNotes() {
+            const notesBox = document.getElementById("notesBox");
+            if (notesBox) {
+                notesBox.value = "";
+                notesBox.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+            const detectedReferences = document.getElementById("detectedReferences");
+            if (detectedReferences) {
+                detectedReferences.textContent = "none yet";
+            }
+            updateChurchPreviewPanel("", "");
+        }
+
+        function localDownloadNotes() {
+            const notes = getNotesText();
+            if (!notes) {
+                setMenuFeedback("No notes to download");
+                return;
+            }
+            downloadTextFile("session_notes.txt", notes);
+            setMenuFeedback("Download started");
+        }
+
+        function localArchiveSession() {
+            const notes = getNotesText();
+            if (!notes) {
+                setMenuFeedback("Add notes before archiving");
+                return;
+            }
+
+            const archiveKey = "omnicast_archive_sessions_v2";
+            let archive = [];
+            try {
+                archive = JSON.parse(localStorage.getItem(archiveKey) || "[]");
+            } catch (error) {
+                archive = [];
+            }
+
+            archive.unshift({
+                id: Date.now(),
+                title: document.getElementById("sessionTitle")?.value?.trim() || "Church Studio Session",
+                summary: notes.split(/\s+/).slice(0, 40).join(" "),
+                createdAt: new Date().toISOString()
+            });
+            localStorage.setItem(archiveKey, JSON.stringify(archive));
+            document.getElementById("archiveCount").textContent = String(archive.length);
+            setMenuFeedback("Session archived");
+        }
+
+        function appStillLoadingMessage(actionName) {
+            setMenuFeedback(`${actionName} loading`);
+        }
+
+        async function localCopyText(text, successMessage, emptyMessage) {
+            if (!text?.trim()) {
+                setMenuFeedback(emptyMessage);
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(text);
+                setMenuFeedback(successMessage);
+            } catch (error) {
+                window.prompt("Copy this text:", text);
+            }
+        }
+
+        function runStudioMenuAction(action) {
+            const appActions = getChurchActions();
+            const runAppAction = (name, fallback, message) => {
+                if (typeof appActions[name] === "function") {
+                    const result = appActions[name]();
+                    if (message) {
+                        setMenuFeedback(message);
+                    }
+                    return result;
+                }
+                return fallback?.();
+            };
+            const clickElement = (selector, message) => {
+                const target = document.querySelector(selector);
+                if (!target) {
+                    setMenuFeedback("Command unavailable");
+                    return false;
+                }
+                target.click();
+                if (message) {
+                    setMenuFeedback(message);
+                }
+                return true;
+            };
+            const focusPanel = (selector) => {
+                const panel = document.querySelector(selector);
+                if (!panel) {
+                    setMenuFeedback("Window unavailable");
+                    return;
+                }
+                panel.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+                panel.classList.add("is-menu-focused");
+                panel.setAttribute("tabindex", "-1");
+                panel.focus({ preventScroll: true });
+                setTimeout(() => panel.classList.remove("is-menu-focused"), 1200);
+                setMenuFeedback("Window focused");
+            };
+            const setLyricAuto = () => {
+                const toggle = document.getElementById("lyricAutoToggle");
+                if (!toggle) {
+                    setMenuFeedback("Lyric detection unavailable");
+                    return;
+                }
+                toggle.checked = !toggle.checked;
+                toggle.dispatchEvent(new Event("change", { bubbles: true }));
+                setMenuFeedback(toggle.checked ? "Lyric detection on" : "Lyric detection off");
+            };
+
+            const actions = {
+                "new-session": () => {
+                    runAppAction("clearNotes", localClearNotes);
+                    const title = document.getElementById("sessionTitle");
+                    if (title) {
+                        title.value = "Church Studio Session";
+                        title.dispatchEvent(new Event("input", { bubbles: true }));
+                    }
+                    setMenuFeedback("New session ready");
+                },
+                "download-notes": () => runAppAction("downloadNotes", localDownloadNotes, "Download started"),
+                "archive-session": () => runAppAction("archiveCurrentSession", localArchiveSession, "Archive command sent"),
+                "copy-obs-url": () => runAppAction("copyObsOverlayUrl", () => {
+                    const url = document.getElementById("openObsOverlayLink")?.href || new URL("lower-third.html", window.location.href).toString();
+                    return localCopyText(url, "Livestream URL copied", "No URL available");
+                }, "Livestream URL copied"),
+                "clear-notes": () => runAppAction("clearNotes", localClearNotes, "Notes cleared"),
+                "copy-caption": () => {
+                    const caption = document.getElementById("socialCaptionInput");
+                    if (!caption?.value?.trim()) {
+                        runAppAction("fillSocialCaption", () => {
+                            const summary = document.getElementById("summaryText")?.textContent?.trim() || "";
+                            if (caption) {
+                                caption.value = summary;
+                            }
+                        });
+                    }
+                    return runAppAction("copySocialCaption", () => localCopyText(caption?.value || "", "Caption copied", "No caption to copy"), "Caption copied");
+                },
+                "copy-lyrics": () => {
+                    lyricDropdown?.setAttribute("open", "");
+                    return runAppAction("copyDetectedLyrics", () => localCopyText(document.getElementById("lyricsBox")?.value || "", "Lyrics copied", "No lyrics to copy"), "Lyrics copied");
+                },
+                "focus-preview": () => focusPanel(".preview-panel"),
+                "focus-transcription": () => focusPanel(".transcription-panel"),
+                "focus-navigator": () => focusPanel(".navigator-panel"),
+                "focus-feed": () => focusPanel(".feed-panel"),
+                "toggle-fullscreen": () => {
+                    if (document.fullscreenElement) {
+                        document.exitFullscreen?.();
+                        setMenuFeedback("Fullscreen off");
+                    } else {
+                        document.documentElement.requestFullscreen?.();
+                        setMenuFeedback("Fullscreen on");
+                    }
+                },
+                "toggle-listening": () => toggleLocalListening(),
+                "toggle-recording": () => runAppAction("toggleRecording", () => appStillLoadingMessage("Recording controls"), "Recording toggled"),
+                "download-audio": () => runAppAction("downloadRecording", () => appStillLoadingMessage("Audio download"), "Audio download requested"),
+                "open-lower-third": () => {
+                    const overlayUrl = document.getElementById("openObsOverlayLink")?.href || "lower-third.html";
+                    window.open(overlayUrl, "_blank", "noopener,noreferrer");
+                    setMenuFeedback("Lower third opened");
+                },
+                "open-main-studio": () => {
+                    window.location.href = "studio.html";
+                },
+                "open-lyrics": () => {
+                    lyricDropdown?.setAttribute("open", "");
+                    document.getElementById("lyricsBox")?.focus();
+                    setMenuFeedback("Lyric panel opened");
+                },
+                "toggle-lyrics": setLyricAuto,
+                "clear-lyrics": () => {
+                    lyricDropdown?.setAttribute("open", "");
+                    return runAppAction("clearDetectedLyrics", () => {
+                        const lyricsBox = document.getElementById("lyricsBox");
+                        if (lyricsBox) {
+                            lyricsBox.value = "";
+                        }
+                        document.getElementById("detectedLyricsList").innerHTML = '<div class="lyric-empty">No lyrics detected yet.</div>';
+                        setMenuFeedback("Lyrics cleared");
+                    }, "Lyrics cleared");
+                },
+                "show-help": () => {
+                    alert("Use Start Listening to capture speech. Spoken Bible references are fetched automatically. Use Copy OBS URL or Open Lower Third to show scripture in livestream software. Use Lyrics > Open Auto Lyrics for worship lyric detection.");
+                    setMenuFeedback("Help opened");
+                },
+                "open-about": () => {
+                    window.location.href = "about.html";
+                }
+            };
+
+            if (actions[action]) {
+                actions[action]();
+            } else {
+                setMenuFeedback("Command unavailable");
+            }
+        }
+
+        document.querySelectorAll(".nav-tab, .feed-tab").forEach((tab) => {
+            tab.addEventListener("click", () => {
+                tab.parentElement.querySelectorAll(".nav-tab, .feed-tab").forEach((item) => item.classList.remove("active"));
+                tab.classList.add("active");
+            });
+        });
+
+        document.getElementById("autoPreviewToggle")?.addEventListener("click", (event) => {
+            event.currentTarget.classList.toggle("active");
+            syncLiveVisibility(event.currentTarget.classList.contains("active"));
+            publishLiveOverlay();
+        });
+
+        document.getElementById("verseInput")?.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                document.getElementById("verseButton")?.click();
+            }
+        });
+
+        window.toggleChurchLiveVisibility = function toggleChurchLiveVisibility() {
+            const nextActive = liveVisibilityButton.textContent.trim().toLowerCase() !== "live";
+            document.getElementById("autoPreviewToggle")?.classList.toggle("active", nextActive);
+            syncLiveVisibility(nextActive);
+            publishLiveOverlay();
+        };
+
+        verseSizeControl?.addEventListener("input", () => {
+            const scale = Number(verseSizeControl.value || 1);
+            verseSizeLabel.textContent = `${scale.toFixed(1)}x`;
+            livePreviewCard.style.setProperty("--verse-scale", scale);
+        });
+
+        async function loadChapterReference() {
+            const reference = chapterSearchInput.value.trim();
+            if (!reference) {
+                return;
+            }
+
+            chapterResult.innerHTML = '<div class="matches-loading"><div class="loading-spinner"></div><div class="loading-text">Loading scripture...</div></div>';
+
+            try {
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
+                const payload = await response.json();
+                const verses = Array.isArray(payload.verses) ? payload.verses : [];
+
+                if (!payload.text) {
+                    chapterResult.innerHTML = '<div class="navigator-empty"><div class="empty-title">Verse not found</div><div class="empty-subtitle">Try another Bible reference.</div></div>';
+                    return;
+                }
+
+                updateChurchPreviewPanel(payload.reference || reference, payload.text.trim());
+                document.getElementById("verseInput").value = payload.reference || reference;
+                document.getElementById("verseButton")?.click();
+
+                chapterResult.innerHTML = verses.length
+                    ? verses.map((verse) => `
+                        <button class="verse-row" type="button" data-ref="${verse.book_name} ${verse.chapter}:${verse.verse}" data-text="${escapeAttribute(verse.text)}">
+                            <span class="verse-num">${verse.verse}</span>
+                            <span class="verse-text-content">${escapeHtml(verse.text)}</span>
+                            <span class="add-verse-btn">+</span>
+                        </button>
+                    `).join("")
+                    : `<div class="verse-row active"><span class="verse-text-content">${escapeHtml(payload.text)}</span></div>`;
+
+                chapterResult.querySelectorAll(".verse-row").forEach((row) => {
+                    row.addEventListener("click", () => {
+                        chapterResult.querySelectorAll(".verse-row").forEach((item) => item.classList.remove("active"));
+                        row.classList.add("active");
+                        const verseInput = document.getElementById("verseInput");
+                        if (verseInput && row.dataset.ref) {
+                            verseInput.value = row.dataset.ref;
+                            document.getElementById("verseButton")?.click();
+                        }
+                    });
+                });
+            } catch (error) {
+                chapterResult.innerHTML = '<div class="navigator-empty"><div class="empty-title">Unable to load scripture</div><div class="empty-subtitle">Check your connection and try again.</div></div>';
+            }
+        }
+
+        function escapeHtml(text) {
+            return String(text || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function escapeAttribute(text) {
+            return escapeHtml(text).replace(/`/g, "&#96;");
+        }
+
+        function syncLiveVisibility(isLive) {
+            if (liveVisibilityButton) {
+                liveVisibilityButton.textContent = isLive ? "LIVE" : "HIDDEN";
+                liveVisibilityButton.classList.toggle("is-live", isLive);
+                liveVisibilityButton.setAttribute("aria-pressed", String(isLive));
+            }
+        }
+
+        function publishLiveOverlay() {
+            const rawReference = document.getElementById("currentReference")?.textContent?.trim() || "";
+            const rawText = document.getElementById("overlayText")?.textContent?.trim() || "";
+            const payload = {
+                reference: rawReference && rawReference.toLowerCase() !== "none yet" ? rawReference : "",
+                text: rawText && !rawText.includes("Fetched scripture will appear here") ? rawText : "",
+                updatedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem("omnicast_live_overlay_v1", JSON.stringify(payload));
+            liveOverlayChannel?.postMessage(payload);
+        }
+
+        async function fetchVerseFromPreviewInput() {
+            const input = document.getElementById("verseInput");
+            const reference = input?.value?.trim();
+
+            if (!reference) {
+                updateChurchPreviewPanel("", "Type or speak a Bible reference first.");
+                return;
+            }
+
+            updateChurchPreviewPanel(reference, "Loading scripture...");
+
+            try {
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
+                const payload = await response.json();
+                const resolvedReference = payload.reference || reference;
+                const verseText = payload.text ? payload.text.trim() : "Verse not found.";
+
+                updateChurchPreviewPanel(resolvedReference, verseText);
+                if (payload.text) {
+                    scheduleChurchDisplayClear(resolvedReference);
+                }
+                publishLiveOverlay();
+            } catch (error) {
+                updateChurchPreviewPanel(reference, "Error fetching verse.");
+            }
+        }
+
+        function updateChurchPreviewPanel(reference, text) {
+            const cleanReference = String(reference || "").trim();
+            const cleanText = String(text || "").trim();
+            const previewReference = document.getElementById("previewReference");
+            const previewText = document.getElementById("previewText");
+            const currentReference = document.getElementById("currentReference");
+            const overlayText = document.getElementById("overlayText");
+
+            if (previewReference) {
+                previewReference.textContent = cleanReference || "Ready to preview";
+            }
+            if (previewText) {
+                previewText.textContent = cleanText || "Search for a verse to see it here first";
+            }
+            if (currentReference) {
+                currentReference.textContent = cleanReference || "none yet";
+            }
+            if (overlayText) {
+                overlayText.textContent = cleanText || "Fetched scripture will appear here for display.";
+            }
+            publishLiveOverlay();
+        }
+
+        function scheduleChurchDisplayClear(reference) {
+            if (churchDisplayTimer) {
+                clearTimeout(churchDisplayTimer);
+            }
+
+            const token = ++churchDisplayToken;
+            const expectedReference = String(reference || "").trim();
+
+            churchDisplayTimer = setTimeout(() => {
+                const currentReference = document.getElementById("currentReference")?.textContent?.trim();
+                if (token !== churchDisplayToken || currentReference !== expectedReference) {
+                    return;
+                }
+
+                updateChurchPreviewPanel("", "");
+                syncLiveVisibility(false);
+                publishLiveOverlay();
+            }, 40000);
+        }
+
+        chapterSearchButton?.addEventListener("click", loadChapterReference);
+        chapterSearchInput?.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                loadChapterReference();
+            }
+        });
+    </script>
+    <script async src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
+    <script src="app.js?v=20260501-lyrics-auto-detect"></script>
+</body>
+</html>
