@@ -244,11 +244,12 @@
         }
 
         function applyOverlayPayload(payload) {
-            const nextReference = payload?.reference || "Scripture Overlay Ready";
-            const nextText = payload?.text || "Start listening in AI Church Broadcast to stream spoken Bible verses here.";
+            const isHidden = payload?.visible === false;
+            const nextReference = isHidden ? "Scripture Overlay Hidden" : (payload?.reference || "Scripture Overlay Ready");
+            const nextText = isHidden ? "Use the Live button in Church Studio to show the current scripture." : (payload?.text || "Start listening in AI Church Broadcast to stream spoken Bible verses here.");
             const signature = `${nextReference}::${nextText}`;
 
-            if (!payload || !payload.text) {
+            if (!payload || !payload.text || isHidden) {
                 referenceText.textContent = nextReference;
                 verseText.textContent = nextText;
                 verseText.classList.add("placeholder");

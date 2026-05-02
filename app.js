@@ -794,7 +794,7 @@ function triggerLiveReference(reference) {
         dom.verseInput.value = reference;
     }
     if (isChurchStudioPage) {
-        setChurchLiveState(true);
+        broadcastOverlay(state.currentReference, state.currentVerseText);
     }
     fetchVerse(reference);
 }
@@ -873,7 +873,6 @@ function clearDisplayedVerse(expectedReference) {
     state.currentVerseText = "";
     lastFetchedReference = "";
     updateChurchPreview("", "");
-    setChurchLiveState(false);
     broadcastOverlay("", "");
 }
 
@@ -892,7 +891,6 @@ function setChurchLiveState(isLive) {
         return;
     }
 
-    document.getElementById("autoPreviewToggle")?.classList.toggle("active", isLive);
     dom.liveVisibilityButton.textContent = isLive ? "LIVE" : "HIDDEN";
     dom.liveVisibilityButton.classList.toggle("is-live", isLive);
     dom.liveVisibilityButton.setAttribute("aria-pressed", String(isLive));
@@ -1549,9 +1547,11 @@ async function copyObsOverlayUrl() {
 }
 
 function broadcastOverlay(reference, text) {
+    const isVisible = !isChurchStudioPage || dom.liveVisibilityButton?.textContent?.trim().toLowerCase() === "live";
     const payload = {
-        reference,
-        text,
+        reference: isVisible ? reference : "",
+        text: isVisible ? text : "",
+        visible: isVisible,
         updatedAt: new Date().toISOString()
     };
 

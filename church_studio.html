@@ -44,6 +44,7 @@
                     <button type="button" data-menu-action="focus-preview">Preview Window</button>
                     <button type="button" data-menu-action="focus-transcription">Live Transcription</button>
                     <button type="button" data-menu-action="focus-navigator">Chapter Navigator</button>
+                    <button type="button" data-menu-action="focus-live-bible">Live Bible</button>
                     <button type="button" data-menu-action="focus-feed">Scripture Feed</button>
                     <button type="button" data-menu-action="toggle-fullscreen">Toggle Fullscreen</button>
                 </div>
@@ -106,6 +107,10 @@
             </button>
             <button class="church-icon-btn" id="downloadAudioButton" type="button" title="Download audio" disabled>
                 <i class="fas fa-file-audio"></i>
+            </button>
+            <button class="btn-lyrics" id="copyObsUrlButton" type="button" title="Copy OBS lower-third browser source URL">
+                OBS LINK
+                <i class="fas fa-link"></i>
             </button>
             <details class="church-nav-dropdown lyric-dropdown">
                 <summary class="church-dropdown-trigger">
@@ -231,9 +236,8 @@
                 <div class="church-preview-controls">
                     <button class="btn-display" id="verseButton" type="button"><i class="fas fa-play"></i> Display</button>
                     <input id="verseInput" type="text" placeholder="Book chapter:verse (e.g. John 3:16)">
-                    <button class="btn-nav" id="copyObsUrlButton" type="button">Copy OBS URL</button>
                 </div>
-                <p class="obs-url-box" id="obsOverlayUrl">Generating browser source URL...</p>
+                <p class="obs-url-box is-hidden" id="obsOverlayUrl">Generating browser source URL...</p>
                 <a class="is-hidden" id="openObsOverlayLink" href="lower-third.html" target="_blank" rel="noreferrer">Open Lower Third</a>
             </article>
 
@@ -274,15 +278,37 @@
                 </div>
             </article>
 
+            <article class="church-panel live-bible-panel">
+                <div class="church-panel-header">
+                    <span class="church-panel-title">Live Bible</span>
+                    <span class="church-chip" id="liveBibleStatus">Ready</span>
+                </div>
+                <div class="live-bible-search">
+                    <span class="card-eyebrow">Auto Search</span>
+                    <p id="liveBibleSearchText">Start listening to search spoken Bible words and references.</p>
+                </div>
+                <div class="live-bible-results" id="liveBibleMatches">
+                    <div class="live-bible-empty">
+                        <i class="fas fa-book-open"></i>
+                        <span>Detected Bible matches will appear here.</span>
+                    </div>
+                </div>
+            </article>
+
             <article class="church-panel detected-panel">
                 <div class="detected-tabs">
-                    <button class="nav-tab active" type="button">Detected Verses</button>
-                    <button class="nav-tab" type="button">Sermon Points</button>
+                    <button class="nav-tab active" type="button" data-detected-tab="verses">Detected Verses</button>
+                    <button class="nav-tab" type="button" data-detected-tab="points">Sermon Points</button>
                 </div>
-                <div class="detected-placeholder">
+                <div class="detected-placeholder detected-view active" id="detectedVersesView">
                     <div class="info-icon"><i class="fas fa-info"></i></div>
                     <h4>Detected references</h4>
                     <p id="detectedReferences">none yet</p>
+                </div>
+                <div class="sermon-points-view detected-view" id="sermonPointsView">
+                    <div class="sermon-points-list" id="sermonPointsList">
+                        <div class="sermon-point-empty">Sermon points will appear as complete thoughts are spoken.</div>
+                    </div>
                 </div>
                 <div class="church-summary">
                     <p class="card-eyebrow">Session Summary</p>
@@ -353,6 +379,16 @@
         let localStoppedManually = true;
         let localLyricLines = [];
         let localRecentLyricCandidates = [];
+        let lastLocalBibleTrigger = "";
+        let lastLocalBibleTriggerAt = 0;
+        let localSpeechBuffer = "";
+        let liveBibleMatchItems = [];
+        let liveBibleWordIndex = {};
+        let sermonPointItems = [];
+        let scriptureFeedItems = [];
+        let activeScriptureFeedPanel = "history";
+        const localVerseCache = {};
+        const localVerseFetches = {};
         const localLyricKeywords = [
             "hallelujah", "hosanna", "glory", "worship", "praise", "worthy", "holy", "amen",
             "jesus", "lord", "savior", "spirit", "mercy", "grace", "love", "faithful",
@@ -378,6 +414,55 @@
             .sort((a, b) => b.length - a.length)
             .map((book) => book.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
             .join("|");
+        const localBiblePhraseReferences = [
+            { phrase: "for god so loved the world", reference: "John 3:16", text: "For God so loved the world, that he gave his only begotten Son..." },
+            { phrase: "the lord is my shepherd", reference: "Psalm 23:1", text: "The LORD is my shepherd; I shall not want." },
+            { phrase: "i shall not want", reference: "Psalm 23:1", text: "The LORD is my shepherd; I shall not want." },
+            { phrase: "in the beginning god created", reference: "Genesis 1:1", text: "In the beginning God created the heaven and the earth." },
+            { phrase: "let there be light", reference: "Genesis 1:3", text: "And God said, Let there be light: and there was light." },
+            { phrase: "trust in the lord with all thine heart", reference: "Proverbs 3:5", text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding." },
+            { phrase: "trust in the lord with all your heart", reference: "Proverbs 3:5", text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding." },
+            { phrase: "lean not unto thine own understanding", reference: "Proverbs 3:5", text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding." },
+            { phrase: "i can do all things through christ", reference: "Philippians 4:13", text: "I can do all things through Christ which strengtheneth me." },
+            { phrase: "i can do all things", reference: "Philippians 4:13", text: "I can do all things through Christ which strengtheneth me." },
+            { phrase: "the lord is my light and my salvation", reference: "Psalm 27:1", text: "The LORD is my light and my salvation; whom shall I fear?" },
+            { phrase: "be still and know that i am god", reference: "Psalm 46:10", text: "Be still, and know that I am God." },
+            { phrase: "no weapon formed against", reference: "Isaiah 54:17", text: "No weapon that is formed against thee shall prosper." },
+            { phrase: "no weapon that is formed against thee", reference: "Isaiah 54:17", text: "No weapon that is formed against thee shall prosper." },
+            { phrase: "seek ye first the kingdom of god", reference: "Matthew 6:33", text: "But seek ye first the kingdom of God, and his righteousness..." },
+            { phrase: "seek first the kingdom of god", reference: "Matthew 6:33", text: "But seek ye first the kingdom of God, and his righteousness..." },
+            { phrase: "ask and it shall be given", reference: "Matthew 7:7", text: "Ask, and it shall be given you; seek, and ye shall find..." },
+            { phrase: "knock and it shall be opened", reference: "Matthew 7:7", text: "Ask, and it shall be given you; seek, and ye shall find..." },
+            { phrase: "the wages of sin is death", reference: "Romans 6:23", text: "For the wages of sin is death; but the gift of God is eternal life..." },
+            { phrase: "the gift of god is eternal life", reference: "Romans 6:23", text: "For the wages of sin is death; but the gift of God is eternal life..." },
+            { phrase: "all things work together for good", reference: "Romans 8:28", text: "All things work together for good to them that love God..." },
+            { phrase: "faith is the substance of things hoped for", reference: "Hebrews 11:1", text: "Now faith is the substance of things hoped for, the evidence of things not seen." },
+            { phrase: "now faith is the substance", reference: "Hebrews 11:1", text: "Now faith is the substance of things hoped for, the evidence of things not seen." },
+            { phrase: "jesus wept", reference: "John 11:35", text: "Jesus wept." },
+            { phrase: "the truth shall make you free", reference: "John 8:32", text: "And ye shall know the truth, and the truth shall make you free." },
+            { phrase: "i am the way the truth and the life", reference: "John 14:6", text: "I am the way, the truth, and the life..." },
+            { phrase: "the joy of the lord is your strength", reference: "Nehemiah 8:10", text: "The joy of the LORD is your strength." },
+            { phrase: "greater is he that is in you", reference: "1 John 4:4", text: "Greater is he that is in you, than he that is in the world." },
+            { phrase: "by his stripes we are healed", reference: "Isaiah 53:5", text: "With his stripes we are healed." },
+            { phrase: "surely goodness and mercy shall follow me", reference: "Psalm 23:6", text: "Surely goodness and mercy shall follow me all the days of my life..." },
+            { phrase: "this is the day which the lord hath made", reference: "Psalm 118:24", text: "This is the day which the LORD hath made; we will rejoice and be glad in it." }
+        ];
+        localBiblePhraseReferences.forEach((entry) => {
+            const cacheKey = entry.reference.toLowerCase();
+            if (!localVerseCache[cacheKey]) {
+                localVerseCache[cacheKey] = {
+                    reference: entry.reference,
+                    text: entry.text
+                };
+            }
+        });
+        const liveBibleStopWords = new Set([
+            "a", "an", "and", "are", "as", "be", "but", "by", "for", "from", "he", "her", "him",
+            "his", "i", "in", "is", "it", "me", "my", "of", "on", "or", "our", "shall", "she",
+            "that", "the", "their", "them", "there", "they", "this", "to", "unto", "us", "was",
+            "we", "with", "ye", "you", "your"
+        ]);
+        buildLiveBibleWordIndex();
 
         function createLiveOverlayChannel() {
             try {
@@ -595,27 +680,49 @@
             localRecognition.continuous = true;
             localRecognition.interimResults = true;
             localRecognition.lang = "en-US";
+            localRecognition.maxAlternatives = 5;
 
             localRecognition.onresult = (event) => {
                 let interimText = "";
                 let finalText = "";
+                const speechChunks = [];
 
                 for (let index = event.resultIndex; index < event.results.length; index += 1) {
-                    const transcript = event.results[index][0].transcript.trim();
-                    if (event.results[index].isFinal) {
+                    const result = event.results[index];
+                    const transcript = result[0].transcript.trim();
+                    for (let alternativeIndex = 0; alternativeIndex < result.length; alternativeIndex += 1) {
+                        const alternative = result[alternativeIndex]?.transcript?.trim();
+                        if (alternative) {
+                            speechChunks.push(alternative);
+                        }
+                    }
+                    if (result.isFinal) {
                         finalText += `${transcript} `;
                         appendLocalNote(transcript);
+                        addSermonPoint(transcript);
                         detectLocalLyrics(transcript, true);
-                        detectLocalReference(transcript);
                     } else {
                         interimText += `${transcript} `;
                         detectLocalLyrics(transcript, false);
-                        detectLocalReference(transcript);
                     }
                 }
 
-                document.getElementById("speechText").textContent = (interimText || finalText || "Listening...").trim();
-                speechHint.textContent = "Listening... waiting for the next phrase.";
+                const liveSpeechText = `${finalText} ${interimText}`.trim();
+                updateLocalSpeechBuffer(liveSpeechText);
+                updateLiveBibleWindow([
+                    ...speechChunks,
+                    liveSpeechText,
+                    localSpeechBuffer
+                ]);
+                const detectedBible = detectLocalBibleTrigger([
+                    ...speechChunks,
+                    liveSpeechText,
+                    localSpeechBuffer
+                ]);
+                document.getElementById("speechText").textContent = (liveSpeechText || "Listening...").trim();
+                if (!detectedBible) {
+                    speechHint.textContent = "Listening... waiting for the next phrase.";
+                }
             };
 
             localRecognition.onerror = (event) => {
@@ -649,6 +756,61 @@
             notesBox.value = `${notesBox.value ? `${notesBox.value}\n` : ""}[${time}] ${cleanText}`;
             notesBox.dispatchEvent(new Event("input", { bubbles: true }));
         }
+
+        function addSermonPoint(text) {
+            const cleanText = String(text || "")
+                .replace(/\s+/g, " ")
+                .replace(/^[-:,\s]+|[-:,\s]+$/g, "")
+                .trim();
+            if (!cleanText || cleanText.split(/\s+/).length < 5) {
+                return;
+            }
+
+            const normalized = cleanText.toLowerCase();
+            if (sermonPointItems.some((point) => point.normalized === normalized)) {
+                return;
+            }
+
+            sermonPointItems = [
+                {
+                    id: Date.now(),
+                    text: cleanText,
+                    normalized,
+                    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                },
+                ...sermonPointItems
+            ].slice(0, 10);
+            renderSermonPoints();
+        }
+
+        function renderSermonPoints() {
+            const sermonPointsList = document.getElementById("sermonPointsList");
+            if (!sermonPointsList) {
+                return;
+            }
+
+            sermonPointsList.innerHTML = sermonPointItems.length
+                ? sermonPointItems.map((point, index) => `
+                    <article class="sermon-point-item">
+                        <span class="sermon-point-number">${index + 1}</span>
+                        <p>${escapeHtml(point.text)}</p>
+                        <small>${escapeHtml(point.time)}</small>
+                    </article>
+                `).join("")
+                : '<div class="sermon-point-empty">Sermon points will appear as complete thoughts are spoken.</div>';
+        }
+
+        document.querySelectorAll("[data-detected-tab]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const activeTab = button.dataset.detectedTab;
+                document.querySelectorAll("[data-detected-tab]").forEach((tab) => {
+                    tab.classList.toggle("active", tab === button);
+                });
+                document.querySelectorAll(".detected-view").forEach((view) => {
+                    view.classList.toggle("active", view.id === (activeTab === "points" ? "sermonPointsView" : "detectedVersesView"));
+                });
+            });
+        });
 
         function detectLocalLyrics(text, isFinal) {
             const lyricToggle = document.getElementById("lyricAutoToggle");
@@ -759,44 +921,483 @@
             renderLocalLyrics();
         });
 
-        function detectLocalReference(text) {
-            const reference = findLocalReference(text);
-            if (!reference) {
-                return;
+        function detectLocalBibleTrigger(text) {
+            const candidates = Array.isArray(text) ? text : [text];
+            const cleanCandidates = candidates
+                .map((candidate) => String(candidate || "").trim())
+                .filter(Boolean);
+            const freshText = cleanCandidates.slice(0, -1).join(" ");
+            const bufferText = cleanCandidates[cleanCandidates.length - 1] || "";
+
+            const freshReference = findLocalReference(freshText);
+            if (freshReference && displayLocalBibleReference(freshReference, "reference")) {
+                return true;
             }
 
+            const bufferReference = findLocalReference(bufferText);
+            if (bufferReference && displayLocalBibleReference(bufferReference, "reference")) {
+                return true;
+            }
+
+            const freshPhraseMatch = findLocalBiblePhrase(freshText);
+            if (freshPhraseMatch && displayLocalBibleReference(freshPhraseMatch.reference, "phrase", freshPhraseMatch.phrase)) {
+                return true;
+            }
+
+            const freshLiveMatch = findLiveBibleWordMatch(freshText);
+            if (freshLiveMatch && previewLiveBibleWordMatch(freshLiveMatch)) {
+                return true;
+            }
+
+            const bufferPhraseMatch = findLocalBiblePhrase(bufferText);
+            if (bufferPhraseMatch && displayLocalBibleReference(bufferPhraseMatch.reference, "phrase", bufferPhraseMatch.phrase)) {
+                return true;
+            }
+
+            const bufferLiveMatch = findLiveBibleWordMatch(bufferText);
+            if (bufferLiveMatch && previewLiveBibleWordMatch(bufferLiveMatch)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function displayLocalBibleReference(reference, sourceType, phrase = "") {
+            const triggerKey = `${sourceType}:${reference}`.toLowerCase();
+            const now = Date.now();
+            if (!reference || (triggerKey === lastLocalBibleTrigger && now - lastLocalBibleTriggerAt < 1200)) {
+                return false;
+            }
+
+            lastLocalBibleTrigger = triggerKey;
+            lastLocalBibleTriggerAt = now;
             document.getElementById("verseInput").value = reference;
-            fetchLocalVerse(reference);
+            const phraseEntry = phrase ? localBiblePhraseReferences.find((entry) => entry.phrase === phrase) : null;
+            const cachedVerse = localVerseCache[reference.toLowerCase()];
+            if (phraseEntry?.text) {
+                localVerseCache[reference.toLowerCase()] = {
+                    reference,
+                    text: phraseEntry.text
+                };
+                updateChurchPreviewPanel(reference, phraseEntry.text);
+                scheduleChurchDisplayClear(reference);
+            } else if (cachedVerse?.text) {
+                updateChurchPreviewPanel(cachedVerse.reference, cachedVerse.text);
+                scheduleChurchDisplayClear(cachedVerse.reference);
+            } else if (phrase) {
+                updateChurchPreviewPanel(reference, `Detected Bible phrase: "${phrase}"`);
+            } else {
+                updateChurchPreviewPanel(reference, `Detected Bible reference: ${reference}`);
+            }
+            const speechHint = document.getElementById("speechHint");
+            if (speechHint) {
+                speechHint.textContent = phrase ? `Detected Bible match for ${reference}.` : `Detected ${reference}.`;
+            }
+            setLiveBibleStatus(`Pushed ${reference}`);
+            fetchLocalVerse(reference, { silent: true });
             const detectedReferences = document.getElementById("detectedReferences");
             if (detectedReferences) {
                 const current = detectedReferences.textContent.trim();
+                const label = phrase ? `${reference} (${phrase})` : reference;
                 detectedReferences.textContent = current && current !== "none yet" && !current.includes(reference)
-                    ? `${current}, ${reference}`
-                    : reference;
+                    ? `${current}, ${label}`
+                    : label;
             }
+            return true;
+        }
+
+        function previewLiveBibleWordMatch(match) {
+            if (!match?.reference) {
+                return false;
+            }
+
+            const previewReference = document.getElementById("previewReference");
+            const previewText = document.getElementById("previewText");
+            if (previewReference) {
+                previewReference.textContent = `${match.reference} word match`;
+            }
+            if (previewText) {
+                previewText.textContent = match.text || `Spoken word matched ${match.phrase}.`;
+            }
+            setLiveBibleStatus(`Word match: ${match.reference}`);
+            return true;
         }
 
         function findLocalReference(text) {
-            const source = String(text || "").toLowerCase().replace(/\s+/g, " ");
-            const numberToken = "(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:[-\\s](?:one|two|three|four|five|six|seven|eight|nine))?";
-
-            let match = source.match(new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(\\d+):(\\d+)\\b`, "i"));
-            if (match) {
-                return formatLocalReference(match[1], match[2], match[3]);
-            }
-
-            match = source.match(new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(?:chapter\\s+|chapter\\s+number\\s+)?(${numberToken})\\s+(?:verse\\s+|verses\\s+|verse\\s+number\\s+|colon\\s+)(${numberToken})\\b`, "i"));
-            if (match) {
-                return formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]));
-            }
-
-            match = source.match(new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(${numberToken})\\s+(${numberToken})\\b`, "i"));
-            if (match) {
-                return formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]));
-            }
-
-            return "";
+            const references = findLocalReferences(text);
+            return references.length ? references[references.length - 1] : "";
         }
+
+        function findLocalReferences(text) {
+            const source = String(text || "")
+                .toLowerCase()
+                .replace(/\bfirst\b/g, "1")
+                .replace(/\bsecond\b/g, "2")
+                .replace(/\bthird\b/g, "3")
+                .replace(/\bchapter number\b/g, "chapter")
+                .replace(/\bverse number\b/g, "verse")
+                .replace(/\bvs\b/g, "verse")
+                .replace(/\bverses\b/g, "verse")
+                .replace(/\band\b/g, " ")
+                .replace(/\bverse\s+of\b/g, "verse")
+                .replace(/\s+/g, " ");
+            const numberToken = "(?:\\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety)(?:[-\\s](?:one|two|three|four|five|six|seven|eight|nine))?";
+            const references = [];
+
+            const collectMatches = (regex, formatter) => {
+                let match;
+                while ((match = regex.exec(source)) !== null) {
+                    const reference = formatter(match);
+                    if (reference) {
+                        references.push({
+                            index: match.index,
+                            reference
+                        });
+                    }
+                }
+            };
+
+            collectMatches(
+                new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(\\d+):(\\d+)\\b`, "gi"),
+                (match) => formatLocalReference(match[1], match[2], match[3])
+            );
+
+            collectMatches(
+                new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(\\d{3,4})\\b`, "gi"),
+                (match) => {
+                    const digits = match[2];
+                    return formatLocalReference(match[1], digits.slice(0, -2), digits.slice(-2));
+                }
+            );
+
+            collectMatches(
+                new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+chapter\\s+(${numberToken})\\s+(${numberToken})\\b`, "gi"),
+                (match) => formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]))
+            );
+
+            collectMatches(
+                new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(?:chapter\\s+|chapter\\s+number\\s+)?(${numberToken})\\s+(?:verse\\s+|verses\\s+|verse\\s+number\\s+|colon\\s+)(${numberToken})\\b`, "gi"),
+                (match) => formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]))
+            );
+
+            collectMatches(
+                new RegExp(`\\b(?:book\\s+of\\s+)?(${localBibleBookPattern})\\s+(${numberToken})\\s+(${numberToken})\\b`, "gi"),
+                (match) => formatLocalReference(match[1], parseLocalNumber(match[2]), parseLocalNumber(match[3]))
+            );
+
+            return references
+                .sort((first, second) => first.index - second.index)
+                .map((item) => item.reference)
+                .filter((reference, index, allReferences) => allReferences.indexOf(reference) === index);
+        }
+
+        function updateLocalSpeechBuffer(text) {
+            const normalizedText = String(text || "").trim();
+            if (!normalizedText) {
+                return;
+            }
+
+            const currentWords = normalizedText.split(/\s+/);
+            const previousWords = localSpeechBuffer.split(/\s+/).filter(Boolean);
+            const mergedWords = [...previousWords, ...currentWords];
+            localSpeechBuffer = mergedWords.slice(-60).join(" ");
+        }
+
+        function findLocalBiblePhrase(text) {
+            const source = normalizeBiblePhraseText(text);
+            if (!source || source.split(" ").length < 3) {
+                return null;
+            }
+
+            return localBiblePhraseReferences
+                .map((entry) => {
+                    const exactIndex = source.lastIndexOf(entry.phrase);
+                    if (exactIndex >= 0) {
+                        return {
+                            ...entry,
+                            index: exactIndex,
+                            score: entry.phrase.split(" ").length
+                        };
+                    }
+
+                    const phraseWords = entry.phrase.split(" ");
+                    const sourceWords = source.split(" ");
+                    const windowSize = phraseWords.length + 2;
+                    let bestIndex = -1;
+                    let bestScore = 0;
+
+                    for (let index = 0; index < sourceWords.length; index += 1) {
+                        const windowWords = sourceWords.slice(index, index + windowSize);
+                        const score = phraseWords.filter((word) => windowWords.includes(word)).length;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestIndex = index;
+                        }
+                    }
+
+                    return phraseWords.length >= 5 && bestScore >= Math.ceil(phraseWords.length * 0.78)
+                        ? {
+                            ...entry,
+                            index: bestIndex,
+                            score: bestScore
+                        }
+                        : null;
+                })
+                .filter(Boolean)
+                .sort((first, second) => second.index - first.index || second.score - first.score)[0] || null;
+        }
+
+        function updateLiveBibleWindow(text) {
+            const candidates = Array.isArray(text) ? text : [text];
+            const cleanText = candidates
+                .map((candidate) => String(candidate || "").trim())
+                .filter(Boolean)
+                .join(" ");
+            const liveBibleSearchText = document.getElementById("liveBibleSearchText");
+            const liveBibleMatches = document.getElementById("liveBibleMatches");
+            const searchWords = getLiveBibleSearchWords(cleanText).slice(-8);
+            const spokenReferences = findLocalReferences(cleanText);
+            const latestSpokenReference = spokenReferences[spokenReferences.length - 1] || "";
+            if (latestSpokenReference) {
+                displayLocalBibleReference(latestSpokenReference, "live-bible-reference");
+            }
+            const references = spokenReferences.map((reference) => ({
+                type: "Reference",
+                reference,
+                phrase: reference,
+                text: localVerseCache[reference.toLowerCase()]?.text || "Ready to fetch scripture.",
+                score: 100
+            }));
+            const wordMatches = findLiveBibleWordMatches(cleanText).slice(0, 7);
+            const nextItems = [...references, ...wordMatches]
+                .filter((item, index, allItems) => allItems.findIndex((match) => match.reference === item.reference && match.phrase === item.phrase) === index)
+                .slice(0, 8);
+
+            if (liveBibleSearchText) {
+                liveBibleSearchText.textContent = searchWords.length
+                    ? searchWords.join(" ")
+                    : "Listening for Bible words and references.";
+            }
+
+            if (nextItems.length) {
+                liveBibleMatchItems = [
+                    ...nextItems,
+                    ...liveBibleMatchItems.filter((oldItem) => !nextItems.some((item) => item.reference === oldItem.reference && item.phrase === oldItem.phrase))
+                ].slice(0, 10);
+                setLiveBibleStatus(`${nextItems.length} match${nextItems.length === 1 ? "" : "es"}`);
+            } else if (searchWords.length) {
+                setLiveBibleStatus("Searching");
+            }
+
+            if (!liveBibleMatches) {
+                return;
+            }
+
+            liveBibleMatches.innerHTML = liveBibleMatchItems.length
+                ? liveBibleMatchItems.map((item) => `
+                    <button class="live-bible-match" type="button" data-reference="${escapeAttribute(item.reference)}">
+                        <span class="live-bible-match-top">
+                            <strong>${escapeHtml(item.reference)}</strong>
+                            <small>${escapeHtml(item.type)} - ${Math.round(item.score)}%</small>
+                        </span>
+                        <span class="live-bible-phrase">${escapeHtml(item.phrase)}</span>
+                        <span class="live-bible-text">${escapeHtml(item.text)}</span>
+                    </button>
+                `).join("")
+                : `
+                    <div class="live-bible-empty">
+                        <i class="fas fa-book-open"></i>
+                        <span>Detected Bible matches will appear here.</span>
+                    </div>
+                `;
+        }
+
+        function setLiveBibleStatus(status) {
+            const liveBibleStatus = document.getElementById("liveBibleStatus");
+            if (liveBibleStatus) {
+                liveBibleStatus.textContent = status;
+            }
+        }
+
+        function buildLiveBibleWordIndex() {
+            liveBibleWordIndex = {};
+            localBiblePhraseReferences.forEach((entry) => {
+                getLiveBibleSearchWords(`${entry.phrase} ${entry.text}`).forEach((word) => {
+                    if (!liveBibleWordIndex[word]) {
+                        liveBibleWordIndex[word] = [];
+                    }
+                    if (!liveBibleWordIndex[word].some((item) => item.reference === entry.reference && item.phrase === entry.phrase)) {
+                        liveBibleWordIndex[word].push(entry);
+                    }
+                });
+            });
+        }
+
+        function findLiveBibleWordMatch(text) {
+            const matches = findLiveBibleWordMatches(text);
+            return matches.length && matches[0].score >= 60 ? matches[0] : null;
+        }
+
+        function findLiveBibleWordMatches(text) {
+            const sourceWords = getLiveBibleSearchWords(text);
+            if (!sourceWords.length) {
+                return [];
+            }
+
+            const recentWords = sourceWords.slice(-6);
+            const scored = new Map();
+            recentWords.forEach((word, wordIndex) => {
+                (liveBibleWordIndex[word] || []).forEach((entry) => {
+                    const key = `${entry.reference}:${entry.phrase}`;
+                    const phraseWords = getLiveBibleSearchWords(entry.phrase);
+                    const current = scored.get(key) || {
+                        type: "Word",
+                        reference: entry.reference,
+                        phrase: entry.phrase,
+                        text: entry.text,
+                        score: 0,
+                        hits: [],
+                        index: wordIndex
+                    };
+                    if (!current.hits.includes(word)) {
+                        current.hits.push(word);
+                    }
+                    const rareWordScore = word.length >= 7 ? 38 : 28;
+                    const coverageScore = (current.hits.length / Math.max(phraseWords.length, 1)) * 42;
+                    const recencyScore = 12 + wordIndex;
+                    current.score = Math.min(100, current.score + rareWordScore + coverageScore + recencyScore);
+                    current.type = current.hits.length > 1 ? "Words" : "Word";
+                    scored.set(key, current);
+                });
+            });
+
+            return [...scored.values()]
+                .filter((item) => item.score >= 38)
+                .sort((first, second) => second.score - first.score || second.hits.length - first.hits.length || second.index - first.index);
+        }
+
+        function getLiveBibleSearchWords(text) {
+            return normalizeBiblePhraseText(text)
+                .split(" ")
+                .filter((word) => word && word.length > 2 && !liveBibleStopWords.has(word));
+        }
+
+        document.getElementById("liveBibleMatches")?.addEventListener("click", (event) => {
+            const matchButton = event.target.closest(".live-bible-match");
+            if (!matchButton?.dataset.reference) {
+                return;
+            }
+            displayLocalBibleReference(matchButton.dataset.reference, "live-bible-click", matchButton.querySelector(".live-bible-phrase")?.textContent || "");
+        });
+
+        const localBibleDictionary = {
+            covenant: "A binding promise that defines relationship and responsibility. In Scripture, God uses covenants to reveal His faithfulness.",
+            grace: "God's undeserved favor and empowering kindness, central to salvation and daily Christian life.",
+            tabernacle: "Israel's mobile worship place in the wilderness, symbolizing God's holy presence among His people.",
+            redemption: "Deliverance by payment of a price. In the gospel, Christ redeems people from sin through His sacrifice.",
+            disciple: "A learner and follower of Jesus being formed by His teaching, character, and mission.",
+            gospel: "The good news that Jesus lived, died, rose again, and offers forgiveness and new life to all who believe.",
+            kingdom: "God's reign and rule, revealed in Jesus and advancing through His people.",
+            faith: "Trusting confidence in God, His word, His character, and His promises.",
+            mercy: "God's compassionate kindness shown toward people in need and toward sinners.",
+            worship: "Reverent love, surrender, and honor given to God."
+        };
+        const localHebrewWords = [
+            { term: "shalom", transliteration: "sha-LOHM", meaning: "peace, wholeness, well-being", note: "Peace that includes harmony, safety, completeness, and welfare." },
+            { term: "hesed", transliteration: "HEH-sed", meaning: "steadfast love, covenant mercy", note: "God's loyal, enduring covenant love toward His people." },
+            { term: "ruach", transliteration: "roo-AKH", meaning: "spirit, breath, wind", note: "Used for breath, wind, and the Spirit of God." },
+            { term: "bara", transliteration: "bah-RAH", meaning: "to create", note: "Used in Genesis for God's creative act." },
+            { term: "adonai", transliteration: "ah-doe-NYE", meaning: "Lord, Master", note: "A reverent title used for God." },
+            { term: "torah", transliteration: "toe-RAH", meaning: "instruction, law", note: "God's teaching, especially the first five books of Scripture." },
+            { term: "mashiach", transliteration: "mah-SHEE-akh", meaning: "anointed one, messiah", note: "The promised deliverer and king." },
+            { term: "emunah", transliteration: "eh-moo-NAH", meaning: "faithfulness, steadfastness", note: "Firmness, reliability, and faithful trust." }
+        ];
+
+        function searchLocalBibleDictionary() {
+            const input = document.getElementById("dictionaryInput");
+            const result = document.getElementById("dictionaryResult");
+            const query = normalizeBiblePhraseText(input?.value || "");
+            if (!result) {
+                return;
+            }
+            if (!query) {
+                result.textContent = "Type a Bible term like grace, covenant, redemption, gospel, or kingdom.";
+                return;
+            }
+            const entry = Object.entries(localBibleDictionary).find(([term]) => term.includes(query) || query.includes(term));
+            result.innerHTML = entry
+                ? `<strong>${escapeHtml(capitalizeLocalWords(entry[0]))}</strong><p>${escapeHtml(entry[1])}</p>`
+                : `<strong>No entry found</strong><p>Try grace, covenant, redemption, disciple, gospel, kingdom, faith, mercy, or worship.</p>`;
+        }
+
+        function searchLocalHebrewWord() {
+            const input = document.getElementById("hebrewInput");
+            const result = document.getElementById("hebrewResult");
+            const query = normalizeBiblePhraseText(input?.value || "");
+            if (!result) {
+                return;
+            }
+            if (!query) {
+                result.textContent = "Type a Hebrew word like shalom, hesed, ruach, torah, or mashiach.";
+                return;
+            }
+            const match = localHebrewWords.find((entry) => (
+                entry.term.includes(query) ||
+                entry.meaning.includes(query) ||
+                entry.note.toLowerCase().includes(query)
+            ));
+            result.innerHTML = match
+                ? `<strong>${escapeHtml(match.term)}</strong><p><strong>Transliteration:</strong> ${escapeHtml(match.transliteration)}</p><p><strong>Meaning:</strong> ${escapeHtml(match.meaning)}</p><p>${escapeHtml(match.note)}</p>`
+                : `<strong>No Hebrew entry found</strong><p>Try shalom, hesed, ruach, bara, adonai, torah, mashiach, or emunah.</p>`;
+        }
+
+        function capitalizeLocalWords(text) {
+            return String(text || "").replace(/\b\w/g, (char) => char.toUpperCase());
+        }
+
+        document.getElementById("dictionaryButton")?.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            searchLocalBibleDictionary();
+        }, true);
+        document.getElementById("dictionaryInput")?.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                searchLocalBibleDictionary();
+            }
+        }, true);
+        document.getElementById("hebrewButton")?.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            searchLocalHebrewWord();
+        }, true);
+        document.getElementById("hebrewInput")?.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                searchLocalHebrewWord();
+            }
+        }, true);
+
+        function normalizeBiblePhraseText(text) {
+            return String(text || "")
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        window.testBibleSpeechTrigger = (spokenText) => {
+            updateLocalSpeechBuffer(spokenText);
+            detectLocalBibleTrigger(localSpeechBuffer);
+            return {
+                buffer: localSpeechBuffer,
+                references: findLocalReferences(localSpeechBuffer),
+                reference: findLocalReference(localSpeechBuffer),
+                phrase: findLocalBiblePhrase(localSpeechBuffer)
+            };
+        };
 
         function formatLocalReference(book, chapter, verse) {
             const chapterNumber = Number(chapter);
@@ -817,27 +1418,54 @@
             return rawValue.split(/[-\s]+/).reduce((total, part) => total + (localNumberWords[part] || 0), 0);
         }
 
-        async function fetchLocalVerse(reference) {
+        async function fetchLocalVerse(reference, options = {}) {
             const cleanReference = String(reference || "").trim();
             if (!cleanReference) {
                 return;
             }
 
-            updateChurchPreviewPanel(cleanReference, "Loading scripture...");
-
-            try {
-                const response = await fetch(`https://bible-api.com/${encodeURIComponent(cleanReference)}`);
-                const payload = await response.json();
-                const resolvedReference = payload.reference || cleanReference;
-                const verseText = payload.text ? payload.text.trim() : "Verse not found.";
-
-                updateChurchPreviewPanel(resolvedReference, verseText);
-                if (payload.text) {
-                    scheduleChurchDisplayClear(resolvedReference);
-                }
-            } catch (error) {
-                updateChurchPreviewPanel(cleanReference, "Error fetching verse.");
+            const silent = Boolean(options.silent);
+            if (!silent) {
+                updateChurchPreviewPanel(cleanReference, "Loading scripture...");
             }
+
+            const cacheKey = cleanReference.toLowerCase();
+            if (localVerseCache[cacheKey]) {
+                updateChurchPreviewPanel(localVerseCache[cacheKey].reference, localVerseCache[cacheKey].text);
+                scheduleChurchDisplayClear(localVerseCache[cacheKey].reference);
+                return;
+            }
+
+            if (localVerseFetches[cacheKey]) {
+                return localVerseFetches[cacheKey];
+            }
+
+            localVerseFetches[cacheKey] = fetch(`https://bible-api.com/${encodeURIComponent(cleanReference)}`)
+                .then((response) => response.json())
+                .then((payload) => {
+                    const resolvedReference = payload.reference || cleanReference;
+                    const verseText = payload.text ? payload.text.trim() : "Verse not found.";
+
+                    if (payload.text) {
+                        localVerseCache[cacheKey] = {
+                            reference: resolvedReference,
+                            text: verseText
+                        };
+                        updateChurchPreviewPanel(resolvedReference, verseText);
+                        scheduleChurchDisplayClear(resolvedReference);
+                    } else if (!silent) {
+                        updateChurchPreviewPanel(resolvedReference, verseText);
+                    }
+                })
+                .catch(() => {
+                    if (!silent) {
+                        updateChurchPreviewPanel(cleanReference, "Error fetching verse.");
+                    }
+                })
+                .finally(() => {
+                    delete localVerseFetches[cacheKey];
+                });
+            return localVerseFetches[cacheKey];
         }
 
         document.querySelectorAll(".studio-menu").forEach((menu) => {
@@ -915,6 +1543,8 @@
             if (detectedReferences) {
                 detectedReferences.textContent = "none yet";
             }
+            sermonPointItems = [];
+            renderSermonPoints();
             updateChurchPreviewPanel("", "");
         }
 
@@ -1055,6 +1685,7 @@
                 "focus-preview": () => focusPanel(".preview-panel"),
                 "focus-transcription": () => focusPanel(".transcription-panel"),
                 "focus-navigator": () => focusPanel(".navigator-panel"),
+                "focus-live-bible": () => focusPanel(".live-bible-panel"),
                 "focus-feed": () => focusPanel(".feed-panel"),
                 "toggle-fullscreen": () => {
                     if (document.fullscreenElement) {
@@ -1118,7 +1749,6 @@
 
         document.getElementById("autoPreviewToggle")?.addEventListener("click", (event) => {
             event.currentTarget.classList.toggle("active");
-            syncLiveVisibility(event.currentTarget.classList.contains("active"));
             publishLiveOverlay();
         });
 
@@ -1131,7 +1761,6 @@
 
         window.toggleChurchLiveVisibility = function toggleChurchLiveVisibility() {
             const nextActive = liveVisibilityButton.textContent.trim().toLowerCase() !== "live";
-            document.getElementById("autoPreviewToggle")?.classList.toggle("active", nextActive);
             syncLiveVisibility(nextActive);
             publishLiveOverlay();
         };
@@ -1211,12 +1840,18 @@
             }
         }
 
+        function isChurchLiveVisible() {
+            return liveVisibilityButton?.textContent?.trim().toLowerCase() === "live";
+        }
+
         function publishLiveOverlay() {
             const rawReference = document.getElementById("currentReference")?.textContent?.trim() || "";
             const rawText = document.getElementById("overlayText")?.textContent?.trim() || "";
+            const isVisible = isChurchLiveVisible();
             const payload = {
-                reference: rawReference && rawReference.toLowerCase() !== "none yet" ? rawReference : "",
-                text: rawText && !rawText.includes("Fetched scripture will appear here") ? rawText : "",
+                reference: isVisible && rawReference && rawReference.toLowerCase() !== "none yet" ? rawReference : "",
+                text: isVisible && rawText && !rawText.includes("Fetched scripture will appear here") ? rawText : "",
+                visible: isVisible,
                 updatedAt: new Date().toISOString()
             };
 
@@ -1271,8 +1906,61 @@
             if (overlayText) {
                 overlayText.textContent = cleanText || "Fetched scripture will appear here for display.";
             }
+            addScriptureFeedItem(cleanReference, cleanText);
             publishLiveOverlay();
         }
+
+        function addScriptureFeedItem(reference, text) {
+            if (!reference || !text || /^(loading scripture|error fetching verse|detected bible|type or speak)/i.test(text)) {
+                return;
+            }
+            const signature = `${reference}::${text}`;
+            if (scriptureFeedItems[0]?.signature === signature) {
+                return;
+            }
+            scriptureFeedItems = [
+                {
+                    signature,
+                    reference,
+                    text,
+                    time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                },
+                ...scriptureFeedItems.filter((item) => item.signature !== signature)
+            ].slice(0, 30);
+            renderScriptureFeed();
+        }
+
+        function renderScriptureFeed() {
+            const archiveList = document.getElementById("archiveList");
+            const archiveCount = document.getElementById("archiveCount");
+            if (archiveCount) {
+                archiveCount.textContent = String(scriptureFeedItems.length);
+            }
+            if (!archiveList) {
+                return;
+            }
+            if (!scriptureFeedItems.length) {
+                archiveList.innerHTML = '<div class="archive-empty"><strong>No scripture yet</strong><p>Fetched and spoken Bible references will appear here.</p></div>';
+                return;
+            }
+            archiveList.innerHTML = scriptureFeedItems.map((item) => `
+                <button class="scripture-feed-item" type="button" data-reference="${escapeAttribute(item.reference)}">
+                    <span class="scripture-feed-top"><strong>${escapeHtml(item.reference)}</strong><small>${escapeHtml(item.time)}</small></span>
+                    <span>${escapeHtml(item.text)}</span>
+                </button>
+            `).join("");
+        }
+
+        document.getElementById("archiveList")?.addEventListener("click", (event) => {
+            const item = event.target.closest(".scripture-feed-item");
+            if (!item?.dataset.reference) {
+                return;
+            }
+            const feedItem = scriptureFeedItems.find((entry) => entry.reference === item.dataset.reference);
+            if (feedItem) {
+                updateChurchPreviewPanel(feedItem.reference, feedItem.text);
+            }
+        });
 
         function scheduleChurchDisplayClear(reference) {
             if (churchDisplayTimer) {
@@ -1289,7 +1977,6 @@
                 }
 
                 updateChurchPreviewPanel("", "");
-                syncLiveVisibility(false);
                 publishLiveOverlay();
             }, 40000);
         }

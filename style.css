@@ -1010,6 +1010,16 @@ canvas {
     background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
     color: #061004;
     font-weight: 700;
+    flex: 0 0 auto;
+    min-width: 2.45rem;
+    width: 2.45rem;
+    height: 2.25rem;
+    padding: 0;
+    font-size: 0;
+}
+
+.btn-display i {
+    font-size: 0.8rem;
 }
 
 .church-studio-body .button-primary,
@@ -1028,7 +1038,7 @@ canvas {
 
 .church-studio-grid {
     display: grid;
-    grid-template-columns: 260px minmax(390px, 1fr) 260px;
+    grid-template-columns: 260px minmax(250px, 1fr) minmax(250px, 1fr) 260px;
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
     gap: 0.45rem;
     flex: 1;
@@ -1075,6 +1085,14 @@ canvas {
 .transcription-panel,
 .feed-panel {
     grid-row: auto;
+}
+
+.preview-panel {
+    grid-column: 2 / 4;
+}
+
+.matches-panel {
+    grid-column: auto;
 }
 
 .church-transcription-content,
@@ -1235,6 +1253,37 @@ canvas {
 
 .church-preview-controls input {
     min-width: 220px;
+    flex: 1 1 auto;
+}
+
+.scripture-feed-item {
+    width: 100%;
+    display: grid;
+    gap: 0.32rem;
+    padding: 0.52rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--muted);
+    text-align: left;
+}
+
+.scripture-feed-item:hover {
+    border-color: rgba(141, 252, 0, 0.52);
+    background: var(--accent-soft);
+    color: var(--text);
+}
+
+.scripture-feed-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.45rem;
+    color: var(--accent-strong);
+}
+
+.scripture-feed-top small {
+    color: var(--muted);
+    font-size: 0.68rem;
 }
 
 .feed-tabs,
@@ -1273,10 +1322,120 @@ canvas {
 }
 
 .navigator-panel,
+.live-bible-panel,
 .detected-panel,
 .matches-panel,
 .notes-panel {
     min-height: 0;
+}
+
+.live-bible-panel {
+    background:
+        linear-gradient(135deg, rgba(141, 252, 0, 0.08), rgba(255, 255, 255, 0.02)),
+        var(--panel);
+}
+
+.live-bible-search {
+    flex: 0 0 auto;
+    min-height: 78px;
+    max-height: 78px;
+    padding: 0.6rem 0.65rem;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+}
+
+.live-bible-search p {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0.28rem 0 0;
+    color: var(--text);
+    font-size: 0.92rem;
+    line-height: 1.35;
+}
+
+.live-bible-results {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    display: grid;
+    align-content: start;
+    gap: 0.38rem;
+    padding: 0.5rem;
+}
+
+.live-bible-empty {
+    min-height: 110px;
+    display: grid;
+    place-items: center;
+    gap: 0.45rem;
+    color: var(--muted);
+    text-align: center;
+}
+
+.live-bible-empty i {
+    color: var(--accent);
+    font-size: 1.3rem;
+}
+
+.live-bible-match {
+    width: 100%;
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.52rem;
+    border: 1px solid rgba(141, 252, 0, 0.22);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--text);
+    text-align: left;
+}
+
+.live-bible-match:hover {
+    border-color: rgba(141, 252, 0, 0.58);
+    background: var(--accent-soft);
+}
+
+.live-bible-match-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.live-bible-match-top strong {
+    min-width: 0;
+    color: var(--accent-strong);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.live-bible-match-top small {
+    flex: 0 0 auto;
+    color: var(--muted);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+.live-bible-phrase,
+.live-bible-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.35;
+}
+
+.live-bible-phrase {
+    -webkit-line-clamp: 1;
+    color: var(--text);
+    font-size: 0.82rem;
+}
+
+.live-bible-text {
+    -webkit-line-clamp: 2;
+    color: var(--muted);
+    font-size: 0.76rem;
 }
 
 .navigator-search {
@@ -1456,6 +1615,73 @@ canvas {
     justify-content: center;
 }
 
+.detected-view {
+    display: none;
+}
+
+.detected-view.active {
+    display: flex;
+}
+
+.sermon-points-view {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.sermon-points-list {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    align-content: start;
+    gap: 0.38rem;
+    overflow: auto;
+    padding: 0.5rem;
+}
+
+.sermon-point-empty {
+    min-height: 108px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    text-align: center;
+}
+
+.sermon-point-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.42rem;
+    align-items: start;
+    padding: 0.52rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.sermon-point-number {
+    display: inline-grid;
+    place-items: center;
+    width: 1.45rem;
+    height: 1.45rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    font-size: 0.72rem;
+    font-weight: 800;
+}
+
+.sermon-point-item p {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.sermon-point-item small {
+    color: var(--muted);
+    font-size: 0.68rem;
+}
+
 .church-summary {
     margin: 0 0.5rem 0.5rem;
     padding: 0.6rem;
@@ -1517,7 +1743,8 @@ canvas {
     }
 
     .preview-panel,
-    .notes-panel {
+    .notes-panel,
+    .matches-panel {
         grid-column: span 2;
     }
 }
@@ -1547,7 +1774,8 @@ canvas {
     }
 
     .preview-panel,
-    .notes-panel {
+    .notes-panel,
+    .matches-panel {
         grid-column: auto;
     }
 }
