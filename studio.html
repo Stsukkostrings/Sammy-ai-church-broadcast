@@ -12,25 +12,622 @@
     <title>Studio | OmniCast AI</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8dfc00">
-    <link rel="stylesheet" href="style.css">
     <script src="auth.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108904240723527"
      crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --text: #f3ffe2;
+            --muted: #bdd79f;
+            --accent: #8dfc00;
+            --accent-strong: #c8ff65;
+            --line: rgba(191, 255, 89, 0.18);
+            --panel: rgba(33, 21, 17, 0.82);
+            --bg: #000000;
+            --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        .page-shell {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ambient {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ambient-one {
+            width: 600px;
+            height: 600px;
+            background: var(--accent);
+            top: -200px;
+            left: -200px;
+        }
+
+        .ambient-two {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-strong);
+            bottom: -150px;
+            right: -150px;
+        }
+
+        /* ===== NAVBAR ===== */
+        #navbar {
+            background: var(--accent);
+            padding: 0.6rem 1.25rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(141, 252, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .nav-brand {
+            color: #000;
+            font-weight: 800;
+            font-size: 1rem;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+        }
+
+        .nav-menu {
+            position: relative;
+        }
+
+        .nav-dropdown-btn {
+            background: rgba(0,0,0,0.15);
+            color: #000;
+            border: none;
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s ease;
+        }
+
+        .nav-dropdown-btn:hover {
+            background: rgba(0,0,0,0.25);
+        }
+
+        .nav-dropdown-btn::after {
+            content: "▼";
+            font-size: 0.6rem;
+        }
+
+        .nav-dropdown {
+            position: absolute;
+            top: calc(100% + 0.4rem);
+            right: 0;
+            background: var(--bg);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 0.4rem;
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-6px);
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 30px rgba(141, 252, 0, 0.2);
+            z-index: 200;
+        }
+
+        .nav-menu.active .nav-dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-dropdown a {
+            display: block;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .nav-dropdown a:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            position: relative;
+            z-index: 1;
+            padding: 1.25rem 1rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* ===== STATS ROW ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0.7rem 0.5rem;
+            text-align: center;
+        }
+
+        .stat-title {
+            display: block;
+            font-size: 0.6rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.15rem;
+        }
+
+        .stat-card strong {
+            color: var(--accent);
+            font-size: 0.8rem;
+        }
+
+        /* ===== PRIMARY WORKSPACE ROW (3 cols) ===== */
+        .primary-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1000px) {
+            .primary-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .primary-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== SECONDARY TOOLBAR ROW (4 cols) ===== */
+        .toolbar-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .toolbar-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .toolbar-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== CARDS ===== */
+        .studio-card,
+        .tool-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(141, 252, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .card-eyebrow {
+            color: var(--accent);
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .studio-card h3,
+        .tool-card h3 {
+            font-size: 0.95rem;
+            color: var(--accent-strong);
+            font-weight: 700;
+        }
+
+        .studio-card h4,
+        .tool-card h4 {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .status-chip {
+            display: inline-block;
+            font-size: 0.6rem;
+            color: var(--muted);
+            background: rgba(141, 252, 0, 0.08);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--line);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        #waveCanvas {
+            width: 100%;
+            height: 70px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .recording-playback {
+            width: 100%;
+            height: 32px;
+            margin-top: 0.3rem;
+            border-radius: 6px;
+        }
+
+        /* ===== INPUTS ===== */
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0.5rem 0.7rem;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--muted);
+            opacity: 0.6;
+            font-size: 0.75rem;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .session-title-input {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* ===== BUTTONS ===== */
+        .card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: auto;
+        }
+
+        .button-primary,
+        .button-secondary {
+            font-family: inherit;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.45rem 0.9rem;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-primary {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .button-primary:hover {
+            background: var(--accent-strong);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(141, 252, 0, 0.3);
+        }
+
+        .button-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--line);
+        }
+
+        .button-secondary:hover {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .button-secondary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .button-secondary:disabled:hover {
+            background: transparent;
+            color: var(--accent);
+            border-color: var(--line);
+        }
+
+        /* ===== INLINE FORM ===== */
+        .inline-form {
+            display: flex;
+            flex-direction: row;
+            gap: 0.4rem;
+        }
+
+        .inline-form input {
+            flex: 1;
+        }
+
+        @media (max-width: 480px) {
+            .inline-form {
+                flex-direction: column;
+            }
+        }
+
+        /* ===== OVERLAY PREVIEW ===== */
+        .overlay-preview,
+        .tool-result {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0.6rem 0.7rem;
+            font-size: 0.75rem;
+            color: var(--muted);
+            min-height: 44px;
+        }
+
+        .detected-refs {
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .detected-refs span {
+            color: var(--accent-strong);
+        }
+
+        /* ===== PLANNER / ARCHIVE LISTS ===== */
+        .planner-list,
+        .archive-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            min-height: 60px;
+        }
+
+        /* ===== PRESENTATION LIST ===== */
+        .presentation-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .presentation-list li {
+            font-size: 0.75rem;
+            color: var(--muted);
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .presentation-list li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* ===== PROMO BOX ===== */
+        .promo-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 0.7rem;
+            margin-top: 0.4rem;
+        }
+
+        /* ===== SOCIAL SHARE ===== */
+        .feature-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+        }
+
+        .social-share-button {
+            font-size: 0.65rem;
+            padding: 0.35rem 0.6rem;
+        }
+
+        /* ===== ADS ===== */
+        .ad-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.5rem 1rem;
+        }
+
+        .ad-slot {
+            min-height: 60px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 0.7rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--line);
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        .footer-panel {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .footer-panel {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+        }
+
+        .footer-copy p {
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-strong);
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-strong);
+        }
+    </style>
 </head>
 <body>
     <div class="page-shell">
         <div class="ambient ambient-one"></div>
         <div class="ambient ambient-two"></div>
-        <header id="navbar"></header>
+
+        <header id="navbar">
+            <a href="index.html" class="nav-brand">OmniCast Studio</a>
+            <div class="nav-menu" id="navMenu">
+                <button class="nav-dropdown-btn" type="button" onClick="toggleDropdown()">Sections ▼</button>
+                <nav class="nav-dropdown">
+                    <a href="#workspace" onClick="closeDropdown()">Overview</a>
+                    <a href="#plannerSection" onClick="closeDropdown()">Planner</a>
+                    <a href="#archiveSection" onClick="closeDropdown()">Archive</a>
+                    <a href="#presentationSection" onClick="closeDropdown()">Present</a>
+                    <a href="#socialPublishSection" onClick="closeDropdown()">Publish</a>
+                </nav>
+            </div>
+        </header>
 
         <main>
             <section class="workspace-section studio-page" id="workspace">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">OmniCast Studio</p>
-                    <h2 id="workspaceGreeting">Welcome</h2>
-                    <p>Capture live sessions, shape summaries, prepare overlays, organize workflow, and publish content from one browser workspace.</p>
-                </div>
-
                 <div class="stats-row reveal">
                     <article class="stat-card">
                         <span class="stat-title">Ready</span>
@@ -50,27 +647,15 @@
                     </article>
                 </div>
 
-                <div class="studio-tabs reveal">
-                    <a href="#workspace">Overview</a>
-                    <a href="#studyToolsSection">Study Tools</a>
-                    <a href="#plannerSection">Planner</a>
-                    <a href="#archiveSection">Archive</a>
-                    <a href="#presentationSection">Present</a>
-                    <a href="#socialPublishSection">Publish</a>
-                </div>
-
-                <section class="ad-container compact" aria-label="Advertisement">
-                    <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
-                </section>
-
-                <div class="workspace-grid">
-                    <article class="studio-card transcript-card reveal">
+                <!-- PRIMARY ROW: Live Transcript | AI Insights | Generated Notes -->
+                <div class="primary-row reveal">
+                    <article class="studio-card" id="transcriptSection">
                         <div class="card-header">
                             <div>
                                 <p class="card-eyebrow">Live Transcript</p>
                                 <h3 id="speechText">Waiting...</h3>
                             </div>
-                            <span class="status-chip" id="speechHint">Listening... waiting for the next phrase.</span>
+                            <span class="status-chip" id="speechHint">Listening...</span>
                         </div>
                         <canvas id="waveCanvas" width="720" height="120"></canvas>
                         <div class="card-actions">
@@ -82,7 +667,7 @@
                         <audio id="recordingPlayback" class="recording-playback" controls></audio>
                     </article>
 
-                    <article class="studio-card insights-card reveal">
+                    <article class="studio-card" id="insightsSection">
                         <p class="card-eyebrow">AI Session Insights</p>
                         <h3>Local smart helpers</h3>
                         <input id="sessionTitle" class="session-title-input" type="text" value="Untitled Session" aria-label="Session title">
@@ -90,13 +675,13 @@
                         <p class="detected-refs">Detected references: <span id="detectedReferences">none yet</span></p>
                     </article>
 
-                    <article class="studio-card notes-card reveal">
+                    <article class="studio-card" id="notesSection">
                         <div class="card-header">
                             <div>
                                 <p class="card-eyebrow">Generated Notes</p>
                                 <h3>Editable workspace</h3>
                             </div>
-                            <span class="status-chip">Captured session notes appear here. Edit freely before download.</span>
+                            <span class="status-chip">Edit freely before download.</span>
                         </div>
                         <textarea id="notesBox" placeholder="Captured session notes appear here. Edit freely before download."></textarea>
                         <div class="card-actions">
@@ -105,86 +690,55 @@
                             <button class="button-secondary" id="archiveButton" type="button">Archive</button>
                         </div>
                     </article>
+                </div>
 
-                    <article class="studio-card scripture-card reveal">
-                        <p class="card-eyebrow">Faith Workflow Tool</p>
-                        <h3>Scripture Overlay</h3>
-                        <div class="inline-form">
-                            <input id="verseInput" type="text" placeholder="Type John 3:16">
-                            <button class="button-primary" id="verseButton" type="button">Show Verse</button>
-                        </div>
-                        <p class="detected-refs">Live reference: <span id="currentReference">none yet</span></p>
-                        <div id="overlayText" class="overlay-preview">Fetched scripture will appear here for display.</div>
-                    </article>
+                <!-- ADS -->
+                <section class="ad-container compact" aria-label="Advertisement">
+                    <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
+                </section>
 
-                    <article class="studio-card study-card reveal" id="studyToolsSection">
-                        <p class="card-eyebrow">Study Tools</p>
-                        <h3>English Dictionary</h3>
-                        <div class="inline-form">
-                            <input id="dictionaryInput" type="text" placeholder="Search any English word">
-                            <button class="button-primary" id="dictionaryButton" type="button">Search</button>
-                        </div>
-                        <div id="dictionaryResult" class="overlay-preview tool-result">Search any English word to see definitions, pronunciation, and examples.</div>
-                    </article>
-
-                    <article class="studio-card planner-card reveal" id="plannerSection">
+                <!-- SECONDARY ROW: Planner | Archive | Present | Publish -->
+                <div class="toolbar-row reveal">
+                    <article class="tool-card" id="plannerSection">
                         <p class="card-eyebrow">Production Planner</p>
-                        <h3>Media checklist</h3>
+                        <h3>Planner</h3>
                         <div id="plannerList" class="planner-list"></div>
                     </article>
 
-                    <article class="studio-card archive-card reveal" id="archiveSection">
+                    <article class="tool-card" id="archiveSection">
                         <p class="card-eyebrow">Session Archive</p>
-                        <h3>Saved sessions</h3>
+                        <h3>Archive</h3>
                         <div id="archiveList" class="archive-list"></div>
                     </article>
 
-                    <article class="studio-card presentation-card reveal" id="presentationSection">
+                    <article class="tool-card" id="presentationSection">
                         <p class="card-eyebrow">Presentation Hub</p>
-                        <h3>Broadcast prep</h3>
+                        <h3>Present</h3>
                         <ul class="presentation-list">
                             <li>Prepare overlay copy for lower thirds</li>
-                            <li>Generate promo snippets for recap or campaign posts</li>
-                            <li>Stage live highlights before broadcast or publishing</li>
+                            <li>Generate promo snippets for recap posts</li>
+                            <li>Stage live highlights before broadcast</li>
                         </ul>
-                        <div class="promo-box">
-                            <p class="card-eyebrow">OBS Browser Source URL</p>
-                            <h4>Copy into OBS</h4>
-                            <p id="obsOverlayUrl" class="obs-url-box">Generating browser source URL...</p>
-                            <div class="card-actions">
-                                <button class="button-primary" id="copyObsUrlButton" type="button">Copy OBS URL</button>
-                                <a class="button-secondary" id="openObsOverlayLink" href="lower-third.html" target="_blank" rel="noreferrer">Open Lower Third</a>
-                            </div>
-                        </div>
-                        <div class="promo-box">
-                            <p class="card-eyebrow">Promo Snippet</p>
-                            <h4>Local generated copy</h4>
-                            <p id="promoSnippet">Here is a concise highlight from this live session. Key takeaway: Start listening or type session notes to generate a summary.</p>
+                        <div class="card-actions" style="margin-top:0.5rem;">
+                            <a class="button-primary" id="openObsOverlayLink" href="lower-third.html" target="_blank" rel="noreferrer">Open Lower Third</a>
                         </div>
                     </article>
 
-                    <article class="studio-card presentation-card reveal" id="socialPublishSection">
+                    <article class="tool-card" id="socialPublishSection">
                         <p class="card-eyebrow">Social Publishing</p>
-                        <h3>Share generated media</h3>
+                        <h3>Publish</h3>
                         <div class="inline-form">
-                            <input id="mediaLinkInput" type="url" placeholder="Paste media URL or file link">
+                            <input id="mediaLinkInput" type="url" placeholder="Paste media URL">
                         </div>
-                        <div class="inline-form">
-                            <textarea id="socialCaptionInput" placeholder="Write or edit a caption for social publishing"></textarea>
+                        <div class="inline-form" style="margin-top:0.3rem;">
+                            <textarea id="socialCaptionInput" placeholder="Write a caption" style="min-height:50px;font-size:0.75rem;"></textarea>
                         </div>
-                        <div class="card-actions">
-                            <button class="button-primary" id="fillCaptionButton" type="button">Use Promo Snippet</button>
-                            <button class="button-secondary" id="copyCaptionButton" type="button">Copy Caption</button>
-                        </div>
-                        <div class="feature-strip">
-                            <button class="button-secondary social-share-button" id="shareFacebookButton" type="button">Facebook</button>
+                        <div class="feature-strip" style="margin-top:0.4rem;">
+                            <button class="button-secondary social-share-button" id="shareFacebookButton" type="button">FB</button>
                             <button class="button-secondary social-share-button" id="shareXButton" type="button">X</button>
-                            <button class="button-secondary social-share-button" id="shareLinkedInButton" type="button">LinkedIn</button>
-                            <button class="button-secondary social-share-button" id="shareWhatsAppButton" type="button">WhatsApp</button>
-                            <button class="button-secondary social-share-button" id="shareTelegramButton" type="button">Telegram</button>
-                        </div>
-                        <div class="overlay-preview tool-result" id="publishStatus">
-                            Add a media link and caption, then use the share buttons to publish through social apps.
+                            <button class="button-secondary social-share-button" id="shareLinkedInButton" type="button">LI</button>
+                            <button class="button-secondary social-share-button" id="shareWhatsAppButton" type="button">WA</button>
+                            <button class="button-secondary social-share-button" id="shareTelegramButton" type="button">TG</button>
                         </div>
                     </article>
                 </div>
@@ -196,22 +750,34 @@
         </section>
 
         <footer class="site-footer">
-            <div class="footer-panel reveal">
+            <div class="footer-panel">
                 <div class="footer-copy">
                     <p>© 2026 OmniCast AI. All rights reserved.</p>
                     <p>Developed by Sammy G Concept.</p>
-                    <p>Microphone and internet features are used for speech capture, lookup, sharing, and related media workflows.</p>
                 </div>
                 <div class="footer-links">
                     <a href="about.html">About</a>
                     <a href="privacy.html">Privacy</a>
                     <a href="terms.html">Terms</a>
+                    <a href="contact.html">Contact Us</a>
                 </div>
             </div>
         </footer>
     </div>
 
-    <script src="navbar.js"></script>
+    <script>
+        function toggleDropdown() {
+            document.getElementById('navMenu').classList.toggle('active');
+        }
+        function closeDropdown() {
+            document.getElementById('navMenu').classList.remove('active');
+        }
+        document.addEventListener('click', function(e) {
+            if (!document.getElementById('navMenu').contains(e.target)) {
+                closeDropdown();
+            }
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
     <script src="ads.js"></script>
     <script src="app.js?v=20260501-verse-display-timer"></script>

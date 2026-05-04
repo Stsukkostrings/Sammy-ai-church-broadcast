@@ -13,6 +13,7 @@ function renderNavbar() {
     const pathname = window.location.pathname || "";
     const isStudioPage = pathname.endsWith("/studio.html");
     const isChurchStudioPage = pathname.endsWith("/church_studio.html");
+    const isLyricsPage = pathname.endsWith("/omnicast_lyrics.html");
     const isHomePage = pathname.endsWith("/home.html");
     const isLandingPage =
         pathname.endsWith("/index.html") ||
@@ -20,24 +21,37 @@ function renderNavbar() {
         pathname.endsWith("/omnicast-ai") ||
         pathname.endsWith("/ai-church-broadcast");
 
-    const studioLink = "studio.html";
-    const studioLabel = isLandingPage ? "Launch OmniCast Studio" : isStudioPage ? "Open Workspace" : "Open Studio";
-    const aboutLink = isStudioPage ? "about.html" : isHomePage ? "about.html" : "index.html";
-    const contactLink = isStudioPage ? "home.html#contact" : isHomePage ? "#contact" : "index.html#contact";
-    const logoLink = isStudioPage || isChurchStudioPage ? "index.html" : isHomePage ? "home.html#studio" : "index.html";
+    const logoLink = isStudioPage || isChurchStudioPage || isLyricsPage ? "index.html" : isHomePage ? "home.html#studio" : "index.html";
     const churchStudioLink = isStudioPage ? '<a href="church_studio.html">Church Studio</a>' : "";
+    const lyricsLink = isChurchStudioPage || isStudioPage ? '<a href="omnicast_lyrics.html">Lyrics</a>' : "";
+
+    if (isChurchStudioPage || isStudioPage) {
+        navMount.innerHTML = "";
+        return;
+    }
+
+    if (isLandingPage) {
+        navMount.innerHTML = `
+        <div class="nav index-nav">
+            <a class="logo" href="index.html">OmniCast AI</a>
+            <div class="links">
+                <a href="church_studio.html">Church Studio</a>
+                <a href="omnicast_lyrics.html">Lyrics</a>
+                <a href="studio.html">Main Studio</a>
+                <a href="#about">About</a>
+            </div>
+        </div>
+        `;
+        return;
+    }
 
     navMount.innerHTML = `
     <div class="nav">
         <a class="logo" href="${logoLink}">OmniCast AI</a>
 
         <div class="links">
-            <a href="${studioLink}">${studioLabel}</a>
             ${churchStudioLink}
-            <a href="${aboutLink}">About</a>
-            <a href="${contactLink}">Contact Us</a>
-            <a href="privacy.html">Privacy</a>
-            <a href="terms.html">Terms</a>
+            ${lyricsLink}
         </div>
     </div>
     `;

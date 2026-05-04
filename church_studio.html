@@ -12,15 +12,1992 @@
     <title>Church Studio | OmniCast AI</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8dfc00">
-    <link rel="stylesheet" href="style.css?v=20260501-church-studio-stable-lyrics">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="auth.js"></script>
+    <style>
+        /* ============================================
+           CSS VARIABLES — Neon Green on Black Theme
+           ============================================ */
+        :root {
+            --text: #8dfc00;
+            --muted: #6bb300;
+            --accent: #8dfc00;
+            --accent-strong: #c8ff65;
+            --line: rgba(141, 252, 0, 0.25);
+            --panel: rgba(20, 20, 20, 0.95);
+            --bg: #000000;
+            --nav-bg: #8dfc00;
+            --danger: #ff4444;
+        }
+
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ============================================
+           NAVBAR (Neon Green Background, Black Text)
+           ============================================ */
+        #navbar {
+            background: var(--nav-bg);
+            color: var(--bg);
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(141, 252, 0, 0.2);
+        }
+
+        /* ============================================
+           PAGE SHELL
+           ============================================ */
+        .church-studio-shell {
+            width: 100%;
+            padding: 0;
+        }
+
+        /* ============================================
+           MENU BAR (File, Edit, View, Audio, Window, Lyric, Help)
+           ============================================ */
+        .church-window-menu {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--line);
+            padding: 4px 12px;
+            flex-wrap: wrap;
+        }
+
+        .studio-menu {
+            position: relative;
+        }
+
+        .studio-menu > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .studio-menu > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .studio-menu > summary:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .studio-menu[open] > summary {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .studio-menu-list {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 200px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 6px;
+            z-index: 200;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .studio-menu-list button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 7px 12px;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .studio-menu-list button:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .church-menu-feedback {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 4px 10px;
+            background: rgba(141, 252, 0, 0.1);
+            border-radius: 4px;
+            border: 1px solid var(--line);
+        }
+
+        .church-menu-feedback.is-visible {
+            opacity: 1;
+        }
+
+        /* ============================================
+           TOP BAR
+           ============================================ */
+        .church-studio-topbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--line);
+            flex-wrap: wrap;
+        }
+
+        .church-brand {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--accent);
+            text-decoration: none;
+            letter-spacing: 0.3px;
+            transition: color 0.2s;
+        }
+
+        .church-brand:hover {
+            color: var(--accent-strong);
+        }
+
+        .church-license-pill {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 3px;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .active-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            background: rgba(141, 252, 0, 0.1);
+            padding: 3px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .active-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .church-session-title {
+            flex: 1;
+            min-width: 120px;
+            max-width: 280px;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .church-session-title:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(141, 252, 0, 0.15);
+        }
+
+        .church-session-title::placeholder {
+            color: rgba(141, 252, 0, 0.4);
+        }
+
+        .church-device-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--muted);
+            background: rgba(141, 252, 0, 0.08);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--line);
+        }
+
+        .church-device-pill i {
+            color: var(--accent);
+        }
+
+        .mic-signal {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 12px;
+        }
+
+        .mic-signal span {
+            width: 3px;
+            background: var(--line);
+            border-radius: 1px;
+            transition: all 0.15s ease;
+        }
+
+        .mic-signal span:nth-child(1) { height: 4px; }
+        .mic-signal span:nth-child(2) { height: 7px; }
+        .mic-signal span:nth-child(3) { height: 10px; }
+        .mic-signal span:nth-child(4) { height: 6px; }
+
+        .mic-signal.is-live span {
+            background: var(--accent);
+            animation: micSignal 0.5s ease-in-out infinite alternate;
+        }
+
+        .mic-signal.is-live span:nth-child(1) { animation-delay: 0s; }
+        .mic-signal.is-live span:nth-child(2) { animation-delay: 0.1s; }
+        .mic-signal.is-live span:nth-child(3) { animation-delay: 0.2s; }
+        .mic-signal.is-live span:nth-child(4) { animation-delay: 0.3s; }
+
+        @keyframes micSignal {
+            from { height: 3px; }
+            to { height: 12px; }
+        }
+
+        .church-icon-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .church-icon-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(141, 252, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .church-icon-btn.is-listening {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            animation: pulseGlow 1.5s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(141, 252, 0, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(141, 252, 0, 0.6); }
+        }
+
+        .btn-lyrics {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(141, 252, 0, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-lyrics:hover {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 12px rgba(141, 252, 0, 0.3);
+        }
+
+        .church-nav-dropdown {
+            position: relative;
+        }
+
+        .church-dropdown-trigger {
+            list-style: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .church-dropdown-trigger::-webkit-details-marker {
+            display: none;
+        }
+
+        .church-dropdown-trigger:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .church-nav-dropdown[open] .church-dropdown-trigger {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .church-dropdown-trigger i {
+            font-size: 9px;
+            transition: transform 0.2s;
+        }
+
+        .church-nav-dropdown[open] .church-dropdown-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .church-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 280px;
+            max-width: 90vw;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 300;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .church-chip {
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            color: var(--muted);
+        }
+
+        /* ============================================
+           STUDIO GRID — Screenshot Layout
+           ============================================ */
+        .church-studio-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: auto auto;
+            gap: 10px;
+            padding: 10px 16px;
+        }
+
+        /* ============================================
+           PANELS
+           ============================================ */
+        .church-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .church-panel:hover {
+            border-color: rgba(141, 252, 0, 0.5);
+            box-shadow: 0 0 20px rgba(141, 252, 0, 0.08);
+        }
+
+        .church-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(141, 252, 0, 0.05);
+            border-bottom: 1px solid var(--line);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .church-panel-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* ============================================
+           TRANSCRIPTION PANEL — Top Left
+           ============================================ */
+        .transcription-panel {
+            grid-column: 1;
+            grid-row: 1;
+            height: 320px;
+            max-height: 320px;
+            min-height: 320px;
+            overflow: hidden;
+        }
+
+        .church-transcription-content {
+            padding: 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .church-transcription-content canvas {
+            width: 100%;
+            height: 70px;
+            background: rgba(141, 252, 0, 0.05);
+            border-radius: 6px;
+            border: 1px solid var(--line);
+        }
+
+        .church-transcription-content h1 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .church-transcription-content p {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .church-transcription-content .church-chip {
+            margin-top: 4px;
+        }
+
+        /* ============================================
+           PREVIEW PANEL — Top Center (spans 2 cols)
+           ============================================ */
+        .preview-panel {
+            grid-column: 2 / 4;
+            grid-row: 1;
+            height: 320px;
+            max-height: 320px;
+            min-height: 320px;
+            overflow: hidden;
+        }
+
+        .church-preview-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(141, 252, 0, 0.05);
+            border-bottom: 1px solid var(--line);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .preview-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .church-toolbar-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .church-toolbar-item span:first-child {
+            color: var(--danger);
+        }
+
+        .hidden-badge {
+            padding: 2px 8px;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            color: var(--muted);
+            font-size: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .hidden-badge:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .hidden-badge.is-live {
+            background: var(--danger);
+            color: var(--text);
+            border-color: var(--danger);
+        }
+
+        .size-slider {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .size-slider input {
+            width: 50px;
+            height: 4px;
+            accent-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .size-slider span:last-child {
+            color: var(--accent);
+            font-weight: 700;
+            min-width: 26px;
+        }
+
+        .church-toggle {
+            width: 28px;
+            height: 14px;
+            background: #333;
+            border-radius: 7px;
+            position: relative;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .church-toggle.active {
+            background: var(--accent);
+        }
+
+        .church-toggle::after {
+            content: "";
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--text);
+            border-radius: 50%;
+            top: 1px;
+            left: 1px;
+            transition: transform 0.2s;
+        }
+
+        .church-toggle.active::after {
+            transform: translateX(14px);
+        }
+
+        .church-preview-stage {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            padding: 12px;
+            min-height: 0;
+            max-height: 100%;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        .church-preview-card {
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            background: rgba(141, 252, 0, 0.03);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px 12px;
+            min-height: 0;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        .church-preview-card.active,
+        #readyPreviewWindow {
+            display: flex;
+        }
+
+        .church-preview-window {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            background: rgba(141, 252, 0, 0.03);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px 12px;
+            min-height: 0;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        .live-window {
+            background: rgba(141, 252, 0, 0.05);
+        }
+
+        .card-icon {
+            font-size: 28px;
+            color: var(--accent);
+            opacity: 0.5;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .live-card .verse-ref {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            margin-bottom: 6px;
+        }
+
+        .live-card .verse-text {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .church-preview-controls {
+            display: flex;
+            gap: 8px;
+            padding: 10px 12px;
+            border-top: 1px solid var(--line);
+        }
+
+        .church-preview-controls input {
+            flex: 1;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 7px 12px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .church-preview-controls input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(141, 252, 0, 0.15);
+        }
+
+        .church-preview-controls input::placeholder {
+            color: rgba(141, 252, 0, 0.4);
+        }
+
+        .btn-display {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 14px;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-display:hover {
+            background: var(--accent-strong);
+            box-shadow: 0 0 15px rgba(141, 252, 0, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .obs-url-box {
+            padding: 8px 12px;
+            font-size: 10px;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        .obs-url-box.is-hidden {
+            display: none;
+        }
+
+        /* ============================================
+           FEED PANEL — Top Right
+           ============================================ */
+        .feed-panel {
+            grid-column: 4;
+            grid-row: 1;
+            height: 320px;
+            max-height: 320px;
+            min-height: 320px;
+            overflow: hidden;
+        }
+
+        .feed-count {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .feed-count span {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .feed-tabs {
+            display: flex;
+            background: rgba(141, 252, 0, 0.05);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .feed-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .feed-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(141, 252, 0, 0.05);
+        }
+
+        .feed-tab:hover:not(.active) {
+            color: var(--text);
+            background: rgba(141, 252, 0, 0.03);
+        }
+
+        .feed-content {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            min-height: 160px;
+        }
+
+        .archive-empty {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .archive-empty strong {
+            display: block;
+            font-size: 13px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+
+        .archive-empty p {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .scripture-feed-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: rgba(141, 252, 0, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scripture-feed-item:hover {
+            background: rgba(141, 252, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .scripture-feed-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scripture-feed-top strong {
+            color: var(--accent-strong);
+            font-size: 11px;
+        }
+
+        .scripture-feed-top small {
+            color: var(--muted);
+            font-size: 9px;
+        }
+
+        /* ============================================
+           NAVIGATOR PANEL — Bottom Left
+           ============================================ */
+        .navigator-panel {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .version-dropdown {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .version-dropdown:hover {
+            color: var(--accent);
+        }
+
+        .navigator-tabs {
+            display: flex;
+            background: rgba(141, 252, 0, 0.05);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            border: none;
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background: rgba(141, 252, 0, 0.05);
+        }
+
+        .nav-tab:hover:not(.active) {
+            color: var(--text);
+            background: rgba(141, 252, 0, 0.03);
+        }
+
+        .navigator-search {
+            display: flex;
+            gap: 6px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 6px 10px;
+        }
+
+        .search-input-wrapper i {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .search-input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .search-input-wrapper input::placeholder {
+            color: rgba(141, 252, 0, 0.4);
+        }
+
+        .scripture-content {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        .navigator-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 10px;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 24px;
+            color: var(--accent);
+            opacity: 0.4;
+        }
+
+        .empty-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .empty-subtitle {
+            font-size: 10px;
+            color: rgba(141, 252, 0, 0.5);
+        }
+
+        .verse-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            margin-bottom: 4px;
+            background: rgba(141, 252, 0, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .verse-row:hover,
+        .verse-row.active {
+            background: rgba(141, 252, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .verse-num {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent);
+            min-width: 20px;
+        }
+
+        .verse-text-content {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .add-verse-btn {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent);
+            padding: 0 4px;
+        }
+
+        .matches-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            gap: 10px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--line);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        /* ============================================
+           LIVE BIBLE PANEL — Bottom Center-Left
+           ============================================ */
+        .live-bible-panel {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .live-bible-search {
+            padding: 12px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .card-eyebrow {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 4px;
+        }
+
+        .live-bible-search p {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .live-bible-results {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        .live-bible-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .live-bible-empty i {
+            font-size: 24px;
+            color: var(--accent);
+            opacity: 0.35;
+        }
+
+        .live-bible-empty span {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .live-bible-match {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            background: rgba(141, 252, 0, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .live-bible-match:hover {
+            background: rgba(141, 252, 0, 0.1);
+            border-color: var(--accent);
+        }
+
+        .live-bible-match-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .live-bible-match-top strong {
+            color: var(--accent-strong);
+            font-size: 11px;
+        }
+
+        .live-bible-match-top small {
+            color: var(--muted);
+            font-size: 9px;
+        }
+
+        .live-bible-phrase {
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .live-bible-text {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.3;
+        }
+
+        /* ============================================
+           DETECTED PANEL — Bottom Center-Right
+           ============================================ */
+        .detected-panel {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        .detected-tabs {
+            display: flex;
+            background: rgba(141, 252, 0, 0.05);
+            border-bottom: 1px solid var(--line);
+        }
+
+        .detected-placeholder {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            gap: 6px;
+            text-align: center;
+            min-height: 120px;
+        }
+
+        .detected-placeholder.active {
+            display: flex;
+        }
+
+        .info-icon {
+            font-size: 18px;
+            color: var(--muted);
+            opacity: 0.5;
+        }
+
+        .detected-placeholder h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .detected-placeholder p {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .sermon-points-view {
+            display: none;
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            min-height: 120px;
+        }
+
+        .sermon-points-view.active {
+            display: block;
+        }
+
+        .sermon-points-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sermon-point-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(141, 252, 0, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+        }
+
+        .sermon-point-number {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: var(--bg);
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .sermon-point-item p {
+            flex: 1;
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        .sermon-point-item small {
+            font-size: 9px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+
+        .sermon-point-empty {
+            text-align: center;
+            padding: 20px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .church-summary {
+            padding: 10px 12px;
+            border-top: 1px solid var(--line);
+            background: rgba(141, 252, 0, 0.05);
+        }
+
+        .church-summary p {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+            margin-top: 3px;
+        }
+
+        .church-summary #promoSnippet {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--line);
+            font-size: 10px;
+            color: rgba(141, 252, 0, 0.6);
+            font-style: italic;
+        }
+
+        /* ============================================
+           MATCHES PANEL — Bottom Right
+           ============================================ */
+        .matches-panel {
+            grid-column: 4;
+            grid-row: 2;
+        }
+
+        .matches-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: rgba(141, 252, 0, 0.05);
+            border-bottom: 1px solid var(--line);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .matches-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .matches-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .match-action-btn {
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid var(--line);
+            background: rgba(141, 252, 0, 0.08);
+            color: var(--muted);
+            transition: all 0.2s ease;
+        }
+
+        .match-action-btn.live {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+        }
+
+        .match-action-btn:hover:not(.live) {
+            color: var(--text);
+            border-color: var(--accent);
+        }
+
+        .lookup-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 12px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        .lookup-stack > div {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .church-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-strong);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .inline-form {
+            display: flex;
+            gap: 6px;
+        }
+
+        .inline-form input {
+            flex: 1;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 7px 12px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .inline-form input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(141, 252, 0, 0.15);
+        }
+
+        .inline-form input::placeholder {
+            color: rgba(141, 252, 0, 0.4);
+        }
+
+        .overlay-preview {
+            padding: 10px;
+            background: rgba(141, 252, 0, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.4;
+            min-height: 60px;
+        }
+
+        .tool-result {
+            margin-top: 8px;
+        }
+
+        /* ============================================
+           NOTES PANEL (Dropdown)
+           ============================================ */
+        .notes-panel textarea {
+            width: 100%;
+            min-height: 100px;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
+        }
+
+        .notes-panel textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(141, 252, 0, 0.15);
+        }
+
+        .notes-panel textarea::placeholder {
+            color: rgba(141, 252, 0, 0.4);
+        }
+
+        .notes-panel input[type="url"] {
+            width: 100%;
+            background: rgba(141, 252, 0, 0.08);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 7px 12px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .notes-panel input[type="url"]:focus {
+            border-color: var(--accent);
+        }
+
+        .notes-panel input[type="url"]::placeholder {
+            color: rgba(141, 252, 0, 0.4);
+        }
+
+        /* ============================================
+           PLANNER PANEL (Dropdown)
+           ============================================ */
+        .planner-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .planner-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(141, 252, 0, 0.05);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .planner-item.done {
+            opacity: 0.5;
+            border-color: rgba(141, 252, 0, 0.3);
+        }
+
+        .planner-item strong {
+            font-size: 12px;
+            color: var(--text);
+        }
+
+        .planner-meta {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .planner-toggle {
+            font-size: 10px;
+            padding: 4px 10px;
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .button-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+
+        .button-primary:hover {
+            background: var(--accent-strong);
+            box-shadow: 0 0 15px rgba(141, 252, 0, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .button-primary:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: rgba(141, 252, 0, 0.08);
+            color: var(--muted);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .button-secondary:hover {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(141, 252, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .button-secondary:active {
+            transform: translateY(0);
+        }
+
+        .social-share-button {
+            flex: 1;
+            text-align: center;
+        }
+
+        .feature-strip {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .church-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        /* ============================================
+           AUDIO PLAYER
+           ============================================ */
+        .recording-playback {
+            width: 100%;
+            height: 28px;
+            border-radius: 4px;
+            margin-top: 6px;
+            filter: invert(1) hue-rotate(180deg);
+            opacity: 0.8;
+        }
+
+        /* ============================================
+           ADS & FOOTER
+           ============================================ */
+        .ad-container {
+            padding: 10px 16px;
+        }
+
+        .church-bottom-ad {
+            margin-top: 10px;
+        }
+
+        /* ============================================
+           SCROLLBAR
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(141, 252, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+
+        /* Menu focus highlight */
+        .is-menu-focused {
+            animation: menuFocus 1.2s ease;
+        }
+
+        @keyframes menuFocus {
+            0%, 100% { box-shadow: none; }
+            50% { box-shadow: 0 0 20px rgba(141, 252, 0, 0.3); border-color: var(--accent); }
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+
+        /* Large tablets & small desktops */
+        @media (max-width: 1200px) {
+            .church-studio-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: auto auto auto auto;
+            }
+
+            .transcription-panel { grid-column: 1; grid-row: 1; }
+            .preview-panel { grid-column: 2; grid-row: 1; }
+            .feed-panel { grid-column: 1; grid-row: 2; }
+            .navigator-panel { grid-column: 2; grid-row: 2; }
+            .live-bible-panel { grid-column: 1; grid-row: 3; }
+            .detected-panel { grid-column: 2; grid-row: 3; }
+            .matches-panel { grid-column: 1 / -1; grid-row: 4; }
+
+            .church-studio-topbar {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Tablets */
+        @media (max-width: 768px) {
+            .church-studio-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+
+            .transcription-panel,
+            .preview-panel,
+            .feed-panel,
+            .navigator-panel,
+            .live-bible-panel,
+            .detected-panel,
+            .matches-panel {
+                grid-column: 1;
+            }
+
+            .transcription-panel { grid-row: 1; }
+            .preview-panel { grid-row: 2; }
+            .feed-panel { grid-row: 3; }
+            .navigator-panel { grid-row: 4; }
+            .live-bible-panel { grid-row: 5; }
+            .detected-panel { grid-row: 6; }
+            .matches-panel { grid-row: 7; }
+
+            .church-window-menu {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .studio-menu-list {
+                position: fixed;
+                left: 10px;
+                right: 10px;
+                top: auto;
+            }
+
+            .church-dropdown-menu {
+                position: fixed;
+                left: 10px;
+                right: 10px;
+                top: auto;
+                max-height: 60vh;
+            }
+
+            .church-session-title {
+                max-width: 100%;
+                order: -1;
+                width: 100%;
+            }
+
+            .church-studio-topbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .church-device-pill,
+            .church-icon-btn,
+            .btn-lyrics,
+            .church-nav-dropdown {
+                order: 1;
+            }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            body {
+                font-size: 12px;
+            }
+
+            .church-window-menu {
+                padding: 4px 8px;
+            }
+
+            .studio-menu > summary {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+
+            .church-studio-topbar {
+                padding: 6px 10px;
+                gap: 6px;
+            }
+
+            .church-brand {
+                font-size: 12px;
+            }
+
+            .church-license-pill,
+            .active-indicator {
+                display: none;
+            }
+
+            .church-panel-header {
+                padding: 6px 10px;
+            }
+
+            .church-transcription-content,
+            .church-preview-stage,
+            .feed-content,
+            .scripture-content,
+            .live-bible-results,
+            .detected-placeholder,
+            .sermon-points-view {
+                padding: 8px;
+            }
+
+            .lookup-stack {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .church-actions,
+            .feature-strip {
+                flex-direction: column;
+            }
+
+            .button-primary,
+            .button-secondary,
+            .social-share-button {
+                width: 100%;
+                text-align: center;
+            }
+
+            .inline-form {
+                flex-direction: column;
+            }
+
+            .inline-form input,
+            .inline-form .button-primary {
+                width: 100%;
+            }
+
+            .navigator-search {
+                flex-direction: column;
+            }
+
+            .church-preview-controls {
+                flex-direction: column;
+            }
+
+            .church-preview-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            .church-session-title {
+                font-size: 11px;
+            }
+
+            .church-icon-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 11px;
+            }
+
+            .btn-lyrics {
+                padding: 4px 8px;
+                font-size: 10px;
+            }
+        }
+
+        /* Large screens — max width container */
+        @media (min-width: 1600px) {
+            .church-studio-shell {
+                max-width: 1600px;
+                margin: 0 auto;
+            }
+        }
+    
+        /* ============================================
+           FETCH / LOADING SCREEN
+           ============================================ */
+        .fetch-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .fetch-screen.is-active {
+            display: flex;
+        }
+
+        .fetch-screen-spinner {
+            width: 56px;
+            height: 56px;
+            border: 3px solid rgba(141, 252, 0, 0.15);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: fetchSpin 1s linear infinite;
+        }
+
+        @keyframes fetchSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        .fetch-screen-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: fetchPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fetchPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .fetch-screen-subtext {
+            font-size: 12px;
+            color: var(--muted);
+            max-width: 300px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .fetch-screen-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(141, 252, 0, 0.15);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .fetch-screen-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            animation: fetchProgress 2s ease-in-out infinite;
+        }
+
+        @keyframes fetchProgress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+</style>
 </head>
 <body class="church-studio-body">
+    <div class="fetch-screen" id="fetchScreen">
+        <div class="fetch-screen-spinner"></div>
+        <div class="fetch-screen-text">Fetching Scripture</div>
+        <div class="fetch-screen-subtext">Retrieving verse from Bible API...</div>
+        <div class="fetch-screen-progress">
+            <div class="fetch-screen-progress-bar"></div>
+        </div>
+    </div>
+
     <header id="navbar"></header>
 
     <main class="church-studio-shell" id="workspace">
-        <div class="church-window-menu" aria-label="Studio menu">
+<div class="church-window-menu" aria-label="Studio menu">
             <details class="studio-menu">
                 <summary>File</summary>
                 <div class="studio-menu-list">
@@ -35,7 +2012,6 @@
                 <div class="studio-menu-list">
                     <button type="button" data-menu-action="clear-notes">Clear Notes</button>
                     <button type="button" data-menu-action="copy-caption">Copy Caption</button>
-                    <button type="button" data-menu-action="copy-lyrics">Copy Lyrics</button>
                 </div>
             </details>
             <details class="studio-menu">
@@ -69,9 +2045,6 @@
                 <summary>Lyric</summary>
                 <div class="studio-menu-list">
                     <button type="button" data-menu-action="open-lyrics">Open Auto Lyrics</button>
-                    <button type="button" data-menu-action="toggle-lyrics">Toggle Auto Detection</button>
-                    <button type="button" data-menu-action="clear-lyrics">Clear Lyrics</button>
-                    <button type="button" data-menu-action="copy-lyrics">Copy Lyrics</button>
                 </div>
             </details>
             <details class="studio-menu">
@@ -98,6 +2071,9 @@
             <div class="church-device-pill">
                 <i class="fas fa-microphone"></i>
                 <span id="micStatus">Mic status</span>
+                <span class="mic-signal" id="churchMicSignal" aria-label="Microphone signal">
+                    <span></span><span></span><span></span><span></span>
+                </span>
             </div>
             <button class="church-icon-btn" id="listenButton" type="button" title="Start listening">
                 <i class="fas fa-microphone-lines"></i>
@@ -108,38 +2084,14 @@
             <button class="church-icon-btn" id="downloadAudioButton" type="button" title="Download audio" disabled>
                 <i class="fas fa-file-audio"></i>
             </button>
-            <button class="btn-lyrics" id="copyObsUrlButton" type="button" title="Copy OBS lower-third browser source URL">
+                        <a class="btn-lyrics" id="obsLinkButton" href="lower-third.html" target="_blank" title="Open OBS Overlay">
                 OBS LINK
                 <i class="fas fa-link"></i>
-            </button>
-            <details class="church-nav-dropdown lyric-dropdown">
-                <summary class="church-dropdown-trigger">
-                    Auto Lyrics
-                    <span class="church-chip" id="lyricDetectStatus">Auto</span>
-                    <i class="fas fa-chevron-down"></i>
-                </summary>
-                <section class="church-panel lyric-panel church-dropdown-menu">
-                    <div class="church-panel-header">
-                        <span class="church-panel-title">Lyric Auto Detection</span>
-                        <button class="button-secondary" id="clearLyricsButton" type="button">Clear</button>
-                    </div>
-                    <label class="lyric-auto-row" for="lyricAutoToggle">
-                        <span>
-                            <strong>Detect worship lyrics from listening notes</strong>
-                            <small>Recognizes repeated phrases and worship keywords while the mic is running.</small>
-                        </span>
-                        <input id="lyricAutoToggle" type="checkbox" checked>
-                    </label>
-                    <div class="lyric-auto-list" id="detectedLyricsList">
-                        <div class="lyric-empty">No lyrics detected yet.</div>
-                    </div>
-                    <textarea id="lyricsBox" placeholder="Detected lyrics will appear here. You can edit these lines before copying."></textarea>
-                    <div class="church-actions">
-                        <button class="button-primary" id="copyLyricsButton" type="button">Copy Lyrics</button>
-                        <span class="church-chip" id="lyricCopyStatus">Ready</span>
-                    </div>
-                </section>
-            </details>
+            </a>
+<a class="btn-lyrics" id="autoLyricsLink" href="omnicast_lyrics.html" title="Open Auto Lyrics">
+                Auto
+                <i class="fas fa-chevron-down"></i>
+            </a>
             <details class="church-nav-dropdown">
                 <summary class="church-dropdown-trigger">
                     Sermon Notes
@@ -223,12 +2175,12 @@
                     <button class="church-toggle active" id="autoPreviewToggle" type="button" aria-label="Toggle automatic preview"></button>
                 </div>
                 <div class="church-preview-stage">
-                    <div class="church-preview-card" id="readyPreviewCard">
+                    <div class="church-preview-window" id="readyPreviewWindow">
                         <div class="card-icon"><i class="fas fa-book-open"></i></div>
                         <div class="card-title" id="previewReference">Ready to preview</div>
                         <div class="card-subtitle" id="previewText">Search for a verse to see it here first</div>
                     </div>
-                    <div class="church-preview-card live-card" id="livePreviewCard">
+                    <div class="church-preview-window live-window" id="livePreviewWindow">
                         <div class="verse-ref" id="currentReference">none yet</div>
                         <div class="verse-text" id="overlayText">Fetched scripture will appear here for display.</div>
                     </div>
@@ -348,24 +2300,24 @@
                 </div>
             </article>
         </section>
-
     </main>
 
-    <section class="ad-container compact church-bottom-ad" aria-label="Advertisement">
+<section class="ad-container compact church-bottom-ad" aria-label="Advertisement">
         <div class="ad-slot" data-ad-slot="REPLACE_WITH_AD_SLOT_ID" data-ad-format="auto"></div>
     </section>
 
-    <script src="navbar.js"></script>
+    
+<script src="navbar.js"></script>
     <script src="ads.js"></script>
-    <script>
+        <script>
+
         const verseSizeControl = document.getElementById("verseSizeControl");
         const verseSizeLabel = document.getElementById("verseSizeLabel");
-        const livePreviewCard = document.getElementById("livePreviewCard");
+        const livePreviewWindow = document.getElementById("livePreviewWindow");
         const chapterSearchInput = document.getElementById("chapterSearchInput");
         const chapterSearchButton = document.getElementById("chapterSearchButton");
         const chapterResult = document.getElementById("chapterResult");
         const liveVisibilityButton = document.getElementById("liveVisibilityButton");
-        const lyricDropdown = document.querySelector(".lyric-dropdown");
         const liveOverlayChannel = createLiveOverlayChannel();
         const churchMenuFeedback = document.getElementById("churchMenuFeedback");
         let churchDisplayTimer = null;
@@ -377,8 +2329,10 @@
         let localWaveFrame = null;
         let localListening = false;
         let localStoppedManually = true;
-        let localLyricLines = [];
-        let localRecentLyricCandidates = [];
+        let localMediaRecorder = null;
+        let localRecordedChunks = [];
+        let localRecordingUrl = "";
+        let localRecordingStream = null;
         let lastLocalBibleTrigger = "";
         let lastLocalBibleTriggerAt = 0;
         let localSpeechBuffer = "";
@@ -389,11 +2343,6 @@
         let activeScriptureFeedPanel = "history";
         const localVerseCache = {};
         const localVerseFetches = {};
-        const localLyricKeywords = [
-            "hallelujah", "hosanna", "glory", "worship", "praise", "worthy", "holy", "amen",
-            "jesus", "lord", "savior", "spirit", "mercy", "grace", "love", "faithful",
-            "alpha", "omega", "yahweh", "adonai", "redeemer"
-        ];
         const localBibleBooks = [
             "genesis", "exodus", "leviticus", "numbers", "deuteronomy", "joshua", "judges", "ruth",
             "1 samuel", "2 samuel", "1 kings", "2 kings", "1 chronicles", "2 chronicles", "ezra", "nehemiah", "esther",
@@ -538,6 +2487,18 @@
             await toggleLocalListening();
         }, true);
 
+        document.getElementById("recordButton")?.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            toggleLocalRecording();
+        }, true);
+
+        document.getElementById("downloadAudioButton")?.addEventListener("click", (event) => {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            downloadLocalRecording();
+        }, true);
+
         async function toggleLocalListening() {
             if (localListening) {
                 await stopLocalListening();
@@ -615,6 +2576,98 @@
             setMenuFeedback("Listening stopped");
         }
 
+        async function toggleLocalRecording() {
+            if (localMediaRecorder?.state === "recording") {
+                stopLocalRecording();
+                return;
+            }
+            await startLocalRecording();
+        }
+
+        async function startLocalRecording() {
+            try {
+                if (!window.MediaRecorder) {
+                    setMenuFeedback("Recording is not supported in this browser");
+                    return;
+                }
+
+                localRecordingStream = localMicStream || await navigator.mediaDevices.getUserMedia({ audio: true });
+                localRecordedChunks = [];
+                localMediaRecorder = new MediaRecorder(localRecordingStream);
+                localMediaRecorder.ondataavailable = (event) => {
+                    if (event.data?.size) {
+                        localRecordedChunks.push(event.data);
+                    }
+                };
+                localMediaRecorder.onstop = () => {
+                    const blob = new Blob(localRecordedChunks, { type: localMediaRecorder?.mimeType || "audio/webm" });
+                    if (localRecordingUrl) {
+                        URL.revokeObjectURL(localRecordingUrl);
+                    }
+                    localRecordingUrl = URL.createObjectURL(blob);
+                    const playback = document.getElementById("recordingPlayback");
+                    if (playback) {
+                        playback.src = localRecordingUrl;
+                    }
+                    const downloadButton = document.getElementById("downloadAudioButton");
+                    if (downloadButton) {
+                        downloadButton.disabled = !localRecordedChunks.length;
+                    }
+                    if (!localMicStream) {
+                        localRecordingStream?.getTracks().forEach((track) => track.stop());
+                    }
+                    localRecordingStream = null;
+                    setLocalRecordingUi(false);
+                    setMenuFeedback("Recording ready");
+                };
+                localMediaRecorder.start();
+                setLocalRecordingUi(true);
+                setMenuFeedback("Recording started");
+            } catch (error) {
+                const message = error?.name === "NotAllowedError" ? "Allow microphone access to record" : "Unable to start recording";
+                setMenuFeedback(message);
+            }
+        }
+
+        function stopLocalRecording() {
+            if (localMediaRecorder?.state === "recording") {
+                localMediaRecorder.stop();
+                const recordingStatus = document.getElementById("recordingStatus");
+                if (recordingStatus) {
+                    recordingStatus.textContent = "Saving recording";
+                }
+                return;
+            }
+            setMenuFeedback("No recording is running");
+        }
+
+        function setLocalRecordingUi(isRecording) {
+            const recordButton = document.getElementById("recordButton");
+            const recordingStatus = document.getElementById("recordingStatus");
+            if (recordButton) {
+                recordButton.classList.toggle("is-listening", isRecording);
+                recordButton.title = isRecording ? "Stop recording" : "Start recording";
+                recordButton.setAttribute("aria-label", recordButton.title);
+            }
+            if (recordingStatus) {
+                recordingStatus.textContent = isRecording ? "Recording" : "Ready to record";
+            }
+        }
+
+        function downloadLocalRecording() {
+            if (!localRecordingUrl || !localRecordedChunks.length) {
+                setMenuFeedback("No audio recording to download");
+                return;
+            }
+            const link = document.createElement("a");
+            link.href = localRecordingUrl;
+            link.download = "church-studio-recording.webm";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setMenuFeedback("Audio download started");
+        }
+
         function setLocalMicUi(status, label) {
             const micStatus = document.getElementById("micStatus");
             const listenButton = document.getElementById("listenButton");
@@ -626,6 +2679,7 @@
                 listenButton.setAttribute("aria-label", label);
                 listenButton.classList.toggle("is-listening", localListening);
             }
+            document.getElementById("churchMicSignal")?.classList.toggle("is-live", localListening);
         }
 
         function startLocalWave(stream) {
@@ -700,10 +2754,8 @@
                         finalText += `${transcript} `;
                         appendLocalNote(transcript);
                         addSermonPoint(transcript);
-                        detectLocalLyrics(transcript, true);
                     } else {
                         interimText += `${transcript} `;
-                        detectLocalLyrics(transcript, false);
                     }
                 }
 
@@ -810,115 +2862,6 @@
                     view.classList.toggle("active", view.id === (activeTab === "points" ? "sermonPointsView" : "detectedVersesView"));
                 });
             });
-        });
-
-        function detectLocalLyrics(text, isFinal) {
-            const lyricToggle = document.getElementById("lyricAutoToggle");
-            if (!lyricToggle?.checked) {
-                updateLocalLyricStatus();
-                return;
-            }
-
-            splitLocalLyricCandidates(text).forEach((line) => {
-                const normalizedLine = normalizeLocalLyricLine(line);
-                if (!normalizedLine || findLocalReference(normalizedLine)) {
-                    return;
-                }
-
-                const lowerLine = normalizedLine.toLowerCase();
-                const keywordHit = localLyricKeywords.some((keyword) => lowerLine.includes(keyword));
-                const repeatHit = localRecentLyricCandidates.includes(lowerLine);
-                const worshipPhraseHit = /\b(i|we)\s+(worship|praise|lift|sing|exalt|adore|surrender|bow|love|need|trust)\b/i.test(normalizedLine);
-                const lineLooksSingable = normalizedLine.split(/\s+/).length <= 16 && /[aeiou]/i.test(normalizedLine);
-
-                if ((keywordHit || repeatHit || (isFinal && worshipPhraseHit)) && lineLooksSingable) {
-                    addLocalLyricLine(normalizedLine);
-                }
-
-                localRecentLyricCandidates = [
-                    lowerLine,
-                    ...localRecentLyricCandidates.filter((candidate) => candidate !== lowerLine)
-                ].slice(0, 12);
-            });
-
-            updateLocalLyricStatus();
-        }
-
-        function splitLocalLyricCandidates(text) {
-            return String(text || "")
-                .replace(/\[[^\]]+\]/g, " ")
-                .split(/\r?\n|[.!?;]+/)
-                .map((line) => line.trim())
-                .filter(Boolean);
-        }
-
-        function normalizeLocalLyricLine(line) {
-            return String(line || "")
-                .replace(/\s+/g, " ")
-                .replace(/^[-:,\s]+|[-:,\s]+$/g, "")
-                .trim();
-        }
-
-        function addLocalLyricLine(line) {
-            const lyricsBox = document.getElementById("lyricsBox");
-            const existingLines = String(lyricsBox?.value || "")
-                .split(/\r?\n/)
-                .map(normalizeLocalLyricLine)
-                .filter(Boolean);
-            const mergedLines = [...existingLines, ...localLyricLines];
-
-            if (mergedLines.some((item) => item.toLowerCase() === line.toLowerCase())) {
-                return;
-            }
-
-            localLyricLines = [...existingLines, ...localLyricLines, line].slice(-40);
-            renderLocalLyrics();
-        }
-
-        function renderLocalLyrics() {
-            const detectedLyricsList = document.getElementById("detectedLyricsList");
-            const lyricsBox = document.getElementById("lyricsBox");
-            if (detectedLyricsList) {
-                detectedLyricsList.innerHTML = localLyricLines.length
-                    ? localLyricLines.map((line) => `<div class="lyric-line">${escapeHtml(line)}</div>`).join("")
-                    : '<div class="lyric-empty">No lyrics detected yet.</div>';
-            }
-            if (lyricsBox) {
-                lyricsBox.value = localLyricLines.join("\n");
-            }
-            updateLocalLyricStatus();
-        }
-
-        function updateLocalLyricStatus() {
-            const lyricDetectStatus = document.getElementById("lyricDetectStatus");
-            const lyricToggle = document.getElementById("lyricAutoToggle");
-            if (!lyricDetectStatus) {
-                return;
-            }
-            if (!lyricToggle?.checked) {
-                lyricDetectStatus.textContent = "Off";
-                return;
-            }
-            lyricDetectStatus.textContent = localLyricLines.length ? String(localLyricLines.length) : "Auto";
-        }
-
-        document.getElementById("lyricAutoToggle")?.addEventListener("change", updateLocalLyricStatus);
-        document.getElementById("clearLyricsButton")?.addEventListener("click", () => {
-            localLyricLines = [];
-            localRecentLyricCandidates = [];
-            renderLocalLyrics();
-            const lyricCopyStatus = document.getElementById("lyricCopyStatus");
-            if (lyricCopyStatus) {
-                lyricCopyStatus.textContent = "Ready";
-            }
-        });
-        document.getElementById("lyricsBox")?.addEventListener("input", () => {
-            localLyricLines = String(document.getElementById("lyricsBox")?.value || "")
-                .split(/\r?\n/)
-                .map(normalizeLocalLyricLine)
-                .filter(Boolean)
-                .slice(-40);
-            renderLocalLyrics();
         });
 
         function detectLocalBibleTrigger(text) {
@@ -1638,17 +3581,6 @@
                 setTimeout(() => panel.classList.remove("is-menu-focused"), 1200);
                 setMenuFeedback("Window focused");
             };
-            const setLyricAuto = () => {
-                const toggle = document.getElementById("lyricAutoToggle");
-                if (!toggle) {
-                    setMenuFeedback("Lyric detection unavailable");
-                    return;
-                }
-                toggle.checked = !toggle.checked;
-                toggle.dispatchEvent(new Event("change", { bubbles: true }));
-                setMenuFeedback(toggle.checked ? "Lyric detection on" : "Lyric detection off");
-            };
-
             const actions = {
                 "new-session": () => {
                     runAppAction("clearNotes", localClearNotes);
@@ -1678,10 +3610,6 @@
                     }
                     return runAppAction("copySocialCaption", () => localCopyText(caption?.value || "", "Caption copied", "No caption to copy"), "Caption copied");
                 },
-                "copy-lyrics": () => {
-                    lyricDropdown?.setAttribute("open", "");
-                    return runAppAction("copyDetectedLyrics", () => localCopyText(document.getElementById("lyricsBox")?.value || "", "Lyrics copied", "No lyrics to copy"), "Lyrics copied");
-                },
                 "focus-preview": () => focusPanel(".preview-panel"),
                 "focus-transcription": () => focusPanel(".transcription-panel"),
                 "focus-navigator": () => focusPanel(".navigator-panel"),
@@ -1697,8 +3625,8 @@
                     }
                 },
                 "toggle-listening": () => toggleLocalListening(),
-                "toggle-recording": () => runAppAction("toggleRecording", () => appStillLoadingMessage("Recording controls"), "Recording toggled"),
-                "download-audio": () => runAppAction("downloadRecording", () => appStillLoadingMessage("Audio download"), "Audio download requested"),
+                "toggle-recording": () => runAppAction("toggleRecording", () => toggleLocalRecording(), "Recording toggled"),
+                "download-audio": () => runAppAction("downloadRecording", () => downloadLocalRecording(), "Audio download requested"),
                 "open-lower-third": () => {
                     const overlayUrl = document.getElementById("openObsOverlayLink")?.href || "lower-third.html";
                     window.open(overlayUrl, "_blank", "noopener,noreferrer");
@@ -1708,24 +3636,10 @@
                     window.location.href = "studio.html";
                 },
                 "open-lyrics": () => {
-                    lyricDropdown?.setAttribute("open", "");
-                    document.getElementById("lyricsBox")?.focus();
-                    setMenuFeedback("Lyric panel opened");
-                },
-                "toggle-lyrics": setLyricAuto,
-                "clear-lyrics": () => {
-                    lyricDropdown?.setAttribute("open", "");
-                    return runAppAction("clearDetectedLyrics", () => {
-                        const lyricsBox = document.getElementById("lyricsBox");
-                        if (lyricsBox) {
-                            lyricsBox.value = "";
-                        }
-                        document.getElementById("detectedLyricsList").innerHTML = '<div class="lyric-empty">No lyrics detected yet.</div>';
-                        setMenuFeedback("Lyrics cleared");
-                    }, "Lyrics cleared");
+                    window.location.href = "omnicast_lyrics.html";
                 },
                 "show-help": () => {
-                    alert("Use Start Listening to capture speech. Spoken Bible references are fetched automatically. Use Copy OBS URL or Open Lower Third to show scripture in livestream software. Use Lyrics > Open Auto Lyrics for worship lyric detection.");
+                    alert("Use Start Listening to capture speech and spoken Bible references. Use Copy OBS URL or Open Lower Third to show scripture in livestream software. Use Auto Lyrics to open the dedicated lyrics page for live singing detection.");
                     setMenuFeedback("Help opened");
                 },
                 "open-about": () => {
@@ -1768,7 +3682,7 @@
         verseSizeControl?.addEventListener("input", () => {
             const scale = Number(verseSizeControl.value || 1);
             verseSizeLabel.textContent = `${scale.toFixed(1)}x`;
-            livePreviewCard.style.setProperty("--verse-scale", scale);
+            livePreviewWindow.style.setProperty("--verse-scale", scale);
         });
 
         async function loadChapterReference() {
@@ -1987,8 +3901,112 @@
                 event.preventDefault();
                 loadChapterReference();
             }
-        });
-    </script>
+        
+
+        /* ============================================
+           FETCH SCREEN CONTROLS
+           ============================================ */
+        let fetchScreenTimeout = null;
+
+        function showFetchScreen(message) {
+            const screen = document.getElementById("fetchScreen");
+            const subtext = screen?.querySelector(".fetch-screen-subtext");
+            if (screen) {
+                screen.classList.add("is-active");
+                if (subtext && message) {
+                    subtext.textContent = message;
+                }
+            }
+            // Push loading state to OBS immediately
+            pushFetchToOverlay(message || "Loading scripture...");
+        }
+
+        function hideFetchScreen() {
+            const screen = document.getElementById("fetchScreen");
+            if (screen) {
+                screen.classList.remove("is-active");
+            }
+            // Clear the fetch timeout and schedule overlay clear
+            if (fetchScreenTimeout) {
+                clearTimeout(fetchScreenTimeout);
+            }
+            // Clear OBS overlay after same delay as fetch screen hide
+            fetchScreenTimeout = setTimeout(() => {
+                clearFetchOverlay();
+            }, 400);
+        }
+
+        function pushFetchToOverlay(message) {
+            // Extract reference from message (e.g., "Loading John 3:16...")
+            const refMatch = message.match(/Loading\s+(.+?)\.\.\./);
+            const reference = refMatch ? refMatch[1] : "";
+
+            const payload = {
+                reference: reference,
+                text: message,
+                visible: true,
+                isLoading: true,
+                updatedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem("omnicast_live_overlay_v1", JSON.stringify(payload));
+            liveOverlayChannel?.postMessage(payload);
+        }
+
+        function clearFetchOverlay() {
+            const payload = {
+                reference: "",
+                text: "",
+                visible: false,
+                isLoading: false,
+                updatedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem("omnicast_live_overlay_v1", JSON.stringify(payload));
+            liveOverlayChannel?.postMessage(payload);
+        }
+
+        // Hook into existing fetch functions
+        const originalFetchLocalVerse = fetchLocalVerse;
+        fetchLocalVerse = async function(reference, options = {}) {
+            showFetchScreen(`Loading ${reference}...`);
+            try {
+                const result = await originalFetchLocalVerse(reference, options);
+                return result;
+            } finally {
+                setTimeout(hideFetchScreen, 400);
+            }
+        };
+
+        const originalLoadChapterReference = loadChapterReference;
+        loadChapterReference = async function() {
+            const reference = chapterSearchInput.value.trim();
+            if (reference) {
+                showFetchScreen(`Loading chapter ${reference}...`);
+            }
+            try {
+                return await originalLoadChapterReference();
+            } finally {
+                setTimeout(hideFetchScreen, 400);
+            }
+        };
+
+        const originalFetchVerseFromPreviewInput = fetchVerseFromPreviewInput;
+        fetchVerseFromPreviewInput = async function() {
+            const input = document.getElementById("verseInput");
+            const reference = input?.value?.trim();
+            if (reference) {
+                showFetchScreen(`Fetching ${reference}...`);
+            }
+            try {
+                return await originalFetchVerseFromPreviewInput();
+            } finally {
+                setTimeout(hideFetchScreen, 400);
+            }
+        };
+
+});
+        </script>
     <script async src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
     <script src="app.js?v=20260501-lyrics-auto-detect"></script>
 </body>

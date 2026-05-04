@@ -55,12 +55,6 @@ const HEBREW_WORDS = [
     { term: "amen", transliteration: "ah-MEN", meaning: "truly, so be it", note: "A spoken agreement affirming truth and confidence." }
 ];
 
-const LYRIC_KEYWORDS = [
-    "hallelujah", "hosanna", "glory", "worship", "praise", "worthy", "holy", "amen",
-    "jesus", "lord", "savior", "spirit", "mercy", "grace", "love", "faithful",
-    "alpha", "omega", "yahweh", "adonai", "redeemer"
-];
-
 const ENGLISH_DICTIONARY_FALLBACK = {
     broadcast: "To transmit audio or video content to an audience by radio, television, or the internet.",
     studio: "A room or workspace equipped for recording, broadcasting, design, or creative production.",
@@ -165,14 +159,7 @@ const dom = {
     shareLinkedInButton: document.getElementById("shareLinkedInButton"),
     shareWhatsAppButton: document.getElementById("shareWhatsAppButton"),
     shareTelegramButton: document.getElementById("shareTelegramButton"),
-    publishStatus: document.getElementById("publishStatus"),
-    lyricAutoToggle: document.getElementById("lyricAutoToggle"),
-    detectedLyricsList: document.getElementById("detectedLyricsList"),
-    lyricsBox: document.getElementById("lyricsBox"),
-    lyricDetectStatus: document.getElementById("lyricDetectStatus"),
-    clearLyricsButton: document.getElementById("clearLyricsButton"),
-    copyLyricsButton: document.getElementById("copyLyricsButton"),
-    lyricCopyStatus: document.getElementById("lyricCopyStatus")
+    publishStatus: document.getElementById("publishStatus")
 };
 
 const canvasContext = dom.canvas ? dom.canvas.getContext("2d") : null;
@@ -181,8 +168,6 @@ const liveOverlayChannel = createLiveOverlayChannel();
 let lastFetchedReference = "";
 let displayClearTimer = null;
 let displayClearToken = 0;
-let detectedLyricLines = [];
-let recentLyricCandidates = [];
 
 function createLiveOverlayChannel() {
     try {
@@ -257,15 +242,9 @@ function bindWorkspace() {
     dom.shareLinkedInButton?.addEventListener("click", () => shareToPlatform("linkedin"));
     dom.shareWhatsAppButton?.addEventListener("click", () => shareToPlatform("whatsapp"));
     dom.shareTelegramButton?.addEventListener("click", () => shareToPlatform("telegram"));
-    dom.lyricAutoToggle?.addEventListener("change", updateLyricStatus);
-    dom.clearLyricsButton?.addEventListener("click", clearDetectedLyrics);
-    dom.copyLyricsButton?.addEventListener("click", copyDetectedLyrics);
-    dom.lyricsBox?.addEventListener("input", syncLyricsFromTextarea);
-
     dom.notesBox?.addEventListener("input", () => {
         syncNotesFromTextarea();
         updateGeneratedContent();
-        detectLyricsFromText(dom.notesBox.value, false);
     });
 
     dom.dictionaryInput?.addEventListener("keydown", (event) => {
@@ -593,7 +572,6 @@ function saveNote(text) {
     }
 
     detectBible(cleanText);
-    detectLyricsFromText(cleanText, true);
     updateGeneratedContent();
 }
 
@@ -617,7 +595,6 @@ function clearNotes() {
     if (dom.hebrewResult) {
         dom.hebrewResult.textContent = "Search a Hebrew word or English meaning to view transliteration and translation.";
     }
-    clearDetectedLyrics();
     if (dom.currentReference) {
         dom.currentReference.textContent = "none yet";
     }
@@ -764,8 +741,6 @@ function processRecognizedSpeech(text, isFinal) {
         return;
     }
 
-    detectLyricsFromText(transcript, isFinal);
-
     const references = extractReferences(transcript);
     if (!references.length) {
         return;
@@ -894,124 +869,6 @@ function setChurchLiveState(isLive) {
     dom.liveVisibilityButton.textContent = isLive ? "LIVE" : "HIDDEN";
     dom.liveVisibilityButton.classList.toggle("is-live", isLive);
     dom.liveVisibilityButton.setAttribute("aria-pressed", String(isLive));
-}
-
-function detectLyricsFromText(text, isFinal) {
-    if (!isChurchStudioPage || !dom.lyricAutoToggle?.checked) {
-        updateLyricStatus();
-        return;
-    }
-
-    splitLyricCandidates(text).forEach((line) => {
-        const normalizedLine = normalizeLyricLine(line);
-        if (!normalizedLine || extractReferences(normalizedLine).length) {
-            return;
-        }
-
-        const lowerLine = normalizedLine.toLowerCase();
-        const keywordHit = LYRIC_KEYWORDS.some((keyword) => lowerLine.includes(keyword));
-        const repeatHit = recentLyricCandidates.includes(lowerLine);
-        const worshipPhraseHit = /\b(i|we)\s+(worship|praise|lift|sing|exalt|adore|surrender|bow|love|need|trust)\b/i.test(normalizedLine);
-        const lineLooksSingable = normalizedLine.split(/\s+/).length <= 16 && /[aeiou]/i.test(normalizedLine);
-
-        if ((keywordHit || repeatHit || (isFinal && worshipPhraseHit)) && lineLooksSingable) {
-            addDetectedLyric(normalizedLine);
-        }
-
-        recentLyricCandidates = [lowerLine, ...recentLyricCandidates.filter((candidate) => candidate !== lowerLine)].slice(0, 12);
-    });
-
-    updateLyricStatus();
-}
-
-function splitLyricCandidates(text) {
-    return String(text || "")
-        .replace(/\[[^\]]+\]/g, " ")
-        .split(/\r?\n|[.!?;]+/)
-        .map((line) => line.trim())
-        .filter(Boolean);
-}
-
-function normalizeLyricLine(line) {
-    return String(line || "")
-        .replace(/\s+/g, " ")
-        .replace(/^[-:,\s]+|[-:,\s]+$/g, "")
-        .trim();
-}
-
-function addDetectedLyric(line) {
-    if (!line || detectedLyricLines.some((item) => item.toLowerCase() === line.toLowerCase())) {
-        return;
-    }
-
-    detectedLyricLines = [...detectedLyricLines, line].slice(-40);
-    renderDetectedLyrics();
-}
-
-function renderDetectedLyrics() {
-    if (dom.detectedLyricsList) {
-        dom.detectedLyricsList.innerHTML = detectedLyricLines.length
-            ? detectedLyricLines.map((line) => `<div class="lyric-line">${escapeHtml(line)}</div>`).join("")
-            : '<div class="lyric-empty">No lyrics detected yet.</div>';
-    }
-
-    if (dom.lyricsBox) {
-        dom.lyricsBox.value = detectedLyricLines.join("\n");
-    }
-
-    updateLyricStatus();
-}
-
-function syncLyricsFromTextarea() {
-    detectedLyricLines = String(dom.lyricsBox?.value || "")
-        .split(/\r?\n/)
-        .map(normalizeLyricLine)
-        .filter(Boolean)
-        .slice(-40);
-    renderDetectedLyrics();
-}
-
-function clearDetectedLyrics() {
-    detectedLyricLines = [];
-    recentLyricCandidates = [];
-    renderDetectedLyrics();
-    if (dom.lyricCopyStatus) {
-        dom.lyricCopyStatus.textContent = "Ready";
-    }
-}
-
-async function copyDetectedLyrics() {
-    const lyrics = String(dom.lyricsBox?.value || detectedLyricLines.join("\n")).trim();
-    if (!lyrics) {
-        if (dom.lyricCopyStatus) {
-            dom.lyricCopyStatus.textContent = "No lyrics";
-        }
-        return;
-    }
-
-    try {
-        await navigator.clipboard.writeText(lyrics);
-        if (dom.lyricCopyStatus) {
-            dom.lyricCopyStatus.textContent = "Copied";
-        }
-    } catch (err) {
-        if (dom.lyricCopyStatus) {
-            dom.lyricCopyStatus.textContent = "Copy failed";
-        }
-    }
-}
-
-function updateLyricStatus() {
-    if (!dom.lyricDetectStatus) {
-        return;
-    }
-
-    if (!dom.lyricAutoToggle?.checked) {
-        dom.lyricDetectStatus.textContent = "Off";
-        return;
-    }
-
-    dom.lyricDetectStatus.textContent = detectedLyricLines.length ? `${detectedLyricLines.length}` : "Auto";
 }
 
 function extractReferences(text) {
@@ -1810,9 +1667,7 @@ function getMicErrorMessage(err) {
 
 window.omnicastChurchActions = {
     archiveCurrentSession,
-    clearDetectedLyrics,
     clearNotes,
-    copyDetectedLyrics,
     copyObsOverlayUrl,
     copySocialCaption,
     downloadNotes,
