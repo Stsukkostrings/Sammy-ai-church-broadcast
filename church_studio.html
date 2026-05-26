@@ -2398,6 +2398,7 @@
     
 <script src="navbar.js"></script>
     <script src="ads.js"></script>
+    <script src="desktop-whisper.js"></script>
         <script>
 
         const verseSizeControl = document.getElementById("verseSizeControl");
@@ -2422,6 +2423,7 @@
         let churchDisplayToken = 0;
         let localMicStream = null;
         let localRecognition = null;
+        let localWhisperActive = false;
         let localAudioContext = null;
         let localAnalyser = null;
         let localWaveFrame = null;
@@ -2663,7 +2665,7 @@
                 });
 
                 startLocalWave(localMicStream);
-                startLocalSpeechRecognition();
+                await startPreferredLocalSpeechRecognition(localMicStream);
                 setMenuFeedback("Listening started");
             } catch (error) {
                 await stopLocalListening();
@@ -2687,6 +2689,8 @@
                 } catch (error) {}
             }
             localRecognition = null;
+            localWhisperActive = false;
+            await window.omnicastDesktopWhisper?.stop?.();
 
             if (localWaveFrame) {
                 cancelAnimationFrame(localWaveFrame);
@@ -2858,6 +2862,80 @@
             draw();
         }
 
+        async function startPreferredLocalSpeechRecognition(stream) {
+            const speechHint = document.getElementById("speechHint");
+            if (window.electronAPI?.speechEngine === "local-whisper-preferred" && window.omnicastDesktopWhisper?.isAvailable?.()) {
+                try {
+                    await window.omnicastDesktopWhisper.start(stream, {
+                        onStatus: (message) => {
+                            if (speechHint) {
+                                speechHint.textContent = message;
+                            }
+                            setMenuFeedback(message);
+                        },
+                        onTranscript: (text) => {
+                            handleLocalSpeechTranscript(text, {
+                                isFinal: true,
+                                alternatives: [text],
+                                source: "local-whisper"
+                            });
+                        },
+                        onError: (error) => {
+                            console.warn("Local Whisper speech error", error);
+                            if (speechHint) {
+                                speechHint.textContent = "Local Whisper is recovering from the last audio chunk.";
+                            }
+                        }
+                    });
+                    localWhisperActive = true;
+                    return;
+                } catch (error) {
+                    localWhisperActive = false;
+                    console.warn("Local Whisper unavailable, falling back to browser speech recognition.", error);
+                    if (speechHint) {
+                        speechHint.textContent = "Local Whisper unavailable; using browser speech fallback.";
+                    }
+                }
+            }
+
+            startLocalSpeechRecognition();
+        }
+
+        function handleLocalSpeechTranscript(text, options = {}) {
+            const cleanText = String(text || "").replace(/\s+/g, " ").trim();
+            const speechHint = document.getElementById("speechHint");
+            const speechText = document.getElementById("speechText");
+            if (!cleanText) {
+                if (speechText) {
+                    speechText.textContent = "Listening...";
+                }
+                return false;
+            }
+
+            if (options.isFinal && !options.skipFinalSave) {
+                appendLocalNote(cleanText);
+                addSermonPoint(cleanText);
+            }
+
+            updateLocalSpeechBuffer(cleanText);
+            const detectionInputs = [
+                ...(options.alternatives || []),
+                cleanText,
+                localSpeechBuffer
+            ].filter(Boolean);
+            updateLiveBibleWindow(detectionInputs);
+            const detectedBible = detectLocalBibleTrigger(detectionInputs);
+            if (speechText) {
+                speechText.textContent = cleanText;
+            }
+            if (!detectedBible && speechHint) {
+                speechHint.textContent = localWhisperActive
+                    ? "Listening with local Whisper."
+                    : "Listening... waiting for the next phrase.";
+            }
+            return detectedBible;
+        }
+
         function startLocalSpeechRecognition() {
             const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
             const speechHint = document.getElementById("speechHint");
@@ -2896,21 +2974,12 @@
                 }
 
                 const liveSpeechText = `${finalText} ${interimText}`.trim();
-                updateLocalSpeechBuffer(liveSpeechText);
-                updateLiveBibleWindow([
-                    ...speechChunks,
-                    liveSpeechText,
-                    localSpeechBuffer
-                ]);
-                const detectedBible = detectLocalBibleTrigger([
-                    ...speechChunks,
-                    liveSpeechText,
-                    localSpeechBuffer
-                ]);
-                document.getElementById("speechText").textContent = (liveSpeechText || "Listening...").trim();
-                if (!detectedBible) {
-                    speechHint.textContent = "Listening... waiting for the next phrase.";
-                }
+                handleLocalSpeechTranscript(liveSpeechText, {
+                    isFinal: Boolean(finalText.trim()),
+                    skipFinalSave: true,
+                    alternatives: speechChunks,
+                    source: "browser-speech"
+                });
             };
 
             localRecognition.onerror = (event) => {
