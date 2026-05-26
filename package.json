@@ -19,10 +19,11 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@netlify/blobs": "^8.1.0",
     "@capacitor-community/media": "^9.0.2",
     "@capacitor/android": "^8.2.0",
     "@capacitor/cli": "^8.2.0",
-    "@capacitor/core": "^8.2.0"
+    "@capacitor/core": "^8.2.0",
+    "@netlify/blobs": "^8.1.0",
+    "@timur00kh/whisper.wasm": "^0.1.0-canary.52de4c5"
   }
 }

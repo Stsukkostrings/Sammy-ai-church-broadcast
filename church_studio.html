@@ -1982,9 +1982,98 @@
             50% { width: 70%; }
             100% { width: 100%; }
         }
+
+        body.church-lower-third-body {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            width: 100vw;
+            height: 100vh;
+            padding: 32px;
+            overflow: hidden;
+            background: transparent;
+        }
+
+        body.church-lower-third-body .fetch-screen,
+        body.church-lower-third-body .church-window-menu,
+        body.church-lower-third-body .church-studio-shell,
+        body.church-lower-third-body .ad-container,
+        body.church-lower-third-body #navbar {
+            display: none !important;
+        }
+
+        .church-standalone-lower-third {
+            display: none;
+            width: min(1080px, 100%);
+            border: 1px solid var(--line);
+            border-left: 8px solid var(--accent);
+            border-radius: 24px;
+            padding: 20px 26px;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.96), rgba(15, 28, 9, 0.88));
+            box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55), 0 0 40px rgba(141, 252, 0, 0.13);
+        }
+
+        body.church-lower-third-body .church-standalone-lower-third {
+            display: grid;
+            gap: 12px;
+        }
+
+        .church-standalone-topline {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .church-standalone-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 18px var(--accent);
+        }
+
+        .church-standalone-reference {
+            color: var(--accent-strong);
+            font-size: clamp(17px, 2vw, 25px);
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .church-standalone-text {
+            color: #ffffff;
+            font-size: clamp(30px, 4.3vw, 58px);
+            line-height: 1.12;
+            text-shadow: 0 3px 16px rgba(0, 0, 0, 0.45);
+        }
+
+        .church-standalone-text.is-placeholder {
+            color: rgba(255, 255, 255, 0.66);
+            font-size: clamp(24px, 3vw, 38px);
+        }
 </style>
+<script>
+    if (new URLSearchParams(window.location.search).get("overlay") === "lower-third") {
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.classList.add("church-lower-third-body");
+        });
+    }
+</script>
 </head>
 <body class="church-studio-body">
+    <section class="church-standalone-lower-third" id="churchStandaloneLowerThird" aria-live="polite">
+        <div class="church-standalone-topline">
+            <span class="church-standalone-dot"></span>
+            <span>Church Studio Scripture</span>
+        </div>
+        <div class="church-standalone-reference" id="churchStandaloneReference">Scripture Overlay Ready</div>
+        <div class="church-standalone-text is-placeholder" id="churchStandaloneText">Start listening in Church Studio to stream spoken Bible verses here.</div>
+    </section>
     <div class="fetch-screen" id="fetchScreen">
         <div class="fetch-screen-spinner"></div>
         <div class="fetch-screen-text">Fetching Scripture</div>
@@ -2084,7 +2173,7 @@
             <button class="church-icon-btn" id="downloadAudioButton" type="button" title="Download audio" disabled>
                 <i class="fas fa-file-audio"></i>
             </button>
-                        <a class="btn-lyrics" id="obsLinkButton" href="lower-third.html" target="_blank" title="Open OBS Overlay">
+                        <a class="btn-lyrics" id="obsLinkButton" href="church_studio.html?overlay=lower-third" target="_blank" title="Open OBS Overlay">
                 OBS LINK
                 <i class="fas fa-link"></i>
             </a>
@@ -2190,7 +2279,7 @@
                     <input id="verseInput" type="text" placeholder="Book chapter:verse (e.g. John 3:16)">
                 </div>
                 <p class="obs-url-box is-hidden" id="obsOverlayUrl">Generating browser source URL...</p>
-                <a class="is-hidden" id="openObsOverlayLink" href="lower-third.html" target="_blank" rel="noreferrer">Open Lower Third</a>
+                <a class="is-hidden" id="openObsOverlayLink" href="church_studio.html?overlay=lower-third" target="_blank" rel="noreferrer">Open Lower Third</a>
             </article>
 
             <article class="church-panel feed-panel">
@@ -2318,8 +2407,17 @@
         const chapterSearchButton = document.getElementById("chapterSearchButton");
         const chapterResult = document.getElementById("chapterResult");
         const liveVisibilityButton = document.getElementById("liveVisibilityButton");
+        const CHURCH_OVERLAY_STORAGE_KEY = "omnicast_church_live_overlay_v1";
+        const CHURCH_OVERLAY_URL = new URL("church_studio.html?overlay=lower-third", window.location.href).toString();
+        const isChurchStandaloneOverlay = new URLSearchParams(window.location.search).get("overlay") === "lower-third";
         const liveOverlayChannel = createLiveOverlayChannel();
         const churchMenuFeedback = document.getElementById("churchMenuFeedback");
+        document.getElementById("openObsOverlayLink")?.setAttribute("href", CHURCH_OVERLAY_URL);
+        document.getElementById("obsLinkButton")?.setAttribute("href", CHURCH_OVERLAY_URL);
+        const obsOverlayUrlLabel = document.getElementById("obsOverlayUrl");
+        if (obsOverlayUrlLabel) {
+            obsOverlayUrlLabel.textContent = CHURCH_OVERLAY_URL;
+        }
         let churchDisplayTimer = null;
         let churchDisplayToken = 0;
         let localMicStream = null;
@@ -2415,10 +2513,48 @@
 
         function createLiveOverlayChannel() {
             try {
-                return "BroadcastChannel" in window ? new BroadcastChannel("omnicast_live_overlay_v1") : null;
+                return "BroadcastChannel" in window ? new BroadcastChannel(CHURCH_OVERLAY_STORAGE_KEY) : null;
             } catch (error) {
                 return null;
             }
+        }
+
+        function applyChurchStandaloneOverlay(payload) {
+            const referenceNode = document.getElementById("churchStandaloneReference");
+            const textNode = document.getElementById("churchStandaloneText");
+            if (!referenceNode || !textNode) {
+                return;
+            }
+
+            const hidden = payload?.visible === false || !payload?.text;
+            referenceNode.textContent = hidden ? "Scripture Overlay Ready" : (payload.reference || "Live Scripture");
+            textNode.textContent = hidden
+                ? "Start listening in Church Studio to stream spoken Bible verses here."
+                : payload.text;
+            textNode.classList.toggle("is-placeholder", hidden);
+        }
+
+        function renderChurchStandaloneOverlay() {
+            let payload = null;
+            try {
+                payload = JSON.parse(localStorage.getItem(CHURCH_OVERLAY_STORAGE_KEY) || "null");
+            } catch (error) {
+                payload = null;
+            }
+            applyChurchStandaloneOverlay(payload);
+        }
+
+        if (isChurchStandaloneOverlay) {
+            renderChurchStandaloneOverlay();
+            window.addEventListener("storage", (event) => {
+                if (event.key === CHURCH_OVERLAY_STORAGE_KEY) {
+                    renderChurchStandaloneOverlay();
+                }
+            });
+            liveOverlayChannel?.addEventListener("message", (event) => {
+                applyChurchStandaloneOverlay(event.data);
+            });
+            setInterval(renderChurchStandaloneOverlay, 700);
         }
 
         const fallbackPlannerItems = [
@@ -3594,7 +3730,7 @@
                 "download-notes": () => runAppAction("downloadNotes", localDownloadNotes, "Download started"),
                 "archive-session": () => runAppAction("archiveCurrentSession", localArchiveSession, "Archive command sent"),
                 "copy-obs-url": () => runAppAction("copyObsOverlayUrl", () => {
-                    const url = document.getElementById("openObsOverlayLink")?.href || new URL("lower-third.html", window.location.href).toString();
+                    const url = document.getElementById("openObsOverlayLink")?.href || CHURCH_OVERLAY_URL;
                     return localCopyText(url, "Livestream URL copied", "No URL available");
                 }, "Livestream URL copied"),
                 "clear-notes": () => runAppAction("clearNotes", localClearNotes, "Notes cleared"),
@@ -3628,7 +3764,7 @@
                 "toggle-recording": () => runAppAction("toggleRecording", () => toggleLocalRecording(), "Recording toggled"),
                 "download-audio": () => runAppAction("downloadRecording", () => downloadLocalRecording(), "Audio download requested"),
                 "open-lower-third": () => {
-                    const overlayUrl = document.getElementById("openObsOverlayLink")?.href || "lower-third.html";
+                    const overlayUrl = document.getElementById("openObsOverlayLink")?.href || CHURCH_OVERLAY_URL;
                     window.open(overlayUrl, "_blank", "noopener,noreferrer");
                     setMenuFeedback("Lower third opened");
                 },
@@ -3761,15 +3897,20 @@
         function publishLiveOverlay() {
             const rawReference = document.getElementById("currentReference")?.textContent?.trim() || "";
             const rawText = document.getElementById("overlayText")?.textContent?.trim() || "";
-            const isVisible = isChurchLiveVisible();
+            const hasScripture = Boolean(
+                rawReference &&
+                rawReference.toLowerCase() !== "none yet" &&
+                rawText &&
+                !rawText.includes("Fetched scripture will appear here")
+            );
             const payload = {
-                reference: isVisible && rawReference && rawReference.toLowerCase() !== "none yet" ? rawReference : "",
-                text: isVisible && rawText && !rawText.includes("Fetched scripture will appear here") ? rawText : "",
-                visible: isVisible,
+                reference: hasScripture ? rawReference : "",
+                text: hasScripture ? rawText : "",
+                visible: hasScripture,
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem("omnicast_live_overlay_v1", JSON.stringify(payload));
+            localStorage.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
             liveOverlayChannel?.postMessage(payload);
         }
 
@@ -3949,11 +4090,21 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem("omnicast_live_overlay_v1", JSON.stringify(payload));
+            localStorage.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
             liveOverlayChannel?.postMessage(payload);
         }
 
         function clearFetchOverlay() {
+            let currentPayload = null;
+            try {
+                currentPayload = JSON.parse(localStorage.getItem(CHURCH_OVERLAY_STORAGE_KEY) || "null");
+            } catch (error) {
+                currentPayload = null;
+            }
+            if (currentPayload && currentPayload.isLoading !== true) {
+                return;
+            }
+
             const payload = {
                 reference: "",
                 text: "",
@@ -3962,7 +4113,7 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem("omnicast_live_overlay_v1", JSON.stringify(payload));
+            localStorage.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
             liveOverlayChannel?.postMessage(payload);
         }
 

@@ -23,7 +23,7 @@ let recordingMimeType = "";
 const STORAGE_KEYS = {
     archive: "omnicast_archive_sessions_v2",
     planner: "omnicast_planner_progress_v2",
-    liveOverlay: "omnicast_live_overlay_v1",
+    liveOverlay: window.location.pathname.endsWith("/church_studio.html") ? "omnicast_church_live_overlay_v1" : "omnicast_live_overlay_v1",
     verseCache: "omnicast_verse_cache_v1"
 };
 
@@ -1373,6 +1373,9 @@ async function shareNotes() {
 }
 
 function getObsOverlayUrl() {
+    if (isChurchStudioPage) {
+        return new URL("church_studio.html?overlay=lower-third", window.location.href).toString();
+    }
     return new URL("lower-third.html", window.location.href).toString();
 }
 
@@ -1404,7 +1407,8 @@ async function copyObsOverlayUrl() {
 }
 
 function broadcastOverlay(reference, text) {
-    const isVisible = !isChurchStudioPage || dom.liveVisibilityButton?.textContent?.trim().toLowerCase() === "live";
+    const hasPayload = Boolean(String(reference || "").trim() && String(text || "").trim());
+    const isVisible = isChurchStudioPage ? hasPayload : (!isChurchStudioPage || dom.liveVisibilityButton?.textContent?.trim().toLowerCase() === "live");
     const payload = {
         reference: isVisible ? reference : "",
         text: isVisible ? text : "",
