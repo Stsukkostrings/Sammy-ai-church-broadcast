@@ -33,7 +33,7 @@
 
         html, body {
             height: 100%;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
         body {
@@ -45,10 +45,9 @@
 
         .page-shell {
             position: relative;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .ambient {
@@ -282,6 +281,112 @@
             border-color: var(--accent);
         }
 
+        .streaming-section {
+            grid-column: 1 / -1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.65rem;
+            margin-top: -0.35rem;
+        }
+
+        .streaming-section h2 {
+            color: var(--accent-strong);
+            font-size: 0.9rem;
+            line-height: 1.2;
+        }
+
+        .streaming-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .streaming-link {
+            min-width: 112px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            padding: 0.5rem 0.75rem;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.72rem;
+            font-weight: 700;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(33, 21, 17, 0.58);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .streaming-link:hover,
+        .streaming-link:focus-visible {
+            transform: scale(1.04);
+            border-color: rgba(200, 255, 101, 0.55);
+            box-shadow: 0 0 18px rgba(141, 252, 0, 0.18);
+            outline: none;
+        }
+
+        .streaming-icon {
+            width: 28px;
+            height: 28px;
+            flex: 0 0 28px;
+            display: block;
+        }
+
+        .streaming-player {
+            display: none;
+            width: min(760px, 100%);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.32);
+            overflow: hidden;
+            box-shadow: 0 0 22px rgba(141, 252, 0, 0.08);
+        }
+
+        .streaming-player.is-active {
+            display: block;
+        }
+
+        .streaming-player iframe {
+            display: block;
+            width: 100%;
+            height: 80px;
+            border: 0;
+        }
+
+        .streaming-player-note {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.45rem 0.65rem;
+            color: var(--muted);
+            font-size: 0.68rem;
+            border-top: 1px solid var(--line);
+        }
+
+        .streaming-player-note a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 640px) {
+            .streaming-links {
+                flex-wrap: wrap;
+                gap: 0.55rem;
+            }
+
+            .streaming-link {
+                min-width: 132px;
+            }
+        }
+
         /* ===== AUTH PANEL ===== */
         .auth-panel {
             background: var(--panel);
@@ -476,13 +581,60 @@
                         <p>As a speaker presents, OmniCast AI captures notes, detects references, prepares overlays, generates summaries, and supports downstream publishing for your team.</p>
                     </div>
                 </aside>
+
+                <section class="streaming-section" aria-labelledby="streamingTitle">
+                    <h2 id="streamingTitle">Listen to SpiritFlow Sounds</h2>
+                    <div class="streaming-links" role="list">
+                        <a class="streaming-link" role="listitem" href="https://www.youtube.com/playlist?list=PLBHyBhksaaNq_T38w961L_Kh_6avzqJ1_" data-platform="YouTube" data-embed-url="https://www.youtube-nocookie.com/embed/videoseries?list=PLBHyBhksaaNq_T38w961L_Kh_6avzqJ1_" aria-label="Play SpiritFlow Sounds from YouTube inside this app">
+                            <svg class="streaming-icon" viewBox="0 0 32 32" role="img" aria-label="YouTube logo">
+                                <title>YouTube logo</title>
+                                <rect x="3" y="7" width="26" height="18" rx="5" fill="#ff0033"/>
+                                <path d="M14 12.3v7.4l6.4-3.7L14 12.3z" fill="#fff"/>
+                            </svg>
+                            <span>YouTube</span>
+                        </a>
+                        <a class="streaming-link" role="listitem" href="https://open.spotify.com/album/0Kg8tsFjsm5wQgmjFPbuq2" data-platform="Spotify" data-embed-url="https://open.spotify.com/embed/album/0Kg8tsFjsm5wQgmjFPbuq2?utm_source=generator" aria-label="Play SpiritFlow Sounds from Spotify inside this app">
+                            <svg class="streaming-icon" viewBox="0 0 32 32" role="img" aria-label="Spotify logo">
+                                <title>Spotify logo</title>
+                                <circle cx="16" cy="16" r="13" fill="#1ed760"/>
+                                <path d="M10 12.2c4.4-1.1 9.1-.6 12.7 1.4" fill="none" stroke="#071006" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M10.8 16c3.4-.8 7-.4 9.9 1.2" fill="none" stroke="#071006" stroke-width="1.8" stroke-linecap="round"/>
+                                <path d="M11.6 19.5c2.6-.5 5.1-.2 7.2 1" fill="none" stroke="#071006" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+                            <span>Spotify</span>
+                        </a>
+                        <a class="streaming-link" role="listitem" href="https://audiomack.com/spiritflowsounds/song/halleluyah-palm-wine" data-platform="Audiomack" data-embed-url="https://audiomack.com/embed/song/spiritflowsounds/halleluyah-palm-wine" aria-label="Play SpiritFlow Sounds from Audiomack inside this app">
+                            <svg class="streaming-icon" viewBox="0 0 32 32" role="img" aria-label="Audiomack logo">
+                                <title>Audiomack logo</title>
+                                <circle cx="16" cy="16" r="13" fill="#ffa200"/>
+                                <path d="M8 19h2.4v-5H8v5zm3.8 0h2.4V9h-2.4v10zm3.8 0H18v-7h-2.4v7zm3.8 0h2.4v-4h-2.4v4zm3.8 0h2.4v-8h-2.4v8z" fill="#120a00"/>
+                            </svg>
+                            <span>Audiomack</span>
+                        </a>
+                        <a class="streaming-link" role="listitem" href="https://www.boomplay.com/songs/251764990?from=search" data-platform="Boomplay" data-embed-url="https://www.boomplay.com/songs/251764990?from=search" aria-label="Play SpiritFlow Sounds from Boomplay inside this app">
+                            <svg class="streaming-icon" viewBox="0 0 32 32" role="img" aria-label="Boomplay logo">
+                                <title>Boomplay logo</title>
+                                <circle cx="16" cy="16" r="13" fill="#00d0ff"/>
+                                <path d="M13 10.5v11l9-5.5-9-5.5z" fill="#031216"/>
+                            </svg>
+                            <span>Boomplay</span>
+                        </a>
+                    </div>
+                    <div class="streaming-player" id="streamingPlayer" aria-live="polite">
+                        <iframe id="streamingFrame" title="SpiritFlow Sounds streaming player" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+                        <div class="streaming-player-note">
+                            <span id="streamingPlayerLabel">Player ready</span>
+                            <a id="streamingFallbackLink" href="https://www.youtube.com/playlist?list=PLBHyBhksaaNq_T38w961L_Kh_6avzqJ1_" target="_blank" rel="noopener noreferrer">Open platform</a>
+                        </div>
+                    </div>
+                </section>
             </section>
         </main>
 
         <footer class="site-footer">
             <div class="footer-panel">
                 <div class="footer-copy">
-                    <p>© 2026 OmniCast AI. All rights reserved.</p>
+                    <p>&copy; 2026 OmniCast AI. All rights reserved.</p>
                     <p>Developed by Sammy G Concept.</p>
                 </div>
                 <div class="footer-links">
@@ -497,5 +649,28 @@
 
     <script src="ads.js"></script>
     <script src="app.js"></script>
+    <script>
+        document.querySelectorAll(".streaming-link").forEach((link) => {
+            link.addEventListener("click", (event) => {
+                const embedUrl = link.dataset.embedUrl;
+                const platform = link.dataset.platform || "Streaming platform";
+                const player = document.getElementById("streamingPlayer");
+                const frame = document.getElementById("streamingFrame");
+                const label = document.getElementById("streamingPlayerLabel");
+                const fallback = document.getElementById("streamingFallbackLink");
+                if (!embedUrl || !player || !frame || !label || !fallback) {
+                    return;
+                }
+
+                event.preventDefault();
+                frame.src = embedUrl;
+                frame.title = `SpiritFlow Sounds ${platform} player`;
+                label.textContent = `Playing inside OmniCast from ${platform}`;
+                fallback.href = link.href;
+                fallback.textContent = `Open ${platform}`;
+                player.classList.add("is-active");
+            });
+        });
+    </script>
 </body>
 </html>
