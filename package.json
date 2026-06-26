@@ -1,0 +1,31 @@
+{
+  "name": "omnicast-ai",
+  "version": "1.0.0",
+  "description": "AI-assisted communication, broadcasting, media workflow, and audience engagement platform for organizations.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node -e \"const fs=require('fs'); for (const file of ['api/youtube-auth.js','api/youtube-callback.js','api/youtube-channel.js','api/_youtubeCore.js']) { if(!fs.existsSync(file)) throw new Error(file+' missing'); } const html=fs.readFileSync('spiritflow_creator_studio.html','utf8'); [...html.matchAll(/<script(?: [^>]*)?>([\\s\\S]*?)<\\/script>/g)].forEach((m,i)=>{ if(m[1].trim()) new Function(m[1]); }); console.log('Smoke checks passed');\""
+  },
+  "keywords": [
+    "ai",
+    "broadcast",
+    "communication",
+    "streaming",
+    "media",
+    "publishing",
+    "organizations"
+  ],
+  "author": "Samuel Olasunkanmi",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@capacitor-community/media": "^9.0.2",
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "@netlify/blobs": "^8.1.0",
+    "@timur00kh/whisper.wasm": "^0.1.0-canary.52de4c5"
+  }
+}
