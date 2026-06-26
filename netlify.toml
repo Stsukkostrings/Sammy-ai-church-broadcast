@@ -14,3 +14,18 @@
   from = "/api/health"
   to = "/.netlify/functions/health"
   status = 200
+
+[[redirects]]
+  from = "/api/youtube-auth"
+  to = "/.netlify/functions/youtube-auth"
+  status = 200
+
+[[redirects]]
+  from = "/api/youtube-callback"
+  to = "/.netlify/functions/youtube-callback"
+  status = 200
+
+[[redirects]]
+  from = "/api/youtube-channel"
+  to = "/.netlify/functions/youtube-channel"
+  status = 200

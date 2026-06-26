@@ -1,6 +1,7 @@
 ﻿const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { authHandler, callbackHandler, channelHandler } = require('./api/_youtubeCore');
 const PORT = process.env.PORT || 8081;
 
 const MIME_TYPES = {
@@ -10,10 +11,32 @@ const MIME_TYPES = {
     '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml',
 };
 
-const server = http.createServer((req, res) => {
+function sendServerlessResult(res, result) {
+    Object.entries(result.headers || {}).forEach(([key, value]) => res.setHeader(key, value));
+    res.writeHead(result.statusCode);
+    res.end(result.body || '');
+}
+
+const server = http.createServer(async (req, res) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     res.setHeader('Access-Control-Allow-Origin', '*');
+
+    try {
+        if (req.url.startsWith('/api/youtube-auth')) {
+            return sendServerlessResult(res, authHandler(req));
+        }
+        if (req.url.startsWith('/api/youtube-callback')) {
+            return sendServerlessResult(res, await callbackHandler(req));
+        }
+        if (req.url.startsWith('/api/youtube-channel')) {
+            return sendServerlessResult(res, await channelHandler(req));
+        }
+    } catch (error) {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: error.message || 'Server error' }));
+        return;
+    }
     
     let filePath = '.' + req.url;
     if (filePath === './') filePath = './studio.html';

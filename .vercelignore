@@ -11,8 +11,7 @@ uploads
 www
 audio
 signup
-!downloads
-!downloads/**
+downloads
 *.md
 *.txt
 docker-compose.yml

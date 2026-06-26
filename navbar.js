@@ -36,6 +36,7 @@ function renderNavbar() {
             <a class="logo" href="index.html">OmniCast AI</a>
             <div class="links">
                 <a href="church_studio.html">Church Studio</a>
+                <a href="spiritflow_creator_studio.html">Creator Studio</a>
                 <a href="omnicast_lyrics.html">Lyrics</a>
                 <a href="studio.html">Main Studio</a>
                 <a href="#about">About</a>
