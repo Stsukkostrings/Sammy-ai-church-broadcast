@@ -1,0 +1,2226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnicast Lyrics</title>
+    <link rel="stylesheet" href="style.css?v=20260503-omnicast-global">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --panel: rgba(33, 21, 17, 0.82);
+            --line: rgba(191, 255, 89, 0.18);
+            --text: #f3ffe2;
+            --muted: #bdd79f;
+            --accent: #8dfc00;
+            --accent-strong: #c8ff65;
+            --accent-soft: rgba(141, 252, 0, 0.14);
+            --success: #8fe0a1;
+            --danger: #f7a38d;
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Georgia, "Times New Roman", serif;
+            color: var(--text);
+            background: #000;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        /* ===== TOP MENU BAR ===== */
+        .menu-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 0 16px;
+            background: var(--accent);
+            height: 36px;
+            border-bottom: 1px solid var(--line);
+            position: relative;
+            z-index: 200;
+        }
+
+        .menu-item {
+            position: relative;
+        }
+
+        .menu-item > a {
+            color: #000;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 14px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            font-family: Georgia, "Times New Roman", serif;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .menu-item > a:hover,
+        .menu-item.open > a {
+            background: #000;
+            color: var(--accent);
+        }
+
+        /* Dropdown */
+        .dropdown {
+            position: absolute;
+            top: 36px;
+            left: 0;
+            min-width: 220px;
+            background: #000;
+            border: 1px solid var(--line);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.15s ease;
+            overflow: hidden;
+            z-index: 201;
+        }
+
+        .menu-item.open .dropdown {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            color: var(--muted);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-bottom: 1px solid rgba(191, 255, 89, 0.06);
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--accent-soft);
+            color: var(--text);
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--line);
+            margin: 4px 0;
+        }
+
+        .dropdown-shortcut {
+            margin-left: auto;
+            font-size: 10px;
+            color: var(--muted);
+            opacity: 0.6;
+            font-family: "Courier New", monospace;
+        }
+
+        /* ===== TOP NAVBAR ===== */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: rgba(7, 10, 7, 0.95);
+            border-bottom: 1px solid var(--line);
+            height: 64px;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--accent-soft);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 16px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 0.02em;
+        }
+
+        .logo-subtitle {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 1px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-icon-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .nav-icon-btn:hover {
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            padding: 7px 16px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: Georgia, "Times New Roman", serif;
+            letter-spacing: 0.08em;
+            text-decoration: none;
+        }
+
+        .btn-back:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px 24px;
+            color: var(--text);
+            font-size: 13px;
+            box-shadow: var(--shadow);
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            color: var(--accent);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 24px;
+            min-width: 360px;
+            max-width: 90vw;
+            box-shadow: var(--shadow);
+            transform: scale(0.95);
+            transition: transform 0.2s;
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .modal-close:hover {
+            color: var(--accent);
+        }
+
+        .modal-body {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .modal-input {
+            width: 100%;
+            background: rgba(170, 255, 110, 0.06);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            color: var(--text);
+            font-size: 13px;
+            font-family: "Courier New", monospace;
+            margin-top: 12px;
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: Georgia, "Times New Roman", serif;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--muted);
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+            color: #000;
+            border-color: transparent;
+            font-weight: 700;
+        }
+
+        .modal-btn.primary:hover {
+            box-shadow: 0 8px 20px rgba(141, 252, 0, 0.3);
+        }
+
+        /* ===== MAIN GRID ===== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 240px 1fr 240px;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            height: calc(100vh - 100px);
+        }
+
+        /* ===== PANEL STYLES ===== */
+        .panel {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(255,255,255,0.02);
+        }
+
+        .panel-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--accent-strong);
+            text-transform: uppercase;
+        }
+
+        .panel-action {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .panel-action:hover {
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .panel-action.accent {
+            color: var(--accent);
+        }
+
+        .panel-action.accent:hover {
+            background: var(--accent-soft);
+        }
+
+        /* ===== SERVICE SCHEDULE ===== */
+        .schedule-panel {
+            grid-row: span 1;
+        }
+
+        .schedule-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .schedule-content i {
+            font-size: 28px;
+            color: var(--muted);
+            opacity: 0.5;
+        }
+
+        .schedule-content p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            max-width: 180px;
+        }
+
+        /* ===== PREVIEW AREA ===== */
+        .preview-panel {
+            grid-column: 2;
+            grid-row: span 1;
+        }
+
+        .preview-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .toolbar-left, .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toolbar-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--accent-strong);
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--muted);
+        }
+
+        .status-badge .dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--muted);
+        }
+
+        .status-badge.live {
+            border-color: rgba(141, 252, 0, 0.3);
+            color: var(--accent);
+        }
+
+        .status-badge.live .dot {
+            background: var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .preview-stage {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            align-items: stretch;
+        }
+
+        .preview-card {
+            flex: 1;
+            background: #000;
+            border-radius: 10px;
+            padding: 40px 24px;
+            text-align: center;
+            border: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .preview-card .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .preview-card .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .preview-card .card-subtitle {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .preview-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            border-top: 1px solid var(--line);
+        }
+
+        .btn-nav {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-nav.primary {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+            color: #000;
+            border-color: transparent;
+            box-shadow: 0 12px 28px rgba(141, 252, 0, 0.24);
+        }
+
+        .btn-nav.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 32px rgba(141, 252, 0, 0.32);
+        }
+
+        .btn-nav:disabled,
+        .nav-icon-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .lyrics-status-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .lyrics-chip {
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--muted);
+            background: rgba(0, 0, 0, 0.35);
+            padding: 5px 9px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .lyrics-chip.is-live {
+            color: #000;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .lyrics-list,
+        .section-list,
+        .schedule-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .song-item,
+        .section-item,
+        .schedule-item {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 10px;
+            text-align: left;
+            cursor: pointer;
+            font-family: Georgia, "Times New Roman", serif;
+            transition: border-color 0.2s, background 0.2s, transform 0.2s;
+        }
+
+        .song-item:hover,
+        .section-item:hover,
+        .schedule-item:hover,
+        .song-item.active,
+        .section-item.active,
+        .schedule-item.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .song-title,
+        .section-title,
+        .schedule-title {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1.35;
+        }
+
+        .song-meta,
+        .section-meta,
+        .schedule-meta {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 4px;
+            line-height: 1.35;
+        }
+
+        .lyrics-editor {
+            width: 100%;
+            min-height: 180px;
+            resize: vertical;
+            background: #000;
+            color: var(--text);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 13px;
+            line-height: 1.55;
+            outline: none;
+        }
+
+        .lyrics-editor:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(141, 252, 0, 0.14);
+        }
+
+        .wave-canvas {
+            width: 100%;
+            height: 70px;
+            background: #050805;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+        }
+
+        /* ===== SECTIONS PANEL ===== */
+        .sections-panel {
+            grid-row: span 1;
+        }
+
+        .sections-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .sections-content p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* ===== SONG LIBRARY ===== */
+        .library-panel {
+            grid-column: 1;
+        }
+
+        .library-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .search-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-input-wrapper input {
+            width: 100%;
+            background: rgba(170, 255, 110, 0.06);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 12px 9px 32px;
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+            font-family: Georgia, "Times New Roman", serif;
+        }
+
+        .search-input-wrapper input::placeholder {
+            color: var(--muted);
+        }
+
+        .search-input-wrapper i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .search-action-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-action-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .library-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+            gap: 16px;
+        }
+
+        .library-content p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            max-width: 200px;
+        }
+
+        .btn-add-first {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: Georgia, "Times New Roman", serif;
+            box-shadow: 0 12px 28px rgba(141, 252, 0, 0.24);
+            transition: all 0.2s;
+        }
+
+        .btn-add-first:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 32px rgba(141, 252, 0, 0.32);
+        }
+
+        /* ===== AI MAGIC IMPORT ===== */
+        .import-panel {
+            grid-column: 2;
+        }
+
+        .import-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .import-content i {
+            font-size: 28px;
+            color: var(--muted);
+            opacity: 0.5;
+        }
+
+        .import-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .import-content p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            max-width: 220px;
+        }
+
+        .btn-upgrade {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: Georgia, "Times New Roman", serif;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-upgrade:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* ===== IMPORT PREVIEW ===== */
+        .preview-import-panel {
+            grid-column: 3;
+        }
+
+        .preview-import-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .preview-import-content i {
+            font-size: 28px;
+            color: var(--muted);
+            opacity: 0.5;
+        }
+
+        .preview-import-content p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            max-width: 200px;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--line);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 200px 1fr 200px;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .main-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto auto;
+                height: auto;
+                overflow-y: auto;
+            }
+
+            .preview-panel {
+                grid-column: span 2;
+                grid-row: auto;
+            }
+
+            .schedule-panel, .sections-panel {
+                grid-row: auto;
+            }
+
+            .library-panel, .import-panel, .preview-import-panel {
+                grid-column: auto;
+            }
+
+            .preview-stage {
+                flex-direction: column;
+            }
+
+            .preview-card {
+                padding: 24px 16px;
+            }
+
+            .menu-bar {
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-panel, .library-panel, .import-panel, .preview-import-panel, .schedule-panel, .sections-panel {
+                grid-column: span 1;
+            }
+
+            .navbar {
+                flex-direction: column;
+                height: auto;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .preview-stage {
+                flex-direction: column;
+            }
+
+            .preview-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body class="omnicast-lyrics-body">
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Action completed</span>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="modalTitle">Title</span>
+                <button class="modal-close" onClick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Content goes here
+            </div>
+            <div class="modal-actions" id="modalActions">
+                <button class="modal-btn" onClick="closeModal()">Cancel</button>
+                <button class="modal-btn primary" id="modalPrimary" onClick="closeModal()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOP MENU BAR ===== -->
+    <nav class="menu-bar" id="menuBar">
+        <!-- File -->
+        <div class="menu-item" data-menu="file">
+            <a>File</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="importLyrics()">
+                    <i class="fas fa-file-import"></i>
+                    <span>Import Lyrics</span>
+                </div>
+                <div class="dropdown-item" onClick="createNewSong()">
+                    <i class="fas fa-plus"></i>
+                    <span>New Song</span>
+                    <span class="dropdown-shortcut">Ctrl+N</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="exportLyrics('pdf')">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Export to PDF</span>
+                </div>
+                <div class="dropdown-item" onClick="exportLyrics('ppt')">
+                    <i class="fas fa-file-powerpoint"></i>
+                    <span>Export to PowerPoint</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="openSettings()">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                    <span class="dropdown-shortcut">Ctrl+,</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit -->
+        <div class="menu-item" data-menu="edit">
+            <a>Edit</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="focusLyricsEditor()">
+                    <i class="fas fa-pen"></i>
+                    <span>Edit Lyrics</span>
+                    <span class="dropdown-shortcut">Ctrl+E</span>
+                </div>
+                <div class="dropdown-item" onClick="undoLyricsEdit()">
+                    <i class="fas fa-rotate-left"></i>
+                    <span>Undo</span>
+                    <span class="dropdown-shortcut">Ctrl+Z</span>
+                </div>
+                <div class="dropdown-item" onClick="redoLyricsEdit()">
+                    <i class="fas fa-rotate-right"></i>
+                    <span>Redo</span>
+                    <span class="dropdown-shortcut">Ctrl+Y</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="cutLyricsSelection()">
+                    <i class="fas fa-scissors"></i>
+                    <span>Cut</span>
+                    <span class="dropdown-shortcut">Ctrl+X</span>
+                </div>
+                <div class="dropdown-item" onClick="copyLyricsSelection()">
+                    <i class="fas fa-copy"></i>
+                    <span>Copy</span>
+                    <span class="dropdown-shortcut">Ctrl+C</span>
+                </div>
+                <div class="dropdown-item" onClick="pasteLyricsClipboard()">
+                    <i class="fas fa-paste"></i>
+                    <span>Paste</span>
+                    <span class="dropdown-shortcut">Ctrl+V</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="findAndReplaceLyrics()">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <span>Find and Replace</span>
+                    <span class="dropdown-shortcut">Ctrl+F</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- View -->
+        <div class="menu-item" data-menu="view">
+            <a>View</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="toggleFullscreen()">
+                    <i class="fas fa-expand"></i>
+                    <span>Toggle Full Screen</span>
+                    <span class="dropdown-shortcut">F11</span>
+                </div>
+                <div class="dropdown-item" onClick="restoreDefaultScreen()">
+                    <i class="fas fa-compress"></i>
+                    <span>Default Screen</span>
+                    <span class="dropdown-shortcut">Esc</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="togglePresentationMode()">
+                    <i class="fas fa-desktop"></i>
+                    <span>Presentation Mode</span>
+                </div>
+                <div class="dropdown-item" onClick="toggleStageDisplay()">
+                    <i class="fas fa-tv"></i>
+                    <span>Stage Display</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="zoomLyrics(1)">
+                    <i class="fas fa-magnifying-glass-plus"></i>
+                    <span>Zoom In</span>
+                    <span class="dropdown-shortcut">Ctrl++</span>
+                </div>
+                <div class="dropdown-item" onClick="zoomLyrics(-1)">
+                    <i class="fas fa-magnifying-glass-minus"></i>
+                    <span>Zoom Out</span>
+                    <span class="dropdown-shortcut">Ctrl+-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audio -->
+        <div class="menu-item" data-menu="audio">
+            <a>Audio</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="startRecording()">
+                    <i class="fas fa-circle" style="color: var(--danger);"></i>
+                    <span>Start Recording</span>
+                    <span class="dropdown-shortcut">Ctrl+R</span>
+                </div>
+                <div class="dropdown-item" onClick="stopRecording()">
+                    <i class="fas fa-square" style="color: var(--danger);"></i>
+                    <span>Stop Recording</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="selectAudioInput()">
+                    <i class="fas fa-microphone"></i>
+                    <span>Select Audio Input</span>
+                </div>
+                <div class="dropdown-item" onClick="showAudioOutput()">
+                    <i class="fas fa-volume-high"></i>
+                    <span>Select Audio Output</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="openAudioSettings()">
+                    <i class="fas fa-sliders"></i>
+                    <span>Audio Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Window -->
+        <div class="menu-item" data-menu="window">
+            <a>Window</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="openLowerThird()">
+                    <i class="fas fa-closed-captioning"></i>
+                    <span>Open Lower Third</span>
+                </div>
+                <div class="dropdown-item" onClick="copyOBSLink()">
+                    <i class="fas fa-link"></i>
+                    <span>Copy OBS Link</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="openLyricsWindow()">
+                    <i class="fas fa-window-restore"></i>
+                    <span>New Window</span>
+                </div>
+                <div class="dropdown-item" onClick="minimizePanels()">
+                    <i class="fas fa-minus"></i>
+                    <span>Minimize</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="goToChurchStudio()">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Go Back to Church Studio</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bible -->
+        <div class="menu-item" data-menu="bible">
+            <a>Bible</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="searchScripture()">
+                    <i class="fas fa-book-bible"></i>
+                    <span>Search Scripture</span>
+                    <span class="dropdown-shortcut">Ctrl+B</span>
+                </div>
+                <div class="dropdown-item" onClick="loadVerseOfDay()">
+                    <i class="fas fa-sun"></i>
+                    <span>Verse of the Day</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="setBibleVersion('KJV')">
+                    <i class="fas fa-check" style="color: var(--accent);"></i>
+                    <span>King James Version</span>
+                </div>
+                <div class="dropdown-item" onClick="setBibleVersion('NIV')">
+                    <i class="fas fa-check" style="opacity: 0;"></i>
+                    <span>New International Version</span>
+                </div>
+                <div class="dropdown-item" onClick="setBibleVersion('ESV')">
+                    <i class="fas fa-check" style="opacity: 0;"></i>
+                    <span>English Standard Version</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="openBibleSettings()">
+                    <i class="fas fa-cog"></i>
+                    <span>Bible Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help -->
+        <div class="menu-item" data-menu="help">
+            <a>Help</a>
+            <div class="dropdown">
+                <div class="dropdown-item" onClick="openDocumentation()">
+                    <i class="fas fa-book"></i>
+                    <span>Documentation</span>
+                    <span class="dropdown-shortcut">F1</span>
+                </div>
+                <div class="dropdown-item" onClick="showKeyboardShortcuts()">
+                    <i class="fas fa-keyboard"></i>
+                    <span>Keyboard Shortcuts</span>
+                </div>
+                <div class="dropdown-item" onClick="openTutorials()">
+                    <i class="fas fa-play-circle"></i>
+                    <span>Video Tutorials</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="contactSupport()">
+                    <i class="fas fa-headset"></i>
+                    <span>Contact Support</span>
+                </div>
+                <div class="dropdown-item" onClick="reportBug()">
+                    <i class="fas fa-bug"></i>
+                    <span>Report a Bug</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onClick="showAboutLyrics()">
+                    <i class="fas fa-circle-info"></i>
+                    <span>About Omnicast Lyrics</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===== TOP NAVBAR ===== -->
+    <nav class="navbar">
+        <div class="navbar-left">
+            <div class="logo-icon">
+                <i class="fas fa-music"></i>
+            </div>
+            <div class="logo-text">
+                <span class="logo-title">Omnicast Lyrics</span>
+                <span class="logo-subtitle">Manage and present lyrics</span>
+            </div>
+        </div>
+        <div class="navbar-right">
+            <button class="nav-icon-btn" id="listenButton" title="Start listening" type="button"><i class="fas fa-microphone-lines"></i></button>
+            <div class="mic-signal-pill" id="lyricsMicSignal">
+                <i class="fas fa-microphone"></i>
+                <span class="mic-signal" aria-label="Microphone signal">
+                    <span></span><span></span><span></span><span></span>
+                </span>
+            </div>
+            <button class="nav-icon-btn" id="helpButton" title="Help" type="button"><i class="far fa-circle-question"></i></button>
+            <button class="nav-icon-btn" id="displayButton" title="Display current section" type="button"><i class="fas fa-desktop"></i></button>
+            <button class="nav-icon-btn" id="shareButton" title="Copy live lyrics" type="button"><i class="fas fa-share-nodes"></i></button>
+            <button class="nav-icon-btn" id="settingsButton" title="Settings" type="button"><i class="fas fa-cog"></i></button>
+            <button class="btn-back" id="copyObsNavbarButton" type="button">
+                <i class="fas fa-link" style="font-size: 10px;"></i>
+                OBS LINK
+            </button>
+            <a href="church_studio.html" class="btn-back">
+                <i class="fas fa-chevron-left" style="font-size: 10px;"></i>
+                BACK TO BIBLE
+            </a>
+        </div>
+    </nav>
+
+    <!-- ===== MAIN GRID ===== -->
+    <div class="main-grid">
+        <!-- ===== LEFT: SERVICE SCHEDULE ===== -->
+        <div class="panel schedule-panel">
+            <div class="panel-header">
+                <span class="panel-title">Service Schedule</span>
+                <span class="panel-action accent" id="clearScheduleButton">CLEAR</span>
+            </div>
+            <div class="schedule-content" id="scheduleContent">
+                <i class="fas fa-music"></i>
+                <p>Click + on songs below to build your service schedule</p>
+            </div>
+        </div>
+
+        <!-- ===== CENTER: PREVIEW ===== -->
+        <div class="panel preview-panel">
+            <div class="preview-toolbar">
+                <div class="toolbar-left">
+                    <span class="toolbar-label">Preview</span>
+                    <span class="lyrics-chip" id="micStatus">Mic status</span>
+                </div>
+                <div class="toolbar-right">
+                    <span class="toolbar-label">Live Display</span>
+                    <div class="status-badge live" id="liveStatusBadge">
+                        <span class="dot"></span>
+                        <span id="liveStatusText">STANDBY</span>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-stage">
+                <div class="preview-card" id="readyPreviewCard">
+                    <div class="card-icon"><i class="fas fa-music"></i></div>
+                    <div class="card-title" id="previewTitle">Ready to preview</div>
+                    <div class="card-subtitle" id="previewText">Select a song to see it here first</div>
+                </div>
+                <div class="preview-card" id="livePreviewCard">
+                    <div class="card-icon"><i class="fas fa-music"></i></div>
+                    <div class="card-title" id="liveTitle">No section live</div>
+                    <div class="card-subtitle" id="liveText">Click a section to send it live</div>
+                </div>
+            </div>
+            <div class="preview-controls">
+                <button class="btn-nav" id="startListenPanelButton" type="button"><i class="fas fa-microphone-lines" style="font-size: 9px;"></i> LISTEN</button>
+                <button class="btn-nav" id="prevSectionButton" type="button"><i class="fas fa-chevron-left" style="font-size: 9px;"></i> PREV</button>
+                <button class="btn-nav primary" id="displaySectionButton" type="button"><i class="fas fa-play" style="font-size: 9px;"></i> DISPLAY</button>
+                <button class="btn-nav" id="nextSectionButton" type="button">NEXT <i class="fas fa-chevron-right" style="font-size: 9px;"></i></button>
+            </div>
+            <canvas id="waveCanvas" class="wave-canvas" width="520" height="70"></canvas>
+        </div>
+
+        <!-- ===== RIGHT: SECTIONS ===== -->
+        <div class="panel sections-panel">
+            <div class="panel-header">
+                <span class="panel-title">Sections</span>
+            </div>
+            <div class="sections-content" id="sectionsContent">
+                <p>Select a song to see its sections</p>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM LEFT: SONG LIBRARY ===== -->
+        <div class="panel library-panel">
+            <div class="panel-header">
+                <span class="panel-title">Song Library</span>
+                <span class="panel-action accent" id="newSongButton"><i class="fas fa-plus" style="font-size: 10px;"></i> NEW</span>
+            </div>
+            <div class="library-search">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input id="songSearchInput" type="text" placeholder="Search songs...">
+                </div>
+                <button class="search-action-btn" id="editSongButton" type="button"><i class="fas fa-pen-to-square"></i></button>
+            </div>
+            <div class="library-content" id="libraryContent">
+                <p>Your song library is empty. Add your first song to get started.</p>
+                <button class="btn-add-first" id="addFirstSongButton" type="button"><i class="fas fa-plus" style="font-size: 11px;"></i> Add Your First Song</button>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM CENTER: AI MAGIC IMPORT ===== -->
+        <div class="panel import-panel">
+            <div class="panel-header">
+                <span class="panel-title">Auto Lyrics</span>
+                <span class="panel-action" id="autoLyricToggle" style="color: var(--accent);">ON</span>
+            </div>
+            <div class="import-content">
+                <div class="lyrics-status-row">
+                    <span class="lyrics-chip" id="lyricDetectStatus">Auto</span>
+                    <span class="lyrics-chip" id="recordingStatus">Ready</span>
+                </div>
+                <textarea id="lyricsBox" class="lyrics-editor" placeholder="Detected or imported lyrics will appear here. Edit lines before sending them live."></textarea>
+                <button class="btn-upgrade" id="copyLyricsButton" type="button">COPY LYRICS</button>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM RIGHT: IMPORT PREVIEW ===== -->
+        <div class="panel preview-import-panel">
+            <div class="panel-header">
+                <span class="panel-title">Import Preview</span>
+                <span class="panel-action accent" id="importLyricsButton">IMPORT</span>
+            </div>
+            <div class="preview-import-content" id="importPreviewContent">
+                <i class="fas fa-download"></i>
+                <p>Paste or import lyrics to preview sections here</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = "omnicast_lyrics_console_v1";
+        const OVERLAY_KEY = "omnicast_live_overlay_v1";
+        const lyricKeywords = ["hallelujah", "glory", "worship", "praise", "holy", "jesus", "lord", "savior", "spirit", "amen", "worthy", "hosanna", "mercy", "grace", "love", "faithful"];
+        let state = loadState();
+        let openMenu = null;
+        let selectedSongId = state.selectedSongId || state.songs[0]?.id || null;
+        let selectedSectionIndex = 0;
+        let liveSectionIndex = -1;
+        let lyricHistory = [];
+        let lyricFuture = [];
+        let recentLyricCandidates = [];
+        let listening = false;
+        let stoppedManually = true;
+        let micStream = null;
+        let recognition = null;
+        let audioContext = null;
+        let analyser = null;
+        let waveFrame = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let lastLiveDetectedPhrase = "";
+        let lastLiveDetectedAt = 0;
+        let voiceGateOpen = false;
+        let voiceGateLastOpenAt = 0;
+        let voiceNoiseFloor = 0.012;
+        let overlayChannel = createOverlayChannel();
+
+        function loadState() {
+            const fallback = {
+                songs: [{
+                    id: "welcome-worship",
+                    title: "Welcome Worship",
+                    lyrics: "We lift Your name\nHallelujah, You are worthy\nWe give You glory\nJesus, You are Lord"
+                }],
+                schedule: ["welcome-worship"],
+                selectedSongId: "welcome-worship",
+                autoDetect: true,
+                bibleVersion: "KJV",
+                zoom: 1
+            };
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+                return saved && Array.isArray(saved.songs) ? { ...fallback, ...saved } : fallback;
+            } catch (error) {
+                return fallback;
+            }
+        }
+
+        function saveState() {
+            state.selectedSongId = selectedSongId;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function $(id) {
+            return document.getElementById(id);
+        }
+
+        function escapeHtml(text) {
+            return String(text || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function showToast(message) {
+            $("toastMsg").textContent = message;
+            $("toast").classList.add("show");
+            clearTimeout(showToast.timer);
+            showToast.timer = setTimeout(() => $("toast").classList.remove("show"), 2500);
+        }
+
+        function showModal(title, bodyHtml, primaryText, primaryAction) {
+            $("modalTitle").textContent = title;
+            $("modalBody").innerHTML = bodyHtml;
+            const primaryBtn = $("modalPrimary");
+            primaryBtn.textContent = primaryText || "Confirm";
+            primaryBtn.onclick = () => {
+                if (primaryAction) {
+                    primaryAction();
+                }
+                closeModal();
+            };
+            $("modal").classList.add("show");
+        }
+
+        function closeModal() {
+            $("modal").classList.remove("show");
+        }
+
+        function selectedSong() {
+            return state.songs.find((song) => song.id === selectedSongId) || state.songs[0] || null;
+        }
+
+        function getSections(song = selectedSong()) {
+            if (!song) {
+                return [];
+            }
+            const chunks = String(song.lyrics || "")
+                .split(/\n{2,}|(?:^|\n)(?=(verse|chorus|bridge|tag|ending)\b[:\s-]*)/i)
+                .map((part) => part.trim())
+                .filter((part) => part && !/^(verse|chorus|bridge|tag|ending)$/i.test(part));
+            const sections = chunks.length > 1 ? chunks : String(song.lyrics || "").split(/\r?\n/).filter(Boolean);
+            return sections.map((text, index) => ({
+                title: index === 0 ? "Section 1" : `Section ${index + 1}`,
+                text: text.replace(/^(verse|chorus|bridge|tag|ending)\b[:\s-]*/i, "").trim()
+            }));
+        }
+
+        function renderAll() {
+            renderLibrary();
+            renderSchedule();
+            renderSections();
+            renderPreview();
+            updateLyricStatus();
+            saveState();
+        }
+
+        function renderLibrary() {
+            const query = $("songSearchInput")?.value?.toLowerCase().trim() || "";
+            const songs = state.songs.filter((song) => `${song.title} ${song.lyrics}`.toLowerCase().includes(query));
+            $("libraryContent").innerHTML = songs.length ? `<div class="lyrics-list">${songs.map((song) => `
+                <button class="song-item ${song.id === selectedSongId ? "active" : ""}" type="button" data-song-id="${song.id}">
+                    <span class="song-title">${escapeHtml(song.title)}</span>
+                    <span class="song-meta">${getSections(song).length} sections</span>
+                </button>
+            `).join("")}</div>` : '<p>No matching songs. Add or import lyrics to build your library.</p><button class="btn-add-first" id="emptyNewSongButton" type="button"><i class="fas fa-plus" style="font-size: 11px;"></i> Add Song</button>';
+            document.querySelectorAll("[data-song-id]").forEach((button) => {
+                button.addEventListener("click", () => selectSong(button.dataset.songId));
+            });
+            $("emptyNewSongButton")?.addEventListener("click", createNewSong);
+        }
+
+        function renderSchedule() {
+            const scheduledSongs = state.schedule.map((id) => state.songs.find((song) => song.id === id)).filter(Boolean);
+            $("scheduleContent").innerHTML = scheduledSongs.length ? `<div class="schedule-list">${scheduledSongs.map((song, index) => `
+                <button class="schedule-item ${song.id === selectedSongId ? "active" : ""}" type="button" data-schedule-song="${song.id}">
+                    <span class="schedule-title">${index + 1}. ${escapeHtml(song.title)}</span>
+                    <span class="schedule-meta">Click to cue this song</span>
+                </button>
+            `).join("")}</div>` : '<i class="fas fa-music"></i><p>Click + on songs below to build your service schedule</p>';
+            document.querySelectorAll("[data-schedule-song]").forEach((button) => {
+                button.addEventListener("click", () => selectSong(button.dataset.scheduleSong));
+            });
+        }
+
+        function renderSections() {
+            const song = selectedSong();
+            const sections = getSections(song);
+            $("sectionsContent").innerHTML = song && sections.length ? `<div class="section-list">${sections.map((section, index) => `
+                <button class="section-item ${index === selectedSectionIndex ? "active" : ""}" type="button" data-section-index="${index}">
+                    <span class="section-title">${escapeHtml(section.title)}</span>
+                    <span class="section-meta">${escapeHtml(section.text.slice(0, 70))}${section.text.length > 70 ? "..." : ""}</span>
+                </button>
+            `).join("")}</div>` : "<p>Select a song to see its sections</p>";
+            document.querySelectorAll("[data-section-index]").forEach((button) => {
+                button.addEventListener("click", () => {
+                    selectedSectionIndex = Number(button.dataset.sectionIndex || 0);
+                    renderPreview();
+                    renderSections();
+                });
+            });
+        }
+
+        function renderPreview() {
+            const song = selectedSong();
+            const sections = getSections(song);
+            const section = sections[selectedSectionIndex];
+            $("lyricsBox").value = song?.lyrics || "";
+            $("previewTitle").textContent = song ? song.title : "Ready to preview";
+            $("previewText").textContent = section?.text || "Select a song to see it here first";
+            const liveSection = sections[liveSectionIndex];
+            $("liveTitle").textContent = liveSection ? `${song.title} - ${liveSection.title}` : "No section live";
+            $("liveText").textContent = liveSection?.text || "Click a section to send it live";
+            $("liveStatusText").textContent = liveSection ? "LIVE" : "STANDBY";
+            $("liveStatusBadge").classList.toggle("live", Boolean(liveSection));
+            $("displaySectionButton").disabled = !section;
+            $("prevSectionButton").disabled = selectedSectionIndex <= 0;
+            $("nextSectionButton").disabled = selectedSectionIndex >= sections.length - 1;
+            $("readyPreviewCard").style.fontSize = `${state.zoom || 1}em`;
+            $("livePreviewCard").style.fontSize = `${state.zoom || 1}em`;
+        }
+
+        function selectSong(songId) {
+            selectedSongId = songId;
+            selectedSectionIndex = 0;
+            liveSectionIndex = -1;
+            renderAll();
+            showToast("Song cued");
+        }
+
+        function createNewSong() {
+            showModal("New Song", '<input class="modal-input" id="newSongTitle" placeholder="Song title"><textarea class="modal-input" id="newSongLyrics" rows="8" placeholder="Paste lyrics here"></textarea>', "Create", () => {
+                const title = $("newSongTitle").value.trim() || "Untitled Song";
+                const lyrics = $("newSongLyrics").value.trim();
+                const song = { id: `song-${Date.now()}`, title, lyrics };
+                state.songs.unshift(song);
+                if (!state.schedule.includes(song.id)) {
+                    state.schedule.push(song.id);
+                }
+                selectedSongId = song.id;
+                renderAll();
+                showToast("Song created");
+            });
+        }
+
+        function importLyrics() {
+            showModal("Import Lyrics", '<input class="modal-input" id="importSongTitle" placeholder="Song title"><textarea class="modal-input" id="importSongLyrics" rows="10" placeholder="Paste lyrics, copied song text, or detected worship lines"></textarea>', "Import", () => {
+                const title = $("importSongTitle").value.trim() || "Imported Song";
+                const lyrics = $("importSongLyrics").value.trim();
+                if (!lyrics) {
+                    showToast("Paste lyrics before importing");
+                    return;
+                }
+                const song = { id: `song-${Date.now()}`, title, lyrics };
+                state.songs.unshift(song);
+                state.schedule.push(song.id);
+                selectedSongId = song.id;
+                renderAll();
+                showToast("Lyrics imported");
+            });
+        }
+
+        function updateSelectedLyricsFromEditor() {
+            const song = selectedSong();
+            if (!song) {
+                return;
+            }
+            const nextLyrics = $("lyricsBox").value;
+            if (song.lyrics !== nextLyrics) {
+                lyricHistory.push(song.lyrics);
+                lyricFuture = [];
+                song.lyrics = nextLyrics;
+                selectedSectionIndex = Math.min(selectedSectionIndex, Math.max(getSections(song).length - 1, 0));
+                renderAll();
+            }
+        }
+
+        function focusLyricsEditor() {
+            $("lyricsBox").focus();
+            showToast("Lyrics editor active");
+        }
+
+        function undoLyricsEdit() {
+            const song = selectedSong();
+            if (!song || !lyricHistory.length) {
+                showToast("Nothing to undo");
+                return;
+            }
+            lyricFuture.push(song.lyrics);
+            song.lyrics = lyricHistory.pop();
+            renderAll();
+        }
+
+        function redoLyricsEdit() {
+            const song = selectedSong();
+            if (!song || !lyricFuture.length) {
+                showToast("Nothing to redo");
+                return;
+            }
+            lyricHistory.push(song.lyrics);
+            song.lyrics = lyricFuture.pop();
+            renderAll();
+        }
+
+        async function copyText(text, success, empty) {
+            if (!String(text || "").trim()) {
+                showToast(empty || "Nothing to copy");
+                return;
+            }
+            try {
+                await navigator.clipboard.writeText(text);
+                showToast(success || "Copied");
+            } catch (error) {
+                window.prompt("Copy this text:", text);
+            }
+        }
+
+        function copyLyricsSelection() {
+            const box = $("lyricsBox");
+            const selected = box.value.slice(box.selectionStart, box.selectionEnd) || box.value;
+            copyText(selected, "Lyrics copied", "No lyrics to copy");
+        }
+
+        function cutLyricsSelection() {
+            const box = $("lyricsBox");
+            if (box.selectionStart === box.selectionEnd) {
+                showToast("Select text to cut");
+                return;
+            }
+            copyLyricsSelection();
+            document.execCommand("delete");
+            updateSelectedLyricsFromEditor();
+        }
+
+        async function pasteLyricsClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.execCommand("insertText", false, text);
+                updateSelectedLyricsFromEditor();
+                showToast("Pasted");
+            } catch (error) {
+                showToast("Clipboard paste unavailable");
+            }
+        }
+
+        function findAndReplaceLyrics() {
+            showModal("Find and Replace", '<input class="modal-input" id="findText" placeholder="Find"><input class="modal-input" id="replaceText" placeholder="Replace with">', "Replace", () => {
+                const find = $("findText").value;
+                if (!find) {
+                    return;
+                }
+                $("lyricsBox").value = $("lyricsBox").value.split(find).join($("replaceText").value);
+                updateSelectedLyricsFromEditor();
+                showToast("Lyrics updated");
+            });
+        }
+
+        function displayCurrentSection() {
+            const song = selectedSong();
+            const sections = getSections(song);
+            const section = sections[selectedSectionIndex];
+            if (!song || !section) {
+                showToast("Cue a lyric section first");
+                return;
+            }
+            liveSectionIndex = selectedSectionIndex;
+            publishOverlay(`${song.title} - ${section.title}`, section.text);
+            renderPreview();
+            showToast("Section sent live");
+        }
+
+        function publishOverlay(reference, text) {
+            const payload = { reference, text, visible: true, hidden: false, updatedAt: Date.now(), source: "omnicast_lyrics" };
+            localStorage.setItem(OVERLAY_KEY, JSON.stringify(payload));
+            overlayChannel?.postMessage(payload);
+        }
+
+        function displayDetectedLyricPhrase(line) {
+            const cleanLine = String(line || "").trim();
+            if (!cleanLine) {
+                return;
+            }
+            const now = Date.now();
+            const normalized = cleanLine.toLowerCase();
+            if (normalized === lastLiveDetectedPhrase && now - lastLiveDetectedAt < 1200) {
+                return;
+            }
+            lastLiveDetectedPhrase = normalized;
+            lastLiveDetectedAt = now;
+            liveSectionIndex = -1;
+            $("liveTitle").textContent = "Live Lyric Detection";
+            $("liveText").textContent = cleanLine;
+            $("liveStatusText").textContent = "LIVE";
+            $("liveStatusBadge").classList.add("live");
+            publishOverlay("Live Lyric Detection", cleanLine);
+        }
+
+        function createOverlayChannel() {
+            try {
+                return "BroadcastChannel" in window ? new BroadcastChannel(OVERLAY_KEY) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function openLowerThird() {
+            window.open("lower-third.html", "_blank", "noopener,noreferrer");
+            showToast("Lower third opened");
+        }
+
+        function copyOBSLink() {
+            copyText(new URL("lower-third.html", window.location.href).toString(), "OBS browser source copied", "No OBS link available");
+        }
+
+        async function toggleListening() {
+            if (listening) {
+                await stopListening();
+            } else {
+                await startListening();
+            }
+        }
+
+        async function startListening() {
+            try {
+                if (!navigator.mediaDevices?.getUserMedia) {
+                    throw new Error("Microphone access is not supported.");
+                }
+                stoppedManually = false;
+                listening = true;
+                setMicUi("Listening", "Stop listening");
+                micStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        channelCount: 1
+                    }
+                });
+                startWave(micStream);
+                startSpeechRecognition();
+                showToast("Listening started");
+            } catch (error) {
+                await stopListening();
+                showToast(error?.name === "NotAllowedError" ? "Allow microphone access to listen" : (error?.message || "Mic unavailable"));
+            }
+        }
+
+        async function stopListening() {
+            stoppedManually = true;
+            listening = false;
+            if (recognition) {
+                recognition.onend = null;
+                try { recognition.stop(); } catch (error) {}
+            }
+            recognition = null;
+            if (waveFrame) {
+                cancelAnimationFrame(waveFrame);
+            }
+            waveFrame = null;
+            if (audioContext && audioContext.state !== "closed") {
+                await audioContext.close().catch(() => {});
+            }
+            audioContext = null;
+            analyser = null;
+            voiceGateOpen = false;
+            voiceGateLastOpenAt = 0;
+            micStream?.getTracks().forEach((track) => track.stop());
+            micStream = null;
+            const canvas = $("waveCanvas");
+            canvas?.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+            setMicUi("Mic status", "Start listening");
+        }
+
+        function setMicUi(status, label) {
+            $("micStatus").textContent = status;
+            $("listenButton").title = label;
+            $("startListenPanelButton").innerHTML = listening ? '<i class="fas fa-stop" style="font-size: 9px;"></i> STOP' : '<i class="fas fa-microphone-lines" style="font-size: 9px;"></i> LISTEN';
+            $("micStatus").classList.toggle("is-live", listening);
+            $("lyricsMicSignal")?.classList.toggle("is-live", listening);
+        }
+
+        function startWave(stream) {
+            const canvas = $("waveCanvas");
+            const context = canvas.getContext("2d");
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+                return;
+            }
+            audioContext = new AudioContextClass();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            audioContext.createMediaStreamSource(stream).connect(analyser);
+            const data = new Uint8Array(analyser.frequencyBinCount);
+            const draw = () => {
+                waveFrame = requestAnimationFrame(draw);
+                analyser.getByteTimeDomainData(data);
+                context.fillStyle = "#050805";
+                context.fillRect(0, 0, canvas.width, canvas.height);
+                context.strokeStyle = "#8dfc00";
+                context.lineWidth = 2;
+                context.beginPath();
+                let sumSquares = 0;
+                let zeroCrossings = 0;
+                let previousCentered = 0;
+                data.forEach((value, index) => {
+                    const centered = (value - 128) / 128;
+                    sumSquares += centered * centered;
+                    if (index && Math.sign(centered) !== Math.sign(previousCentered)) {
+                        zeroCrossings += 1;
+                    }
+                    previousCentered = centered;
+                    const x = (index / data.length) * canvas.width;
+                    const y = (value / 128) * (canvas.height / 2);
+                    index ? context.lineTo(x, y) : context.moveTo(x, y);
+                });
+                const rms = Math.sqrt(sumSquares / data.length);
+                voiceNoiseFloor = Math.min(0.08, Math.max(0.008, (voiceNoiseFloor * 0.96) + (rms * 0.04)));
+                const zeroCrossingRate = zeroCrossings / data.length;
+                voiceGateOpen = rms > Math.max(0.025, voiceNoiseFloor * 1.8) && zeroCrossingRate > 0.02 && zeroCrossingRate < 0.38;
+                if (voiceGateOpen) {
+                    voiceGateLastOpenAt = Date.now();
+                }
+                context.stroke();
+            };
+            draw();
+        }
+
+        function startSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                showToast("Mic is active, but speech recognition is unavailable");
+                return;
+            }
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = "en-US";
+            recognition.maxAlternatives = 5;
+            recognition.onresult = (event) => {
+                for (let index = event.resultIndex; index < event.results.length; index += 1) {
+                    const result = event.results[index];
+                    const transcript = result[0].transcript.trim();
+                    if (!isSingerVoiceActive(result.isFinal)) {
+                        continue;
+                    }
+                    detectLyrics(transcript, result.isFinal);
+                }
+            };
+            recognition.onerror = (event) => {
+                showToast(event.error || "Speech recognition failed");
+                listening = false;
+                setMicUi("Mic status", "Start listening");
+            };
+            recognition.onend = () => {
+                if (!stoppedManually && listening) {
+                    try { recognition.start(); } catch (error) {}
+                }
+            };
+            recognition.start();
+        }
+
+        function isSingerVoiceActive(isFinal) {
+            if (!analyser) {
+                return true;
+            }
+            const holdMs = isFinal ? 1400 : 800;
+            return voiceGateOpen || (Date.now() - voiceGateLastOpenAt) < holdMs;
+        }
+
+        function detectLyrics(text, isFinal) {
+            if (!state.autoDetect) {
+                updateLyricStatus();
+                return;
+            }
+            String(text || "").split(/\r?\n|[.!?;]+/).forEach((rawLine) => {
+                const line = rawLine.replace(/\s+/g, " ").replace(/^[-:,\s]+|[-:,\s]+$/g, "").trim();
+                const wordCount = line.split(/\s+/).filter(Boolean).length;
+                if (!line || wordCount > 18 || wordCount < 2) {
+                    return;
+                }
+                const lower = line.toLowerCase();
+                if (isNonSingerSpeech(lower)) {
+                    return;
+                }
+                const keywordHit = lyricKeywords.some((keyword) => lower.includes(keyword));
+                const repeatHit = recentLyricCandidates.includes(lower);
+                const worshipPhraseHit = /\b(i|we)\s+(worship|praise|lift|sing|exalt|adore|surrender|bow|love|need|trust)\b/i.test(line);
+                const lineLooksSingable = /[aeiou]/i.test(line) && !/\b(chapter|verse|john|romans|psalm|genesis|revelation)\b\s+\d/i.test(line);
+                const shouldShowLive = lineLooksSingable && (keywordHit || repeatHit || worshipPhraseHit || isFinal);
+                if (shouldShowLive) {
+                    appendDetectedLyric(line);
+                    displayDetectedLyricPhrase(line);
+                }
+                recentLyricCandidates = [lower, ...recentLyricCandidates.filter((item) => item !== lower)].slice(0, 12);
+            });
+            updateLyricStatus();
+        }
+
+        function isNonSingerSpeech(lowerLine) {
+            return /\b(verse|chapter|scripture|open your bible|turn with me|today we|announcement|offering|prayer request|pastor|sermon|message|welcome to|good morning|good evening)\b/i.test(lowerLine) ||
+                /\b(genesis|exodus|leviticus|numbers|deuteronomy|joshua|judges|ruth|samuel|kings|chronicles|ezra|nehemiah|esther|job|psalm|proverbs|ecclesiastes|isaiah|jeremiah|ezekiel|daniel|matthew|mark|luke|john|acts|romans|corinthians|galatians|ephesians|philippians|colossians|thessalonians|timothy|titus|philemon|hebrews|james|peter|jude|revelation)\b\s+\d+/i.test(lowerLine);
+        }
+
+        function appendDetectedLyric(line) {
+            const song = selectedSong();
+            if (!song) {
+                return;
+            }
+            const lines = String(song.lyrics || "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+            if (lines.some((item) => item.toLowerCase() === line.toLowerCase())) {
+                return;
+            }
+            lyricHistory.push(song.lyrics);
+            song.lyrics = `${song.lyrics ? `${song.lyrics}\n` : ""}${line}`;
+            renderAll();
+        }
+
+        function updateLyricStatus() {
+            $("lyricDetectStatus").textContent = state.autoDetect ? `${String($("lyricsBox").value || "").split(/\r?\n/).filter(Boolean).length} lines` : "Off";
+            $("autoLyricToggle").textContent = state.autoDetect ? "ON" : "OFF";
+        }
+
+        function toggleAutoLyrics() {
+            state.autoDetect = !state.autoDetect;
+            updateLyricStatus();
+            saveState();
+            showToast(state.autoDetect ? "Auto lyric detection on" : "Auto lyric detection off");
+        }
+
+        async function startRecording() {
+            try {
+                const stream = micStream || await navigator.mediaDevices.getUserMedia({ audio: true });
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.onstop = downloadRecording;
+                mediaRecorder.start();
+                $("recordingStatus").textContent = "Recording";
+                showToast("Recording started");
+            } catch (error) {
+                showToast("Unable to start recording");
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder?.state === "recording") {
+                mediaRecorder.stop();
+                $("recordingStatus").textContent = "Saving";
+            } else {
+                showToast("No recording is running");
+            }
+        }
+
+        function downloadRecording() {
+            const blob = new Blob(recordedChunks, { type: "audio/webm" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "omnicast-lyrics-recording.webm";
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            $("recordingStatus").textContent = "Ready";
+            showToast("Recording downloaded");
+        }
+
+        function exportLyrics(type) {
+            const song = selectedSong();
+            if (!song) {
+                showToast("No lyrics to export");
+                return;
+            }
+            const blob = new Blob([`${song.title}\n\n${song.lyrics}`], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${song.title.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.${type === "ppt" ? "txt" : "txt"}`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            showToast(type === "ppt" ? "PowerPoint-ready lyric text exported" : "PDF-ready lyric text exported");
+        }
+
+        function searchScripture() {
+            showModal("Search Scripture", '<input class="modal-input" id="scriptureQuery" placeholder="John 3:16">', "Search", async () => {
+                const query = $("scriptureQuery").value.trim();
+                if (!query) {
+                    return;
+                }
+                await fetchScripture(query);
+            });
+        }
+
+        async function fetchScripture(reference) {
+            try {
+                const response = await fetch(`https://bible-api.com/${encodeURIComponent(reference)}`);
+                const payload = await response.json();
+                if (!payload.text) {
+                    showToast("Verse not found");
+                    return;
+                }
+                publishOverlay(payload.reference || reference, payload.text.trim());
+                $("liveTitle").textContent = payload.reference || reference;
+                $("liveText").textContent = payload.text.trim();
+                $("liveStatusText").textContent = "LIVE";
+                showToast("Scripture sent to lower third");
+            } catch (error) {
+                showToast("Unable to load scripture");
+            }
+        }
+
+        function loadVerseOfDay() {
+            fetchScripture("Psalm 118:24");
+        }
+
+        function setBibleVersion(version) {
+            state.bibleVersion = version;
+            saveState();
+            showToast(`${version} selected`);
+        }
+
+        function openSettings() {
+            showModal("Lyrics Settings", `<p>Auto detection is ${state.autoDetect ? "on" : "off"}.</p><p>Current Bible version: ${state.bibleVersion}.</p>`, "Toggle Auto Lyrics", toggleAutoLyrics);
+        }
+
+        function openAudioSettings() {
+            showModal("Audio Settings", "<p>Use the microphone button to start listening. Recording uses the same browser microphone permission.</p>", "Start Listening", toggleListening);
+        }
+
+        function selectAudioInput() { openAudioSettings(); }
+        function showAudioOutput() { showToast("Audio output follows your browser or system output"); }
+        function openBibleSettings() { showModal("Bible Settings", `<p>Selected Bible version: ${state.bibleVersion}. Scripture lookup uses the available web Bible API.</p>`, "Done"); }
+        function openDocumentation() { showModal("Documentation", "<p>Build a song library, cue a section, press Display, then use OBS LINK as a browser source for the lower third.</p>", "Done"); }
+        function showKeyboardShortcuts() { showModal("Keyboard Shortcuts", "<p>Ctrl+N new song, Ctrl+R recording, Ctrl+B Bible search, F11 fullscreen, Escape close menus.</p>", "Done"); }
+        function openTutorials() { showModal("Video Tutorials", "<p>Tutorials are available from the main OmniCast help area.</p>", "Done"); }
+        function contactSupport() { window.location.href = "index.html#contact"; }
+        function reportBug() { copyText(`OmniCast Lyrics issue on ${location.href}`, "Bug report starter copied", ""); }
+        function showAboutLyrics() { showModal("About Omnicast Lyrics", "<p>Omnicast Lyrics manages worship lyrics, auto-detects sung lines, and publishes lyrics or scripture to the OBS lower-third page.</p>", "Done"); }
+        function openLyricsWindow() { window.open("omnicast_lyrics.html", "_blank", "noopener,noreferrer"); }
+        function minimizePanels() { document.querySelector(".main-grid").scrollIntoView({ behavior: "smooth", block: "start" }); showToast("Workspace centered"); }
+        function restoreDefaultScreen() { if (document.fullscreenElement) document.exitFullscreen(); showToast("Default screen restored"); }
+        function togglePresentationMode() { displayCurrentSection(); openLowerThird(); }
+        function toggleStageDisplay() { publishOverlay($("liveTitle").textContent, $("liveText").textContent); showToast("Stage display refreshed"); }
+        function zoomLyrics(direction) { state.zoom = Math.min(1.6, Math.max(0.8, (state.zoom || 1) + direction * 0.1)); renderPreview(); saveState(); showToast(`Zoom ${Math.round(state.zoom * 100)}%`); }
+        function goToChurchStudio() { window.location.href = "church_studio.html"; }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen?.().then(() => showToast("Full screen mode enabled")).catch(() => showToast("Full screen not supported"));
+            } else {
+                document.exitFullscreen?.().then(() => showToast("Default screen restored"));
+            }
+        }
+
+        document.querySelectorAll(".menu-item").forEach((item) => {
+            item.addEventListener("click", function(event) {
+                event.stopPropagation();
+                if (openMenu && openMenu !== this) {
+                    openMenu.classList.remove("open");
+                }
+                this.classList.toggle("open");
+                openMenu = this.classList.contains("open") ? this : null;
+            });
+        });
+        document.addEventListener("click", () => {
+            document.querySelectorAll(".menu-item").forEach((item) => item.classList.remove("open"));
+            openMenu = null;
+        });
+        $("modal").addEventListener("click", (event) => { if (event.target === $("modal")) closeModal(); });
+        $("lyricsBox").addEventListener("change", updateSelectedLyricsFromEditor);
+        $("lyricsBox").addEventListener("blur", updateSelectedLyricsFromEditor);
+        $("songSearchInput").addEventListener("input", renderLibrary);
+        $("newSongButton").addEventListener("click", createNewSong);
+        $("addFirstSongButton").addEventListener("click", createNewSong);
+        $("importLyricsButton").addEventListener("click", importLyrics);
+        $("clearScheduleButton").addEventListener("click", () => { state.schedule = []; renderAll(); showToast("Schedule cleared"); });
+        $("editSongButton").addEventListener("click", focusLyricsEditor);
+        $("copyLyricsButton").addEventListener("click", () => copyText($("lyricsBox").value, "Lyrics copied", "No lyrics to copy"));
+        $("copyObsNavbarButton").addEventListener("click", copyOBSLink);
+        $("listenButton").addEventListener("click", toggleListening);
+        $("startListenPanelButton").addEventListener("click", toggleListening);
+        $("displayButton").addEventListener("click", displayCurrentSection);
+        $("displaySectionButton").addEventListener("click", displayCurrentSection);
+        $("shareButton").addEventListener("click", () => copyText($("liveText").textContent, "Live lyrics copied", "No live lyrics"));
+        $("settingsButton").addEventListener("click", openSettings);
+        $("helpButton").addEventListener("click", openDocumentation);
+        $("autoLyricToggle").addEventListener("click", toggleAutoLyrics);
+        $("prevSectionButton").addEventListener("click", () => { selectedSectionIndex = Math.max(0, selectedSectionIndex - 1); renderAll(); });
+        $("nextSectionButton").addEventListener("click", () => { selectedSectionIndex = Math.min(getSections().length - 1, selectedSectionIndex + 1); renderAll(); });
+
+        document.querySelectorAll(".btn-nav, .btn-add-first, .btn-upgrade, .panel-action, .search-action-btn, .nav-icon-btn").forEach((btn) => {
+            btn.addEventListener("click", function() {
+                this.style.transform = "scale(0.97)";
+                setTimeout(() => { this.style.transform = ""; }, 100);
+            });
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.ctrlKey && event.key.toLowerCase() === "n") { event.preventDefault(); createNewSong(); }
+            if (event.ctrlKey && event.key.toLowerCase() === "r") { event.preventDefault(); mediaRecorder?.state === "recording" ? stopRecording() : startRecording(); }
+            if (event.ctrlKey && event.key.toLowerCase() === "b") { event.preventDefault(); searchScripture(); }
+            if (event.key === "F11") { event.preventDefault(); toggleFullscreen(); }
+            if (event.key === "Escape") {
+                document.querySelectorAll(".menu-item").forEach((item) => item.classList.remove("open"));
+                closeModal();
+            }
+        });
+
+        renderAll();
+    </script>
+</body>
+</html>

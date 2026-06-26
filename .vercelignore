@@ -1,0 +1,20 @@
+.git
+.idea
+node_modules
+android
+backend
+electron
+frontend
+netlify
+autopost-ai-netlify
+uploads
+www
+audio
+signup
+downloads
+*.md
+*.txt
+docker-compose.yml
+netlify.toml
+.env*
+Integrated an AdSense-ready web ad.txt

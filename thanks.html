@@ -1,0 +1,308 @@
+<!--
+ OmniCast AI
+ © 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You | OmniCast AI</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8dfc00">
+    <style>
+        :root {
+            --text: #f3ffe2;
+            --muted: #bdd79f;
+            --accent: #8dfc00;
+            --accent-strong: #c8ff65;
+            --line: rgba(191, 255, 89, 0.18);
+            --panel: rgba(33, 21, 17, 0.82);
+            --bg: #000000;
+            --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-shell {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ambient {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ambient-one {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            top: -150px;
+            left: -150px;
+        }
+
+        .ambient-two {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-strong);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* ===== NAVBAR ===== */
+        #navbar {
+            background: var(--accent);
+            padding: 0.5rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-shrink: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(141, 252, 0, 0.15);
+        }
+
+        .nav-brand {
+            color: #000;
+            font-weight: 800;
+            font-size: 0.95rem;
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #000;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(0,0,0,0.15);
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 1.5rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ===== THANKS CARD ===== */
+        .thanks-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 2rem 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            text-align: center;
+        }
+
+        .thanks-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000;
+            margin-bottom: 0.3rem;
+        }
+
+        .thanks-card h1 {
+            font-size: 1.3rem;
+            color: var(--accent-strong);
+            font-weight: 700;
+        }
+
+        .thanks-card p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .button-primary {
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.55rem 1.4rem;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent);
+            color: #000;
+            margin-top: 0.5rem;
+        }
+
+        .button-primary:hover {
+            background: var(--accent-strong);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(141, 252, 0, 0.3);
+        }
+
+        /* ===== FOOTER ===== */
+        .site-footer {
+            position: relative;
+            z-index: 1;
+            border-top: 1px solid var(--line);
+            padding: 0.6rem 1.5rem;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .footer-panel {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        @media (max-width: 640px) {
+            .footer-panel {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.4rem;
+            }
+        }
+
+        .footer-copy {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-copy p {
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-strong);
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+
+        <header id="navbar">
+            <a href="index.html" class="nav-brand">OmniCast AI</a>
+            <nav class="nav-links">
+                <a href="church_studio.html">Church Studio</a>
+                <a href="studio.html">Main Studio</a>
+            </nav>
+        </header>
+
+        <main>
+            <div class="thanks-card">
+                <div class="thanks-icon">✓</div>
+                <h1>Message Sent</h1>
+                <p>Thank you for reaching out. Your message has been delivered to our team. We will get back to you as soon as possible.</p>
+                <a href="index.html" class="button-primary">Back to Home</a>
+            </div>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-panel">
+                <div class="footer-copy">
+                    <p>© 2026 OmniCast AI. All rights reserved.</p>
+                    <p>Developed by Sammy G Concept.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

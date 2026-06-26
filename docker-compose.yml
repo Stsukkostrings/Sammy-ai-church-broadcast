@@ -1,0 +1,41 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: autopost-ai-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+    container_name: autopost-ai-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/autopost-ai
+      FRONTEND_URL: http://localhost:8080
+      APP_BASE_URL: http://localhost:5000
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+    depends_on:
+      - mongodb
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/../uploads
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: autopost-ai-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  mongo_data:

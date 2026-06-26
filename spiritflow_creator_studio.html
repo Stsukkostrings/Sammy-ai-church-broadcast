@@ -1,0 +1,2721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpiritFlow Creator Studio Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind = {
+            config: {
+                theme: {
+                    extend: {
+                        colors: {
+                            lemon: '#C8FF00',
+                            'lemon-light': '#DFFF4D',
+                            'lemon-dark': '#A8D800',
+                            black: '#0A0A0A',
+                            blackLight: '#141414',
+                            blackLighter: '#1E1E1E'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --lemon: #8dfc00;
+            --lemon-light: #c8ff65;
+            --lemon-dark: #6fd400;
+            --black: #0A0A0A;
+            --black-light: #141414;
+            --black-lighter: #1E1E1E;
+            --gray: #888888;
+            --gray-light: #CCCCCC;
+            --omni-text: #f3ffe2;
+            --omni-muted: #bdd79f;
+            --omni-line: rgba(191, 255, 89, 0.2);
+            --omni-panel: rgba(33, 21, 17, 0.88);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--black);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--black); }
+        ::-webkit-scrollbar-thumb { background: var(--lemon); border-radius: 3px; }
+
+        .glass-panel {
+            background: rgba(22, 22, 22, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(200, 255, 0, 0.08);
+        }
+
+        .gradient-lemon {
+            background: linear-gradient(135deg, var(--lemon), var(--lemon-dark));
+        }
+
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(200, 255, 0, 0.3), 0 0 40px rgba(200, 255, 0, 0.1);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 20px rgba(200, 255, 0, 0.5), 0 0 40px rgba(200, 255, 0, 0.2);
+        }
+
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(200, 255, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--lemon), var(--lemon-dark));
+            color: #000;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(200, 255, 0, 0.4);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--lemon);
+            color: var(--lemon);
+            background: transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-outline:hover {
+            background: var(--lemon);
+            color: #000;
+        }
+
+        .tag {
+            background: rgba(200, 255, 0, 0.1);
+            border: 1px solid rgba(200, 255, 0, 0.3);
+            color: var(--lemon);
+        }
+
+        .input-field {
+            background: var(--black-light);
+            border: 1px solid #2A2A2A;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: var(--lemon);
+            box-shadow: 0 0 15px rgba(200, 255, 0, 0.1);
+            outline: none;
+        }
+
+        .pulse-ring { animation: pulse-ring 2s ease-out infinite; }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(200, 255, 0, 0.4); }
+            100% { box-shadow: 0 0 0 20px rgba(200, 255, 0, 0); }
+        }
+
+        .grid-pattern {
+            background-image: linear-gradient(rgba(200, 255, 0, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .hero-gradient {
+            background: radial-gradient(ellipse at top, rgba(200, 255, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(200, 255, 0, 0.05) 0%, transparent 40%);
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #161616, #1a1a1a);
+            border: 1px solid rgba(200, 255, 0, 0.08);
+        }
+
+        .feature-icon {
+            background: linear-gradient(135deg, rgba(200, 255, 0, 0.2), rgba(200, 255, 0, 0.05));
+            border: 1px solid rgba(200, 255, 0, 0.3);
+        }
+
+        .result-card {
+            background: var(--black-light);
+            border: 1px solid #2A2A2A;
+            transition: all 0.3s ease;
+        }
+        .result-card:hover { border-color: rgba(200, 255, 0, 0.4); }
+
+        .copy-btn {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .result-card:hover .copy-btn { opacity: 1; }
+
+        .loading-spinner {
+            border: 3px solid var(--black-lighter);
+            border-top: 3px solid var(--lemon);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23C8FF00' fill-opacity='0.03' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #161616;
+            border: 1px solid var(--lemon);
+            color: var(--lemon);
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        .badge-new {
+            background: linear-gradient(135deg, var(--lemon), var(--lemon-dark));
+            color: var(--black);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+
+        .tool-interface { display: none; }
+        .tool-interface.active { display: block; }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--lemon), var(--lemon-dark));
+            box-shadow: 0 0 10px rgba(200, 255, 0, 0.5);
+        }
+
+        .score-ring {
+            background: conic-gradient(var(--lemon) var(--score), var(--black-lighter) 0deg);
+        }
+
+        .nav-link { position: relative; transition: all 0.3s ease; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--lemon);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
+        .nav-link:hover, .nav-link.active { color: var(--lemon); }
+
+        button, input, textarea, select { font: inherit; }
+        button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+            outline: 2px solid var(--lemon);
+            outline-offset: 3px;
+        }
+        main { min-height: auto; }
+        nav {
+            background: var(--lemon);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+            box-shadow: 0 2px 20px rgba(141, 252, 0, 0.15);
+        }
+        #mobile-menu {
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+        .copy-btn { opacity: 1; }
+        .input-field, .btn-primary, .btn-outline, .result-card, .glass-panel, .stat-card {
+            border-radius: 10px;
+        }
+        .tool-card { min-height: 100%; }
+        .tool-interface.active {
+            animation: fade-up 0.28s ease both;
+        }
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Local utility layer: keeps this app polished if Tailwind CDN is unavailable. */
+        .fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0}.top-0{top:0}.left-0{left:0}.right-0{right:0}.bottom-0{bottom:0}
+        .z-0{z-index:0}.z-10{z-index:10}.z-50{z-index:50}.pointer-events-none{pointer-events:none}.hidden{display:none!important}.block{display:block}.inline-flex{display:inline-flex}.flex{display:flex}.grid{display:grid}
+        .min-h-screen{min-height:100vh}.h-2{height:.5rem}.h-3{height:.75rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-8{height:2rem}.h-10{height:2.5rem}.h-12{height:3rem}.h-14{height:3.5rem}.h-16{height:4rem}.h-20{height:5rem}.h-full{height:100%}
+        .w-2{width:.5rem}.w-3{width:.75rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-8{width:2rem}.w-10{width:2.5rem}.w-12{width:3rem}.w-14{width:3.5rem}.w-20{width:5rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-3xl{max-width:48rem}.max-w-4xl{max-width:56rem}.max-w-5xl{max-width:64rem}.max-w-7xl{max-width:80rem}.max-w-\[80\%\]{max-width:80%}
+        .mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mb-8{margin-bottom:2rem}.mb-12{margin-bottom:3rem}.mb-16{margin-bottom:4rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.mt-8{margin-top:2rem}.ml-2{margin-left:.5rem}.mr-2{margin-right:.5rem}
+        .p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.p-10{padding:2.5rem}.p-12{padding:3rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-8{padding-left:2rem;padding-right:2rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-8{padding-top:2rem;padding-bottom:2rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-16{padding-top:4rem;padding-bottom:4rem}.py-20{padding-top:5rem;padding-bottom:5rem}.pt-16{padding-top:4rem}.pb-16{padding-bottom:4rem}
+        .items-center{align-items:center}.items-start{align-items:flex-start}.items-end{align-items:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.justify-end{justify-content:flex-end}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.flex-shrink-0{flex-shrink:0}.gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-x-1>*+*{margin-left:.25rem}.space-x-2>*+*{margin-left:.5rem}.space-x-3>*+*{margin-left:.75rem}.space-y-1>*+*{margin-top:.25rem}.space-y-2>*+*{margin-top:.5rem}.space-y-3>*+*{margin-top:.75rem}.space-y-4>*+*{margin-top:1rem}.space-y-6>*+*{margin-top:1.5rem}
+        .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+        .rounded{border-radius:.25rem}.rounded-lg{border-radius:8px}.rounded-xl{border-radius:10px}.rounded-2xl{border-radius:12px}.rounded-full{border-radius:9999px}.rounded-tl-none{border-top-left-radius:0}.rounded-tr-none{border-top-right-radius:0}
+        .border{border-width:1px;border-style:solid}.border-2{border-width:2px;border-style:solid}.border-b{border-bottom-width:1px;border-bottom-style:solid}.border-t{border-top-width:1px;border-top-style:solid}.border-dashed{border-style:dashed}.border-lemon{border-color:var(--lemon)}.border-lemon\/10{border-color:rgba(200,255,0,.1)}.border-lemon\/20{border-color:rgba(200,255,0,.2)}.border-lemon\/30{border-color:rgba(200,255,0,.3)}.border-lemon\/40{border-color:rgba(200,255,0,.4)}.border-blue-500{border-color:#3b82f6}.border-purple-500{border-color:#a855f7}.border-red-500{border-color:#ef4444}.border-gray-700{border-color:#374151}
+        .bg-lemon{background:var(--lemon)}.bg-lemon\/5{background:rgba(200,255,0,.05)}.bg-lemon\/10{background:rgba(200,255,0,.1)}.bg-lemon\/20{background:rgba(200,255,0,.2)}.bg-black{background:var(--black)}.bg-blackLight{background:var(--black-light)}.bg-blackLighter{background:var(--black-lighter)}.bg-gray-700{background:#374151}.bg-transparent{background:transparent}
+        .text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.text-xs{font-size:.75rem;line-height:1rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-4xl{font-size:2.25rem;line-height:2.5rem}.text-5xl{font-size:3rem;line-height:1}.font-medium{font-weight:500}.font-semibold{font-weight:600}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-black{font-weight:900}.uppercase{text-transform:uppercase}.tracking-tight{letter-spacing:0}.tracking-wider{letter-spacing:.05em}.tracking-widest{letter-spacing:.1em}.leading-tight{line-height:1.1}.leading-relaxed{line-height:1.625}
+        .text-white{color:#fff}.text-black{color:#000}.text-lemon{color:var(--lemon)}.text-lemon-light{color:var(--lemon-light)}.text-gray-300{color:#d1d5db}.text-gray-400{color:#9ca3af}.text-gray-500{color:#6b7280}.text-blue-400{color:#60a5fa}.text-purple-400{color:#c084fc}.text-red-400{color:#f87171}.text-green-400{color:#4ade80}
+        .cursor-pointer{cursor:pointer}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.resize-none{resize:none}.transition-colors{transition:color .2s ease,background-color .2s ease,border-color .2s ease}.transition-transform{transition:transform .2s ease}.transition-opacity{transition:opacity .2s ease}.opacity-80{opacity:.8}.group:hover .group-hover\:scale-110{transform:scale(1.1)}
+        .hover\:text-lemon:hover{color:var(--lemon)}.hover\:text-lemon-light:hover{color:var(--lemon-light)}.hover\:bg-lemon\/5:hover{background:rgba(200,255,0,.05)}.hover\:bg-lemon\/10:hover{background:rgba(200,255,0,.1)}.hover\:bg-lemon\/20:hover{background:rgba(200,255,0,.2)}.hover\:opacity-80:hover{opacity:.8}
+        @media (min-width:640px){.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:block{display:block!important}.sm\:flex{display:flex!important}.sm\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media (min-width:768px){.md\:hidden{display:none!important}.md\:flex{display:flex!important}.md\:block{display:block!important}.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.md\:text-5xl{font-size:3rem;line-height:1}.md\:text-7xl{font-size:4.5rem;line-height:1}}
+        @media (min-width:1024px){.lg\:px-8{padding-left:2rem;padding-right:2rem}.lg\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.lg\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}.lg\:grid-cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}.lg\:col-span-2{grid-column:span 2 / span 2}}
+        @media (max-width:767px){
+            .text-5xl{font-size:2.35rem}.text-4xl{font-size:2rem}.text-3xl{font-size:1.6rem}
+            .py-20{padding-top:3.5rem;padding-bottom:3.5rem}.p-8,.p-10,.p-12{padding:1.25rem}
+            .toast{left:1rem;right:1rem;bottom:1rem;text-align:center}
+        }
+
+        /* Match the compact OmniCast shell while keeping this page's tool UI intact. */
+        body {
+            color: var(--omni-text);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .text-sm{font-size:.78rem;line-height:1.15rem}
+        .text-lg{font-size:.98rem;line-height:1.45rem}
+        .text-xl{font-size:1.08rem;line-height:1.5rem}
+        .text-2xl{font-size:1.28rem;line-height:1.7rem}
+        .text-3xl{font-size:1.48rem;line-height:1.85rem}
+        .text-4xl{font-size:1.75rem;line-height:2.05rem}
+        .text-5xl{font-size:2.15rem;line-height:1.05}
+        @media (min-width:768px){
+            .md\:text-5xl{font-size:2.35rem;line-height:1.05}
+            .md\:text-7xl{font-size:3.15rem;line-height:1.02}
+        }
+        .creator-nav {
+            color: #000;
+        }
+        .creator-nav .h-16 {
+            height: 2.4rem;
+        }
+        .creator-nav .max-w-7xl {
+            max-width: 1180px;
+        }
+        .creator-nav .brand-icon,
+        .creator-nav .creator-avatar {
+            background: #000;
+            color: var(--lemon);
+            box-shadow: none;
+        }
+        .creator-nav .brand-icon {
+            width: 1.65rem;
+            height: 1.65rem;
+            border-radius: 6px;
+        }
+        .creator-nav .brand-icon [data-lucide],
+        .creator-nav .creator-avatar [data-lucide] {
+            color: var(--lemon);
+        }
+        .creator-nav h1,
+        .creator-nav p,
+        .creator-nav .nav-link,
+        .creator-nav button,
+        .creator-nav span {
+            color: #000;
+        }
+        .creator-nav h1 {
+            font-size: .92rem;
+            letter-spacing: .02em;
+        }
+        .creator-nav p {
+            display: none;
+        }
+        .creator-nav .nav-link {
+            border-radius: 6px;
+            font-size: .75rem;
+            font-weight: 800;
+            padding: .35rem .65rem;
+        }
+        .creator-nav .nav-link::after {
+            display: none;
+        }
+        .creator-nav .nav-link:hover,
+        .creator-nav .nav-link.active,
+        .creator-nav button:hover {
+            background: #000;
+            color: var(--lemon);
+        }
+        .creator-nav .pulse-ring {
+            background: #000;
+            animation: none;
+        }
+        .creator-nav #mobile-menu {
+            background: var(--lemon) !important;
+            border-top-color: rgba(0, 0, 0, 0.2);
+        }
+        .creator-nav #mobile-menu button {
+            color: #000;
+            font-weight: 800;
+        }
+        .studio-main {
+            padding-top: 2.4rem;
+        }
+        .studio-main .py-20 {
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+        }
+        .studio-main .mb-16 {
+            margin-bottom: 2rem;
+        }
+        .studio-main .mb-12 {
+            margin-bottom: 2rem;
+        }
+        .studio-main .p-8,
+        .studio-main .p-10,
+        .studio-main .p-12 {
+            padding: 1.25rem;
+        }
+        .studio-main .rounded-2xl {
+            border-radius: 8px;
+        }
+        .studio-main .max-w-7xl,
+        .creator-footer .footer-panel {
+            max-width: 1180px;
+        }
+        .creator-footer {
+            width: min(1180px, calc(100% - 36px));
+            margin: 24px auto 18px;
+        }
+        .creator-footer .footer-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding: 16px 18px;
+            background: var(--omni-panel);
+            border: 1px solid var(--omni-line);
+            border-radius: 8px;
+            color: var(--omni-muted);
+        }
+        .creator-footer .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--omni-text);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: .02em;
+        }
+        .creator-footer .footer-brand-mark {
+            width: 1.65rem;
+            height: 1.65rem;
+            border-radius: 6px;
+            background: var(--lemon);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .creator-footer .footer-copy,
+        .creator-footer .footer-links a {
+            color: var(--omni-muted);
+            text-decoration: none;
+            font-size: .78rem;
+        }
+        .creator-footer .footer-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .creator-footer .footer-links a:hover {
+            color: var(--lemon-light);
+        }
+        @media (max-width:767px){
+            body{font-size:13px}
+            .text-5xl{font-size:1.85rem}
+            .text-4xl{font-size:1.55rem}
+            .text-3xl{font-size:1.32rem}
+            .studio-main .py-20{padding-top:2rem;padding-bottom:2rem}
+            .creator-footer{width:min(100% - 20px, 1180px)}
+            .creator-footer .footer-panel{align-items:flex-start}
+        }
+        .studio-main .text-sm,.creator-footer .text-sm{font-size:.78rem!important;line-height:1.15rem!important}
+        .studio-main .text-lg{font-size:.98rem!important;line-height:1.45rem!important}
+        .studio-main .text-xl{font-size:1.08rem!important;line-height:1.5rem!important}
+        .studio-main .text-2xl{font-size:1.28rem!important;line-height:1.7rem!important}
+        .studio-main .text-3xl{font-size:1.48rem!important;line-height:1.85rem!important}
+        .studio-main .text-4xl{font-size:1.75rem!important;line-height:2.05rem!important}
+        .studio-main .text-5xl{font-size:2.15rem!important;line-height:1.05!important}
+        @media (min-width:768px){
+            .studio-main .md\:text-5xl{font-size:2.35rem!important;line-height:1.05!important}
+            .studio-main .md\:text-7xl{font-size:3.15rem!important;line-height:1.02!important}
+        }
+        @media (max-width:767px){
+            .studio-main .text-5xl{font-size:1.85rem!important}
+            .studio-main .text-4xl{font-size:1.55rem!important}
+            .studio-main .text-3xl{font-size:1.32rem!important}
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="grid-pattern fixed inset-0 pointer-events-none z-0"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="creator-nav fixed top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('dashboard')">
+                    <div class="brand-icon w-10 h-10 rounded-xl gradient-lemon flex items-center justify-center neon-glow">
+                        <i data-lucide="flame" class="w-6 h-6 text-black"></i>
+                    </div>
+                    <div class="hidden sm:block">
+                        <h1 class="text-lg font-bold tracking-tight text-white">SPIRIT<span style="color:var(--lemon)">FLOW</span></h1>
+                        <p class="text-[10px] text-gray-400 -mt-1 tracking-widest uppercase">Creator Studio Pro</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-1">
+                    <button onclick="showSection('dashboard')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-dashboard">Dashboard</button>
+                    <button onclick="showSection('tools')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-tools">Tools</button>
+                    <button onclick="showSection('analytics')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-analytics">Analytics</button>
+                    <button onclick="showSection('ai-assistant')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg flex items-center gap-2" id="nav-ai-assistant">
+                        <span class="w-2 h-2 rounded-full bg-lemon pulse-ring"></span>AI Assistant
+                    </button>
+                    <button onclick="showSection('calendar')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-calendar">Calendar</button>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <button onclick="showNotifications()" class="p-2 rounded-lg text-gray-400 hover:text-lemon transition-colors relative">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-lemon rounded-full"></span>
+                    </button>
+                    <div class="hidden sm:flex items-center space-x-2">
+                        <div class="creator-avatar w-8 h-8 rounded-full gradient-lemon flex items-center justify-center">
+                            <i data-lucide="user" class="w-4 h-4 text-black"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-300">Creator</span>
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-400">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden border-t border-lemon/10">
+            <div class="px-4 py-3 space-y-1">
+                <button onclick="showSection('dashboard'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium text-gray-300 hover:text-lemon hover:bg-lemon/5 rounded-lg">Dashboard</button>
+                <button onclick="showSection('tools'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium text-gray-300 hover:text-lemon hover:bg-lemon/5 rounded-lg">Tools</button>
+                <button onclick="showSection('analytics'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium text-gray-300 hover:text-lemon hover:bg-lemon/5 rounded-lg">Analytics</button>
+                <button onclick="showSection('ai-assistant'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium text-gray-300 hover:text-lemon hover:bg-lemon/5 rounded-lg">AI Assistant</button>
+                <button onclick="showSection('calendar'); toggleMobileMenu()" class="block w-full text-left px-4 py-3 text-sm font-medium text-gray-300 hover:text-lemon hover:bg-lemon/5 rounded-lg">Calendar</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="studio-main pt-16 relative z-10">
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="section-content active">
+            <div class="relative overflow-hidden py-20 px-4 hero-gradient">
+                <div class="max-w-7xl mx-auto">
+                    <div class="text-center mb-16">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-semibold mb-6">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>AI-Powered YouTube Growth Platform
+                        </div>
+                        <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+                            <span class="text-white">Create.</span>
+                            <span class="text-lemon neon-text">Optimize.</span>
+                            <span class="text-white">Worship.</span>
+                            <span class="text-lemon neon-text">Grow.</span>
+                        </h1>
+                        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+                            The all-in-one AI-powered platform for Christian musicians, worship leaders, and gospel content creators to dominate YouTube.
+                        </p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button onclick="showSection('tools')" class="btn-primary px-8 py-4 rounded-xl text-lg flex items-center gap-2">
+                                <i data-lucide="rocket" class="w-5 h-5"></i>Launch Studio
+                            </button>
+                            <button onclick="showSection('analytics')" class="btn-outline px-8 py-4 rounded-xl text-lg flex items-center gap-2">
+                                <i data-lucide="bar-chart-3" class="w-5 h-5"></i>View Analytics
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                        <div class="stat-card rounded-2xl p-6 text-center card-hover">
+                            <div class="text-3xl font-black text-lemon mb-1">16+</div>
+                            <div class="text-sm text-gray-400">AI Tools</div>
+                        </div>
+                        <div class="stat-card rounded-2xl p-6 text-center card-hover">
+                            <div class="text-3xl font-black text-lemon mb-1">100%</div>
+                            <div class="text-sm text-gray-400">Free Forever</div>
+                        </div>
+                        <div class="stat-card rounded-2xl p-6 text-center card-hover">
+                            <div class="text-3xl font-black text-lemon mb-1">Offline</div>
+                            <div class="text-sm text-gray-400">Mode Ready</div>
+                        </div>
+                        <div class="stat-card rounded-2xl p-6 text-center card-hover">
+                            <div class="text-3xl font-black text-lemon mb-1">Local</div>
+                            <div class="text-sm text-gray-400">AI Powered</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wave-bg"></div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 py-16">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-2">Quick Access Tools</h2>
+                        <p class="text-gray-400">Your most-used creation tools, one click away</p>
+                    </div>
+                    <button onclick="showSection('tools')" class="text-lemon hover:text-lemon-light font-semibold flex items-center gap-2 transition-colors">View All <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div onclick="showTool('title-optimizer')" class="glass-panel rounded-2xl p-6 cursor-pointer card-hover group">
+                        <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="type" class="w-7 h-7 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Title Optimizer</h3>
+                        <p class="text-sm text-gray-400 mb-4">Generate viral, SEO-optimized titles for Christian content</p>
+                        <div class="flex items-center justify-between">
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">AI Powered</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="showTool('thumbnail-analyzer')" class="glass-panel rounded-2xl p-6 cursor-pointer card-hover group">
+                        <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="image" class="w-7 h-7 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Thumbnail Analyzer</h3>
+                        <p class="text-sm text-gray-400 mb-4">AI-powered thumbnail scoring and improvement suggestions</p>
+                        <div class="flex items-center justify-between">
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">AI Vision</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="showTool('description-generator')" class="glass-panel rounded-2xl p-6 cursor-pointer card-hover group">
+                        <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="file-text" class="w-7 h-7 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Description Generator</h3>
+                        <p class="text-sm text-gray-400 mb-4">Auto-generate SEO-rich descriptions with CTAs</p>
+                        <div class="flex items-center justify-between">
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">SEO</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="showTool('hashtag-generator')" class="glass-panel rounded-2xl p-6 cursor-pointer card-hover group">
+                        <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="hash" class="w-7 h-7 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Hashtag Generator</h3>
+                        <p class="text-sm text-gray-400 mb-4">Generate trending Christian and worship hashtags</p>
+                        <div class="flex items-center justify-between">
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Trending</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="showTool('keyword-research')" class="glass-panel rounded-2xl p-6 cursor-pointer card-hover group">
+                        <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="search" class="w-7 h-7 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Keyword Research</h3>
+                        <p class="text-sm text-gray-400 mb-4">Discover high-opportunity Christian keywords</p>
+                        <div class="flex items-center justify-between">
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Research</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+
+                    <div onclick="showTool('content-ideas')" class="glass-panel rounded-2xl p-6 cursor-pointer card-hover group">
+                        <div class="feature-icon w-14 h-14 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="lightbulb" class="w-7 h-7 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Content Ideas</h3>
+                        <p class="text-sm text-gray-400 mb-4">AI-generated Bible story and worship content ideas</p>
+                        <div class="flex items-center justify-between">
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Creative</span>
+                            <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 pb-16">
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-2xl bg-lemon/10 border border-lemon/20 flex items-center justify-center">
+                                <i data-lucide="play-square" class="w-8 h-8 text-red-500"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-white" id="youtube-channel-title">Channel Overview</h2>
+                                <p class="text-gray-400" id="youtube-channel-status">Connect your YouTube channel to unlock full analytics</p>
+                            </div>
+                        </div>
+                        <button onclick="connectYouTube()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
+                            <i data-lucide="link" class="w-5 h-5"></i>Connect Channel
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-blackLight rounded-2xl p-6 border border-lemon/5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="users" class="w-4 h-4 text-lemon"></i>
+                                <span class="text-sm text-gray-400">Subscribers</span>
+                            </div>
+                            <div class="text-3xl font-black text-white" id="youtube-subscribers">0</div>
+                            <div class="text-xs text-gray-500 mt-1" id="youtube-subscribers-note">Connect to see data</div>
+                        </div>
+                        <div class="bg-blackLight rounded-2xl p-6 border border-lemon/5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="eye" class="w-4 h-4 text-lemon"></i>
+                                <span class="text-sm text-gray-400">Total Views</span>
+                            </div>
+                            <div class="text-3xl font-black text-white" id="youtube-views">0</div>
+                            <div class="text-xs text-gray-500 mt-1" id="youtube-views-note">Connect to see data</div>
+                        </div>
+                        <div class="bg-blackLight rounded-2xl p-6 border border-lemon/5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-lemon"></i>
+                                <span class="text-sm text-gray-400">Watch Time</span>
+                            </div>
+                            <div class="text-3xl font-black text-white" id="youtube-watch-hours">0h</div>
+                            <div class="text-xs text-gray-500 mt-1" id="youtube-watch-note">Connect to see data</div>
+                        </div>
+                        <div class="bg-blackLight rounded-2xl p-6 border border-lemon/5">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i data-lucide="video" class="w-4 h-4 text-lemon"></i>
+                                <span class="text-sm text-gray-400">Uploads</span>
+                            </div>
+                            <div class="text-3xl font-black text-white" id="youtube-uploads">0</div>
+                            <div class="text-xs text-gray-500 mt-1" id="youtube-uploads-note">Connect to see data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLS SECTION -->
+        <section id="tools" class="section-content">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="mb-8">
+                    <h1 class="text-4xl font-black text-white mb-2">Creator Tools</h1>
+                    <p class="text-gray-400">16 powerful AI tools to supercharge your Christian content</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mb-8">
+                    <button onclick="filterTools('all')" class="tool-filter active px-4 py-2 rounded-full text-sm font-semibold" style="background:var(--lemon);color:#000" data-filter="all">All Tools</button>
+                    <button onclick="filterTools('seo')" class="tool-filter px-4 py-2 rounded-full text-sm font-semibold border border-lemon/30 text-lemon hover:bg-lemon/10" data-filter="seo">SEO</button>
+                    <button onclick="filterTools('creative')" class="tool-filter px-4 py-2 rounded-full text-sm font-semibold border border-lemon/30 text-lemon hover:bg-lemon/10" data-filter="creative">Creative</button>
+                    <button onclick="filterTools('analytics')" class="tool-filter px-4 py-2 rounded-full text-sm font-semibold border border-lemon/30 text-lemon hover:bg-lemon/10" data-filter="analytics">Analytics</button>
+                    <button onclick="filterTools('music')" class="tool-filter px-4 py-2 rounded-full text-sm font-semibold border border-lemon/30 text-lemon hover:bg-lemon/10" data-filter="music">Music</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="tools-grid">
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="seo" onclick="showTool('title-optimizer')">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                                <i data-lucide="type" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="badge-new">POPULAR</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Title Optimizer</h3>
+                        <p class="text-sm text-gray-400 mb-4">Generate viral, SEO-optimized titles with CTR predictions</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">SEO</span>
+                            <span class="tag px-2 py-1 rounded text-xs">CTR</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="analytics" onclick="showTool('thumbnail-analyzer')">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                                <i data-lucide="image" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="badge-new">NEW</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Thumbnail Analyzer</h3>
+                        <p class="text-sm text-gray-400 mb-4">AI-powered thumbnail scoring and improvement suggestions</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">AI Vision</span>
+                            <span class="tag px-2 py-1 rounded text-xs">CTR</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="creative" onclick="showTool('thumbnail-recreator')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="wand-2" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">AI Thumbnail Re-Creator</h3>
+                        <p class="text-sm text-gray-400 mb-4">Generate improved thumbnail prompts for Midjourney, DALL-E & more</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">AI Prompts</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Creative</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="seo" onclick="showTool('description-generator')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="file-text" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Description Generator</h3>
+                        <p class="text-sm text-gray-400 mb-4">Auto-generate SEO-rich descriptions with CTAs and timestamps</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">SEO</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Auto</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="seo" onclick="showTool('hashtag-generator')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="hash" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Hashtag Generator</h3>
+                        <p class="text-sm text-gray-400 mb-4">Generate 15-30 trending Christian and worship hashtags</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Trending</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Christian</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="seo" onclick="showTool('keyword-research')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="search" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Keyword Research</h3>
+                        <p class="text-sm text-gray-400 mb-4">Discover high-opportunity keywords with difficulty scores</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Research</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Data</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="creative" onclick="showTool('content-ideas')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="lightbulb" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Content Ideas</h3>
+                        <p class="text-sm text-gray-400 mb-4">AI-generated Bible stories, worship ideas, and viral topics</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Creative</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Bible</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="analytics" onclick="showTool('trend-discovery')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Christian Trend Discovery</h3>
+                        <p class="text-sm text-gray-400 mb-4">Analyze current Christian, worship, and gospel music trends</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Trends</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Analytics</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="creative" onclick="showTool('capcut-prompts')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="scissors" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">CapCut Prompt Generator</h3>
+                        <p class="text-sm text-gray-400 mb-4">Generate image and animation prompts for CapCut editing</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Editing</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Video</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="music" onclick="showTool('music-release')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="music" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Music Release Assistant</h3>
+                        <p class="text-sm text-gray-400 mb-4">Complete release kit for DistroKid, Spotify, Apple Music</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Music</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Distribution</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="analytics" onclick="showTool('comment-manager')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="message-circle" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Comment Manager</h3>
+                        <p class="text-sm text-gray-400 mb-4">AI-generated replies and community engagement suggestions</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Community</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Engagement</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="analytics" onclick="showTool('channel-audit')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Channel Audit Engine</h3>
+                        <p class="text-sm text-gray-400 mb-4">Full channel health analysis with actionable recommendations</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Audit</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Health</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="seo" onclick="showTool('video-seo')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="search-check" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Video SEO Audit</h3>
+                        <p class="text-sm text-gray-400 mb-4">Analyze every video for title, description, and thumbnail SEO</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">SEO</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Audit</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="creative" onclick="showTool('content-calendar')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Content Calendar</h3>
+                        <p class="text-sm text-gray-400 mb-4">30-day AI-generated content calendar with upload schedules</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">Planning</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Schedule</span>
+                        </div>
+                    </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="analytics" onclick="showTool('youtube-connector')">
+                        <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                            <i data-lucide="play-square" class="w-6 h-6 text-lemon"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">YouTube Connector</h3>
+                        <p class="text-sm text-gray-400 mb-4">Connect channels, fetch analytics, manage multiple accounts</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">API</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ANALYTICS SECTION -->
+        <section id="analytics" class="section-content">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="mb-8">
+                    <h1 class="text-4xl font-black text-white mb-2">Analytics Dashboard</h1>
+                    <p class="text-gray-400">Track your Christian content performance and growth</p>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="glass-panel rounded-2xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-lemon/10 flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-lemon bg-lemon/10 px-2 py-1 rounded-full" id="analytics-subscribers-delta">Live</span>
+                        </div>
+                        <div class="text-3xl font-black text-white mb-1" id="analytics-subscribers">Connect</div>
+                        <div class="text-sm text-gray-400">Subscribers</div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-lemon/10 flex items-center justify-center">
+                                <i data-lucide="eye" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-lemon bg-lemon/10 px-2 py-1 rounded-full" id="analytics-views-delta">Live</span>
+                        </div>
+                        <div class="text-3xl font-black text-white mb-1" id="analytics-views">Connect</div>
+                        <div class="text-sm text-gray-400">Total Views</div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-lemon/10 flex items-center justify-center">
+                                <i data-lucide="clock" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-lemon bg-lemon/10 px-2 py-1 rounded-full" id="analytics-watch-delta">28 days</span>
+                        </div>
+                        <div class="text-3xl font-black text-white mb-1" id="analytics-watch-hours">0h</div>
+                        <div class="text-sm text-gray-400">Watch Hours</div>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl p-6 card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-lemon/10 flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-lemon bg-lemon/10 px-2 py-1 rounded-full" id="analytics-health-note">Audit</span>
+                        </div>
+                        <div class="text-3xl font-black text-white mb-1" id="analytics-health-score">0</div>
+                        <div class="text-sm text-gray-400">Health Score</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="glass-panel rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Views Growth</h3>
+                        <canvas id="viewsChart" height="250"></canvas>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Subscriber Growth</h3>
+                        <canvas id="subscribersChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-white mb-4">Top Performing Videos</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="text-left text-sm text-gray-400 border-b border-lemon/10">
+                                    <th class="pb-3 font-semibold">Video</th>
+                                    <th class="pb-3 font-semibold">Views</th>
+                                    <th class="pb-3 font-semibold">CTR</th>
+                                    <th class="pb-3 font-semibold">Avg Duration</th>
+                                    <th class="pb-3 font-semibold">SEO Score</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm" id="analytics-top-videos">
+                                <tr class="border-b border-lemon/5">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
+                                        <span class="text-white font-medium">How to Worship in Spirit</span>
+                                    </td>
+                                    <td class="py-4 text-gray-300">125K</td>
+                                    <td class="py-4 text-lemon font-semibold">12.4%</td>
+                                    <td class="py-4 text-gray-300">8:24</td>
+                                    <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">92/100</span></td>
+                                </tr>
+                                <tr class="border-b border-lemon/5">
+                                    <td class="py-4 flex items-center gap-3">
+                                        <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
+                                        <span class="text-white font-medium">David and Goliath Story</span>
+                                    </td>
+                                    <td class="py-4 text-gray-300">98K</td>
+                                    <td class="py-4 text-lemon font-semibold">10.8%</td>
+                                    <td class="py-4 text-gray-300">12:15</td>
+                                    <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">88/100</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 flex items-center gap-3">
+                                        <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
+                                        <span class="text-white font-medium">Morning Worship Playlist</span>
+                                    </td>
+                                    <td class="py-4 text-gray-300">87K</td>
+                                    <td class="py-4 text-lemon font-semibold">9.2%</td>
+                                    <td class="py-4 text-gray-300">45:30</td>
+                                    <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">85/100</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI ASSISTANT SECTION -->
+        <section id="ai-assistant" class="section-content">
+            <div class="max-w-4xl mx-auto px-4 py-8" style="min-height:calc(100vh - 4rem); display:flex; flex-direction:column;">
+                <div class="mb-6">
+                    <h1 class="text-4xl font-black text-white mb-2">SpiritFlow AI Assistant</h1>
+                    <p class="text-gray-400">Your personal AI consultant for Christian content strategy</p>
+                </div>
+
+                <div class="flex-1 glass-panel rounded-2xl border border-lemon/10 flex flex-col overflow-hidden" style="min-height:500px;">
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full gradient-lemon flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="flame" class="w-5 h-5 text-black"></i>
+                            </div>
+                            <div class="bg-blackLight rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                                <p class="text-white">Hello! I am your SpiritFlow AI Assistant. I can help you with:</p>
+                                <ul class="mt-2 space-y-1 text-gray-300 text-sm">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Channel analysis and strategy</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> SEO recommendations</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Thumbnail and title suggestions</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Christian content strategy</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Music promotion guidance</li>
+                                </ul>
+                                <p class="mt-3 text-gray-300">What would you like help with today?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-3 border-t border-lemon/5 flex gap-2 overflow-x-auto">
+                        <button onclick="sendQuickMessage('Analyze my channel health')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Analyze Channel</button>
+                        <button onclick="sendQuickMessage('Generate content ideas for this week')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Content Ideas</button>
+                        <button onclick="sendQuickMessage('Help me optimize my latest video')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Optimize Video</button>
+                        <button onclick="sendQuickMessage('Trending Christian topics right now')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Trending Topics</button>
+                    </div>
+
+                    <div class="p-4 border-t border-lemon/5">
+                        <div class="flex items-center gap-3">
+                            <input type="text" id="chat-input" placeholder="Ask me anything about your Christian content strategy..." 
+                                class="flex-1 input-field rounded-xl px-4 py-3 text-sm"
+                                onkeypress="if(event.key==='Enter') sendMessage()">
+                            <button onclick="sendMessage()" class="btn-primary p-3 rounded-xl">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CALENDAR SECTION -->
+        <section id="calendar" class="section-content">
+            <div class="max-w-7xl mx-auto px-4 py-8">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="text-4xl font-black text-white mb-2">Content Calendar</h1>
+                        <p class="text-gray-400">Plan and schedule your Christian content strategy</p>
+                    </div>
+                    <button onclick="generateCalendar()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate 30-Day Plan
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6 border border-lemon/10">
+                    <div class="grid grid-cols-7 gap-2 mb-4">
+                        <div class="text-center text-sm font-semibold text-lemon">Sun</div>
+                        <div class="text-center text-sm font-semibold text-lemon">Mon</div>
+                        <div class="text-center text-sm font-semibold text-lemon">Tue</div>
+                        <div class="text-center text-sm font-semibold text-lemon">Wed</div>
+                        <div class="text-center text-sm font-semibold text-lemon">Thu</div>
+                        <div class="text-center text-sm font-semibold text-lemon">Fri</div>
+                        <div class="text-center text-sm font-semibold text-lemon">Sat</div>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+                </div>
+
+                <div class="flex flex-wrap gap-4 mt-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bg-lemon/30 border border-lemon"></div>
+                        <span class="text-sm text-gray-400">Long-form Video</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bg-blue-500/30 border border-blue-500"></div>
+                        <span class="text-sm text-gray-400">Shorts</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bg-purple-500/30 border border-purple-500"></div>
+                        <span class="text-sm text-gray-400">Community Post</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bg-red-500/30 border border-red-500"></div>
+                        <span class="text-sm text-gray-400">Music Release</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOL INTERFACES -->
+
+        <!-- Title Optimizer -->
+        <div id="tool-title-optimizer" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="type" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Title Optimizer</h1>
+                            <p class="text-gray-400">Generate viral, SEO-optimized YouTube titles for Christian content</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Enter your video title or topic</label>
+                        <input type="text" id="title-input" placeholder="e.g., Jonah's Second Chance" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setTitleType('viral')" class="title-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-type="viral">Viral</button>
+                        <button onclick="setTitleType('seo')" class="title-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="seo">SEO Focused</button>
+                        <button onclick="setTitleType('shorts')" class="title-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="shorts">Shorts</button>
+                        <button onclick="setTitleType('christian')" class="title-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="christian">Christian Audience</button>
+                    </div>
+
+                    <button onclick="optimizeTitle()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate Optimized Titles
+                    </button>
+
+                    <div id="title-results" class="mt-8 space-y-4 hidden">
+                        <h3 class="text-xl font-bold text-white mb-4">Generated Titles</h3>
+                        <div id="title-results-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thumbnail Analyzer -->
+        <div id="tool-thumbnail-analyzer" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="image" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Thumbnail Analyzer</h1>
+                            <p class="text-gray-400">AI-powered analysis of your thumbnail quality and CTR potential</p>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-dashed border-lemon/20 rounded-2xl p-12 text-center mb-6 hover:border-lemon/40 transition-colors cursor-pointer" onclick="document.getElementById('thumbnail-upload').click()">
+                        <i data-lucide="upload-cloud" class="w-16 h-16 text-lemon/40 mx-auto mb-4"></i>
+                        <p class="text-lg font-semibold text-white mb-2">Upload your thumbnail</p>
+                        <p class="text-sm text-gray-400">Drag and drop or click to browse (PNG, JPG, max 5MB)</p>
+                        <input type="file" id="thumbnail-upload" class="hidden" accept="image/*" onchange="analyzeThumbnail()">
+                    </div>
+
+                    <div id="thumbnail-results" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            <div class="bg-blackLight rounded-2xl p-6 text-center border border-lemon/5">
+                                <div class="text-4xl font-black text-lemon mb-2" id="thumb-score">0</div>
+                                <div class="text-sm text-gray-400">Overall Score</div>
+                            </div>
+                            <div class="bg-blackLight rounded-2xl p-6 text-center border border-lemon/5">
+                                <div class="text-4xl font-black text-lemon mb-2" id="thumb-ctr">0%</div>
+                                <div class="text-sm text-gray-400">Estimated CTR</div>
+                            </div>
+                            <div class="bg-blackLight rounded-2xl p-6 text-center border border-lemon/5">
+                                <div class="text-4xl font-black text-lemon mb-2" id="thumb-mobile">0%</div>
+                                <div class="text-sm text-gray-400">Mobile Visibility</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-300">Resolution & Aspect Ratio</span>
+                                    <span class="text-sm text-lemon font-bold" id="thumb-res-score">0/100</span>
+                                </div>
+                                <div class="w-full h-2 bg-blackLight rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full rounded-full" id="thumb-res-bar" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-300">Brightness & Contrast</span>
+                                    <span class="text-sm text-lemon font-bold" id="thumb-bright-score">0/100</span>
+                                </div>
+                                <div class="w-full h-2 bg-blackLight rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full rounded-full" id="thumb-bright-bar" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-300">Text Readability</span>
+                                    <span class="text-sm text-lemon font-bold" id="thumb-text-score">0/100</span>
+                                </div>
+                                <div class="w-full h-2 bg-blackLight rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full rounded-full" id="thumb-text-bar" style="width:0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold text-gray-300">Color Harmony</span>
+                                    <span class="text-sm text-lemon font-bold" id="thumb-color-score">0/100</span>
+                                </div>
+                                <div class="w-full h-2 bg-blackLight rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full rounded-full" id="thumb-color-bar" style="width:0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-lemon/5 border border-lemon/20 rounded-xl">
+                            <h4 class="text-lemon font-bold mb-2 flex items-center gap-2"><i data-lucide="lightbulb" class="w-5 h-5"></i>Improvement Suggestions</h4>
+                            <ul class="space-y-2 text-sm text-gray-300" id="thumb-suggestions"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Description Generator -->
+        <div id="tool-description-generator" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="file-text" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Description Generator</h1>
+                            <p class="text-gray-400">Auto-generate SEO-rich YouTube descriptions with CTAs</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Video Title or Topic</label>
+                        <input type="text" id="desc-input" placeholder="e.g., How to Lead Worship Effectively" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setDescType('longform')" class="desc-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-type="longform">Long-form</button>
+                        <button onclick="setDescType('shorts')" class="desc-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="shorts">Shorts</button>
+                        <button onclick="setDescType('worship')" class="desc-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="worship">Worship</button>
+                        <button onclick="setDescType('music')" class="desc-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="music">Music Release</button>
+                    </div>
+
+                    <button onclick="generateDescription()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate Description
+                    </button>
+
+                    <div id="desc-results" class="mt-8 hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-white">Generated Description</h3>
+                            <button onclick="copyToClipboard('desc-output')" class="text-lemon hover:text-lemon-light text-sm font-semibold flex items-center gap-1">
+                                <i data-lucide="copy" class="w-4 h-4"></i>Copy
+                            </button>
+                        </div>
+                        <div class="result-card rounded-xl p-6 relative">
+                            <pre id="desc-output" class="text-gray-300 text-sm whitespace-pre-wrap font-sans"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hashtag Generator -->
+        <div id="tool-hashtag-generator" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="hash" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Hashtag Generator</h1>
+                            <p class="text-gray-400">Generate trending Christian and worship hashtags</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Video Topic or Niche</label>
+                        <input type="text" id="hashtag-input" placeholder="e.g., worship music, bible story" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setHashtagCount(15)" class="hashtag-count-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-count="15">15 Hashtags</button>
+                        <button onclick="setHashtagCount(30)" class="hashtag-count-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-count="30">30 Hashtags</button>
+                        <button onclick="setHashtagType('christian')" class="hashtag-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-type="christian">Christian</button>
+                        <button onclick="setHashtagType('worship')" class="hashtag-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="worship">Worship</button>
+                        <button onclick="setHashtagType('gospel')" class="hashtag-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="gospel">Gospel</button>
+                        <button onclick="setHashtagType('shorts')" class="hashtag-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="shorts">Shorts</button>
+                    </div>
+
+                    <button onclick="generateHashtags()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate Hashtags
+                    </button>
+
+                    <div id="hashtag-results" class="mt-8 hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-white">Generated Hashtags</h3>
+                            <button onclick="copyToClipboard('hashtag-output')" class="text-lemon hover:text-lemon-light text-sm font-semibold flex items-center gap-1">
+                                <i data-lucide="copy" class="w-4 h-4"></i>Copy All
+                            </button>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <div id="hashtag-output" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyword Research -->
+        <div id="tool-keyword-research" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="search" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Keyword Research</h1>
+                            <p class="text-gray-400">Discover high-opportunity Christian keywords</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Enter a seed keyword</label>
+                        <input type="text" id="keyword-input" placeholder="e.g., worship songs" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <button onclick="researchKeywords()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Research Keywords
+                    </button>
+
+                    <div id="keyword-results" class="mt-8 hidden">
+                        <h3 class="text-xl font-bold text-white mb-4">Keyword Opportunities</h3>
+                        <div class="space-y-3" id="keyword-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Ideas -->
+        <div id="tool-content-ideas" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="lightbulb" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Content Ideas</h1>
+                            <p class="text-gray-400">AI-generated Bible stories, worship ideas, and viral topics</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setContentType('bible')" class="content-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-type="bible">Bible Stories</button>
+                        <button onclick="setContentType('worship')" class="content-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="worship">Worship Music</button>
+                        <button onclick="setContentType('gospel')" class="content-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="gospel">Gospel Songs</button>
+                        <button onclick="setContentType('shorts')" class="content-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="shorts">Christian Shorts</button>
+                        <button onclick="setContentType('ministry')" class="content-type-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-type="ministry">Ministry</button>
+                    </div>
+
+                    <button onclick="generateContentIdeas()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate Ideas
+                    </button>
+
+                    <div id="content-results" class="mt-8 hidden">
+                        <h3 class="text-xl font-bold text-white mb-4">Content Ideas</h3>
+                        <div class="space-y-4" id="content-ideas-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thumbnail Re-Creator -->
+        <div id="tool-thumbnail-recreator" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="wand-2" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">AI Thumbnail Re-Creator</h1>
+                            <p class="text-gray-400">Generate improved thumbnail prompts for AI image generators</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Describe your current thumbnail or video topic</label>
+                        <textarea id="thumb-prompt-input" rows="3" placeholder="e.g., A man praying in a church with golden light..." class="w-full input-field rounded-xl px-4 py-4 text-lg"></textarea>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setThumbStyle('viral')" class="thumb-style-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-style="viral">Viral Style</button>
+                        <button onclick="setThumbStyle('christian')" class="thumb-style-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-style="christian">Christian</button>
+                        <button onclick="setThumbStyle('worship')" class="thumb-style-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-style="worship">Worship</button>
+                        <button onclick="setThumbStyle('bible')" class="thumb-style-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-style="bible">Bible Story</button>
+                    </div>
+
+                    <button onclick="generateThumbnailPrompts()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate AI Prompts
+                    </button>
+
+                    <div id="thumb-prompt-results" class="mt-8 hidden space-y-6">
+                        <div class="result-card rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-lemon font-bold flex items-center gap-2"><i data-lucide="image" class="w-5 h-5"></i>ChatGPT / DALL-E Prompt</h4>
+                                <button onclick="copyText(this)" class="copy-btn text-lemon text-sm flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i>Copy</button>
+                            </div>
+                            <p class="text-gray-300 text-sm" id="prompt-dalle"></p>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-lemon font-bold flex items-center gap-2"><i data-lucide="image" class="w-5 h-5"></i>Midjourney Prompt</h4>
+                                <button onclick="copyText(this)" class="copy-btn text-lemon text-sm flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i>Copy</button>
+                            </div>
+                            <p class="text-gray-300 text-sm" id="prompt-midjourney"></p>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-lemon font-bold flex items-center gap-2"><i data-lucide="image" class="w-5 h-5"></i>Leonardo AI Prompt</h4>
+                                <button onclick="copyText(this)" class="copy-btn text-lemon text-sm flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i>Copy</button>
+                            </div>
+                            <p class="text-gray-300 text-sm" id="prompt-leonardo"></p>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="text-lemon font-bold flex items-center gap-2"><i data-lucide="image" class="w-5 h-5"></i>Ideogram Prompt</h4>
+                                <button onclick="copyText(this)" class="copy-btn text-lemon text-sm flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i>Copy</button>
+                            </div>
+                            <p class="text-gray-300 text-sm" id="prompt-ideogram"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Music Release Assistant -->
+        <div id="tool-music-release" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="music" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Music Release Assistant</h1>
+                            <p class="text-gray-400">Complete release kit for DistroKid, Spotify, Apple Music</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Song Title</label>
+                        <input type="text" id="song-input" placeholder="e.g., Rivers of Living Water" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Artist Name</label>
+                        <input type="text" id="artist-input" placeholder="Your artist or ministry name" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setMusicPlatform('distrokid')" class="music-platform-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-platform="distrokid">DistroKid</button>
+                        <button onclick="setMusicPlatform('spotify')" class="music-platform-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-platform="spotify">Spotify</button>
+                        <button onclick="setMusicPlatform('apple')" class="music-platform-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-platform="apple">Apple Music</button>
+                        <button onclick="setMusicPlatform('youtube')" class="music-platform-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-platform="youtube">YouTube Music</button>
+                    </div>
+
+                    <button onclick="generateMusicRelease()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate Release Kit
+                    </button>
+
+                    <div id="music-results" class="mt-8 hidden space-y-6">
+                        <div class="result-card rounded-xl p-6">
+                            <h4 class="text-lemon font-bold mb-3">Cover Art Prompt</h4>
+                            <p class="text-gray-300 text-sm mb-3" id="music-cover-prompt"></p>
+                            <button onclick="copyToClipboard('music-cover-prompt')" class="text-lemon text-sm flex items-center gap-1"><i data-lucide="copy" class="w-4 h-4"></i>Copy Prompt</button>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <h4 class="text-lemon font-bold mb-3">YouTube Description</h4>
+                            <pre id="music-yt-desc" class="text-gray-300 text-sm whitespace-pre-wrap font-sans"></pre>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <h4 class="text-lemon font-bold mb-3">Promotional Captions</h4>
+                            <div id="music-captions" class="space-y-2"></div>
+                        </div>
+                        <div class="result-card rounded-xl p-6">
+                            <h4 class="text-lemon font-bold mb-3">Release Hashtags</h4>
+                            <div id="music-hashtags" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Channel Audit -->
+        <div id="tool-channel-audit" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="shield-check" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Channel Audit Engine</h1>
+                            <p class="text-gray-400">Full channel health analysis with actionable recommendations</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-12">
+                        <div class="w-24 h-24 rounded-full border-4 border-lemon/20 mx-auto mb-6 flex items-center justify-center" style="background:conic-gradient(var(--lemon) 0deg, var(--lemon) 288deg, var(--black-lighter) 288deg)">
+                            <div class="w-20 h-20 rounded-full bg-blackLight flex items-center justify-center">
+                                <span class="text-3xl font-black text-lemon" id="audit-health-score">0</span>
+                            </div>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Channel Health Score</h3>
+                        <p class="text-gray-400 mb-8">Based on branding, SEO, consistency, and engagement</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                            <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                <div class="text-2xl font-black text-lemon mb-1" id="audit-branding-score">0</div>
+                                <div class="text-xs text-gray-400">Branding</div>
+                            </div>
+                            <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                <div class="text-2xl font-black text-lemon mb-1" id="audit-seo-score">0</div>
+                                <div class="text-xs text-gray-400">SEO</div>
+                            </div>
+                            <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                <div class="text-2xl font-black text-lemon mb-1" id="audit-consistency-score">0</div>
+                                <div class="text-xs text-gray-400">Consistency</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 space-y-4">
+                        <div class="p-4 bg-lemon/5 border border-lemon/20 rounded-xl">
+                            <h4 class="text-lemon font-bold mb-2 flex items-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i>Strengths</h4>
+                            <ul class="space-y-1 text-sm text-gray-300" id="audit-strengths">
+                                <li>Strong niche identity in Christian worship content</li>
+                                <li>Consistent upload schedule (3x per week)</li>
+                                <li>Good thumbnail branding consistency</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
+                            <h4 class="text-red-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="alert-circle" class="w-5 h-5"></i>Weaknesses</h4>
+                            <ul class="space-y-1 text-sm text-gray-300" id="audit-weaknesses">
+                                <li>Missing keywords in About section</li>
+                                <li>Weak playlist structure (only 2 playlists)</li>
+                                <li>Low community post engagement</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+                            <h4 class="text-blue-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="zap" class="w-5 h-5"></i>Recommendations</h4>
+                            <ul class="space-y-1 text-sm text-gray-300" id="audit-recommendations">
+                                <li>Create Bible Story playlist series</li>
+                                <li>Improve channel description SEO with target keywords</li>
+                                <li>Add channel tags and location</li>
+                                <li>Post 2 community posts per week</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Calendar Tool -->
+        <div id="tool-content-calendar" class="tool-interface">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="calendar" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Content Calendar Generator</h1>
+                            <p class="text-gray-400">Generate a 30-day AI-powered content schedule</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Your Channel Niche</label>
+                        <input type="text" id="calendar-niche" placeholder="e.g., Worship Music, Bible Stories, Christian Vlogs" class="w-full input-field rounded-xl px-4 py-4 text-lg">
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="setCalendarFreq('daily')" class="calendar-freq-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors active" style="background:var(--lemon);color:#000" data-freq="daily">Daily Uploads</button>
+                        <button onclick="setCalendarFreq('3x')" class="calendar-freq-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-freq="3x">3x Per Week</button>
+                        <button onclick="setCalendarFreq('weekly')" class="calendar-freq-btn px-4 py-2 rounded-full border border-lemon/30 text-lemon text-sm font-medium hover:bg-lemon/10 transition-colors" data-freq="weekly">Weekly</button>
+                    </div>
+
+                    <button onclick="generateCalendarPlan()" class="btn-primary w-full py-4 rounded-xl text-lg font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-5 h-5"></i>Generate Calendar
+                    </button>
+
+                    <div id="calendar-plan-results" class="mt-8 hidden">
+                        <h3 class="text-xl font-bold text-white mb-4">30-Day Content Plan</h3>
+                        <div class="space-y-3" id="calendar-plan-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="creator-footer relative z-10">
+        <div class="footer-panel">
+            <div class="footer-brand">
+                <span class="footer-brand-mark"><i data-lucide="flame" class="w-4 h-4"></i></span>
+                <span>SpiritFlow Creator Studio</span>
+            </div>
+            <p class="footer-copy">2026 OmniCast AI. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="index.html">OmniCast AI</a>
+                <a href="privacy.html">Privacy</a>
+                <a href="terms.html">Terms</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Copied to clipboard!</div>
+
+    <script>
+
+        function safeRenderIcons() {
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
+        }
+
+        // Initialize Lucide icons
+        safeRenderIcons();
+
+        // State management
+        let currentSection = 'dashboard';
+        let currentTool = null;
+        let titleType = 'viral';
+        let descType = 'longform';
+        let hashtagCount = 15;
+        let hashtagType = 'christian';
+        let contentType = 'bible';
+        let thumbStyle = 'viral';
+        let musicPlatform = 'distrokid';
+        let calendarFreq = 'daily';
+        let youtubeChannelData = null;
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tool-interface').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            const navEl = document.getElementById('nav-' + sectionId);
+            if (navEl) navEl.classList.add('active');
+
+            currentSection = sectionId;
+            currentTool = null;
+            window.scrollTo(0, 0);
+
+            if (sectionId === 'analytics') initCharts();
+            if (sectionId === 'calendar') initCalendar();
+        }
+
+        function getToolLabel(toolId) {
+            const toolCard = document.querySelector(`[onclick="showTool('${toolId}')"]`);
+            const title = toolCard ? toolCard.querySelector('h3') : null;
+            if (title && title.textContent.trim()) return title.textContent.trim();
+            return toolId.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+        }
+
+        function ensureToolFallback(toolId) {
+            let fallback = document.getElementById('tool-generic-fallback');
+            const label = getToolLabel(toolId);
+            if (!fallback) {
+                fallback = document.createElement('section');
+                fallback.id = 'tool-generic-fallback';
+                fallback.className = 'tool-interface';
+                document.querySelector('main').appendChild(fallback);
+            }
+
+            fallback.innerHTML = `
+                <div class="max-w-5xl mx-auto px-4 py-16">
+                    <button onclick="hideTool()" class="btn-outline px-4 py-2 rounded-lg mb-6 inline-flex items-center gap-2">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>Back to Tools
+                    </button>
+                    <div class="glass-panel rounded-2xl p-8">
+                        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                            <div>
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-xs font-bold uppercase tracking-widest mb-3">
+                                    <i data-lucide="sparkles" class="w-4 h-4"></i>Quick Studio
+                                </div>
+                                <h1 class="text-3xl font-black text-white">${label}</h1>
+                                <p class="text-gray-400 mt-2">Use this workspace to draft, organize, and copy production-ready creator notes.</p>
+                            </div>
+                            <button onclick="generateFallbackTool('${toolId}')" class="btn-primary px-6 py-3 rounded-xl inline-flex items-center gap-2">
+                                <i data-lucide="wand-sparkles" class="w-5 h-5"></i>Generate
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-lemon mb-2">Prompt / Goal</label>
+                                <textarea id="fallback-prompt" class="input-field w-full p-4 rounded-xl resize-none" rows="9" placeholder="Describe the video, song, ministry message, audience, or task you want to plan..."></textarea>
+                            </div>
+                            <div class="result-card rounded-xl p-6">
+                                <div class="flex items-center justify-between gap-3 mb-4">
+                                    <h3 class="text-xl font-bold text-white">Studio Output</h3>
+                                    <button onclick="copyToClipboard('fallback-output')" class="copy-btn text-lemon hover:text-lemon-light">
+                                        <i data-lucide="copy" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                                <div id="fallback-output" class="text-gray-300 leading-relaxed space-y-3">
+                                    Add your goal, then generate a practical creator workflow.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+
+            return fallback;
+        }
+
+        function generateFallbackTool(toolId) {
+            const prompt = (document.getElementById('fallback-prompt')?.value || '').trim();
+            const label = getToolLabel(toolId);
+            const topic = prompt || 'your next gospel content idea';
+            const output = document.getElementById('fallback-output');
+            if (!output) return;
+
+            output.innerHTML = `
+                <p><strong class="text-lemon">${label} plan:</strong> Build around "${topic}".</p>
+                <p><strong>1. Hook:</strong> Open with the clearest promise or worship moment in the first 5 seconds.</p>
+                <p><strong>2. Structure:</strong> Use one focused message, one proof point, and one invitation to respond.</p>
+                <p><strong>3. Production:</strong> Keep the title, thumbnail, caption, and first spoken line saying the same core idea.</p>
+                <p><strong>4. Publish:</strong> Save one short clip, one quote, and one community post from the same session.</p>`;
+        }
+
+        function showTool(toolId) {
+            document.querySelectorAll('.section-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tool-interface').forEach(el => el.classList.remove('active'));
+            const toolPanel = document.getElementById('tool-' + toolId) || ensureToolFallback(toolId);
+            toolPanel.classList.add('active');
+            currentTool = toolId;
+            window.scrollTo(0, 0);
+            safeRenderIcons();
+        }
+
+        function hideTool() {
+            document.querySelectorAll('.tool-interface').forEach(el => el.classList.remove('active'));
+            document.getElementById('tools').classList.add('active');
+            currentTool = null;
+            window.scrollTo(0, 0);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // Tool filtering
+        function filterTools(category) {
+            document.querySelectorAll('.tool-filter').forEach(btn => {
+                if (btn.dataset.filter === category) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                    btn.classList.add('active');
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                    btn.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.tool-card').forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Type setters
+        function setTitleType(type) {
+            titleType = type;
+            document.querySelectorAll('.title-type-btn').forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setDescType(type) {
+            descType = type;
+            document.querySelectorAll('.desc-type-btn').forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setHashtagCount(count) {
+            hashtagCount = count;
+            document.querySelectorAll('.hashtag-count-btn').forEach(btn => {
+                if (parseInt(btn.dataset.count) === count) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setHashtagType(type) {
+            hashtagType = type;
+            document.querySelectorAll('.hashtag-type-btn').forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setContentType(type) {
+            contentType = type;
+            document.querySelectorAll('.content-type-btn').forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setThumbStyle(style) {
+            thumbStyle = style;
+            document.querySelectorAll('.thumb-style-btn').forEach(btn => {
+                if (btn.dataset.style === style) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setMusicPlatform(platform) {
+            musicPlatform = platform;
+            document.querySelectorAll('.music-platform-btn').forEach(btn => {
+                if (btn.dataset.platform === platform) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        function setCalendarFreq(freq) {
+            calendarFreq = freq;
+            document.querySelectorAll('.calendar-freq-btn').forEach(btn => {
+                if (btn.dataset.freq === freq) {
+                    btn.style.background = 'var(--lemon)';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'transparent';
+                    btn.style.color = 'var(--lemon)';
+                }
+            });
+        }
+
+        // Title Optimizer
+        function optimizeTitle() {
+            const input = document.getElementById('title-input').value;
+            if (!input) { showToast('Please enter a title or topic'); return; }
+
+            const resultsDiv = document.getElementById('title-results');
+            const listDiv = document.getElementById('title-results-list');
+
+            const titles = generateMockTitles(input, titleType);
+
+            listDiv.innerHTML = titles.map((title, i) => `
+                <div class="result-card rounded-xl p-4 flex items-center justify-between group">
+                    <div class="flex-1">
+                        <p class="text-white font-semibold">${title.text}</p>
+                        <div class="flex items-center gap-4 mt-2">
+                            <span class="text-xs text-lemon bg-lemon/10 px-2 py-1 rounded-full">SEO: ${title.seo}/100</span>
+                            <span class="text-xs text-lemon bg-lemon/10 px-2 py-1 rounded-full">CTR: ${title.ctr}/100</span>
+                            <span class="text-xs text-lemon bg-lemon/10 px-2 py-1 rounded-full">Rank: ${title.rank}%</span>
+                        </div>
+                    </div>
+                    <button onclick="copyText(this, '${title.text.replace(/'/g, "\'")}')" class="copy-btn text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
+                        <i data-lucide="copy" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `).join('');
+
+            resultsDiv.classList.remove('hidden');
+            safeRenderIcons();
+        }
+
+        function generateMockTitles(input, type) {
+            const base = input.replace(/'s/g, '').replace(/'/g, '');
+            const templates = {
+                viral: [
+                    { text: `${input.toUpperCase()} | The Bible Story That Changed Everything`, seo: 92, ctr: 95, rank: 88 },
+                    { text: `I Tried ${input}... Here's What Happened`, seo: 78, ctr: 92, rank: 75 },
+                    { text: `${input} EXPLAINED | What They Don't Tell You`, seo: 85, ctr: 89, rank: 82 },
+                    { text: `The TRUTH About ${input} (Shocking)`, seo: 72, ctr: 96, rank: 70 }
+                ],
+                seo: [
+                    { text: `${input} - Complete Guide for Christians`, seo: 96, ctr: 78, rank: 94 },
+                    { text: `What is ${input}? Biblical Explanation & Study`, seo: 94, ctr: 72, rank: 92 },
+                    { text: `${input} Bible Study | Scripture & Meaning`, seo: 95, ctr: 75, rank: 93 },
+                    { text: `Understanding ${input}: A Christian Perspective`, seo: 93, ctr: 70, rank: 91 }
+                ],
+                shorts: [
+                    { text: `${input} in 60 Seconds!`, seo: 70, ctr: 94, rank: 68 },
+                    { text: `POV: You Discover ${input}`, seo: 65, ctr: 96, rank: 62 },
+                    { text: `${input} #shorts #christian`, seo: 72, ctr: 90, rank: 70 },
+                    { text: `Wait... ${input}? #bible #worship`, seo: 68, ctr: 93, rank: 65 }
+                ],
+                christian: [
+                    { text: `${input} | A Message for Believers`, seo: 88, ctr: 85, rank: 86 },
+                    { text: `God's Plan: ${input} Devotional`, seo: 90, ctr: 82, rank: 88 },
+                    { text: `${input} - Faith & Worship Guide`, seo: 87, ctr: 84, rank: 85 },
+                    { text: `Finding Hope in ${input} | Christian Encouragement`, seo: 89, ctr: 86, rank: 87 }
+                ]
+            };
+            return templates[type] || templates.viral;
+        }
+
+        // Thumbnail Analyzer
+        function analyzeThumbnail() {
+            const file = document.getElementById('thumbnail-upload').files[0];
+            if (!file) return;
+
+            showToast('Analyzing thumbnail...');
+
+            setTimeout(() => {
+                document.getElementById('thumbnail-results').classList.remove('hidden');
+
+                // Animate scores
+                animateValue('thumb-score', 0, 87, 1000);
+                animateValue('thumb-ctr', 0, 12, 1000, '%');
+                animateValue('thumb-mobile', 0, 94, 1000, '%');
+
+                animateValue('thumb-res-score', 0, 95, 1000, '/100');
+                animateValue('thumb-bright-score', 0, 82, 1000, '/100');
+                animateValue('thumb-text-score', 0, 78, 1000, '/100');
+                animateValue('thumb-color-score', 0, 91, 1000, '/100');
+
+                document.getElementById('thumb-res-bar').style.width = '95%';
+                document.getElementById('thumb-bright-bar').style.width = '82%';
+                document.getElementById('thumb-text-bar').style.width = '78%';
+                document.getElementById('thumb-color-bar').style.width = '91%';
+
+                document.getElementById('thumb-suggestions').innerHTML = `
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Increase text contrast for better mobile visibility</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Add a human face to increase CTR by up to 38%</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Use brighter colors - current palette is slightly dark</li>
+                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Reduce text to 3-4 words maximum</li>
+                `;
+                safeRenderIcons();
+            }, 1500);
+        }
+
+        // Description Generator
+        function generateDescription() {
+            const input = document.getElementById('desc-input').value;
+            if (!input) { showToast('Please enter a video title or topic'); return; }
+
+            const descs = {
+                longform: `Welcome to this deep dive into ${input}! 
+
+In this video, we explore the biblical meaning, practical application, and spiritual significance of this topic. Whether you are new to faith or have been walking with God for years, there is something here for you.
+
+TIMESTAMPS:
+0:00 - Introduction
+2:15 - Biblical Foundation
+5:30 - Key Scripture Breakdown
+10:45 - Practical Application
+15:20 - Prayer & Worship
+18:00 - Closing Thoughts
+
+SCRIPTURE REFERENCES:
+- John 3:16
+- Psalm 23
+- Romans 8:28
+- Philippians 4:13
+
+FOLLOW US:
+Subscribe for more Christian content every week!
+Hit the notification bell so you never miss an upload.
+
+LEAVE A COMMENT:
+What did you learn from this video? Share your thoughts below!
+
+#ChristianContent #BibleStudy #Worship #Faith #Jesus`,
+                shorts: `${input} - Quick biblical insight! 
+
+Like and subscribe for daily Christian shorts!
+
+#Shorts #Christian #Bible #Faith #Jesus`,
+                worship: `Join us in worship as we explore ${input}!
+
+This worship session is designed to draw you closer to God through music, prayer, and reflection. Let the Holy Spirit move as you worship with us.
+
+WORSHIP SETLIST:
+1. Opening Prayer
+2. Praise & Worship
+3. Deep Worship
+4. Communion & Reflection
+5. Closing Blessing
+
+CONNECT WITH US:
+Subscribe for weekly worship sessions
+Follow us on social media for daily encouragement
+
+#Worship #ChristianMusic #Praise #Gospel #HolySpirit`,
+                music: `NEW RELEASE: ${input}
+
+Stream now on all platforms!
+Spotify | Apple Music | YouTube Music | Amazon Music
+
+This song was written during a season of deep prayer and worship. My prayer is that it blesses you and draws you closer to God.
+
+CREDITS:
+Written by: [Your Name]
+Produced by: [Producer]
+Mixed & Mastered: [Engineer]
+
+LYRICS:
+[Verse 1]
+...
+[Chorus]
+...
+[Bridge]
+...
+
+FOLLOW THE ARTIST:
+Instagram: @[handle]
+Facebook: [page]
+Website: [url]
+
+#NewMusic #ChristianMusic #Worship #Gospel #Spotify #AppleMusic`
+            };
+
+            document.getElementById('desc-output').textContent = descs[descType] || descs.longform;
+            document.getElementById('desc-results').classList.remove('hidden');
+        }
+
+        // Hashtag Generator
+        function generateHashtags() {
+            const input = document.getElementById('hashtag-input').value;
+            const tags = {
+                christian: ['#Christian', '#Faith', '#Jesus', '#Bible', '#Gospel', '#Christ', '#God', '#HolySpirit', '#ChristianLife', '#Believer', '#Scripture', '#Prayer', '#Worship', '#Church', '#Ministry', '#ChristianContent', '#BibleVerse', '#JesusSaves', '#GodsLove', '#ChristianCommunity', '#FaithOverFear', '#Blessed', '#Thankful', '#Grace', '#Salvation', '#BornAgain', '#ChristianCreator', '#GospelMusic', '#Testimony', '#BibleStudy'],
+                worship: ['#Worship', '#Praise', '#WorshipMusic', '#PraiseAndWorship', '#WorshipLeader', '#WorshipTeam', '#SundayWorship', '#WorshipNight', '#LiveWorship', '#WorshipSession', '#GuitarWorship', '#PianoWorship', '#WorshipVocals', '#SpontaneousWorship', '#IntimateWorship', '#WorshipMoment', '#WorshipCulture', '#WorshipTogether', '#WorshipSong', '#WorshipCover'],
+                gospel: ['#Gospel', '#GospelMusic', '#GospelArtist', '#GospelSong', '#GospelChoir', '#TraditionalGospel', '#ContemporaryGospel', '#GospelConcert', '#GospelRadio', '#GospelChart', '#GospelHits', '#GospelClassic', '#GospelLegend', '#GospelNewRelease', '#GospelAlbum', '#GospelSingle', '#GospelVibes', '#GospelSound', '#GospelCulture', '#GospelIndustry'],
+                shorts: ['#Shorts', '#YouTubeShorts', '#ChristianShorts', '#BibleShorts', '#FaithShorts', '#WorshipShorts', '#GospelShorts', '#JesusShorts', '#PrayerShorts', '#MinistryShorts', '#ChurchShorts', '#TestimonyShorts', '#MotivationShorts', '#InspirationShorts', '#DailyShorts', '#ViralShorts', '#TrendingShorts', '#ShortsFeed', '#ShortsCreator', '#ShortsCommunity']
+            };
+
+            const selected = tags[hashtagType] || tags.christian;
+            const count = Math.min(hashtagCount, selected.length);
+            const shuffled = selected.sort(() => 0.5 - Math.random()).slice(0, count);
+
+            document.getElementById('hashtag-output').innerHTML = shuffled.map(tag => 
+                `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer hover:bg-lemon/20 transition-colors">${tag}</span>`
+            ).join('');
+            document.getElementById('hashtag-results').classList.remove('hidden');
+        }
+
+        // Keyword Research
+        function researchKeywords() {
+            const input = document.getElementById('keyword-input').value;
+            if (!input) { showToast('Please enter a seed keyword'); return; }
+
+            const keywords = [
+                { word: `${input} tutorial`, volume: '12K', difficulty: 'Low', opportunity: 92 },
+                { word: `${input} for beginners`, volume: '8.5K', difficulty: 'Low', opportunity: 88 },
+                { word: `best ${input}`, volume: '15K', difficulty: 'Medium', opportunity: 75 },
+                { word: `${input} bible study`, volume: '6K', difficulty: 'Low', opportunity: 90 },
+                { word: `${input} worship`, volume: '9K', difficulty: 'Medium', opportunity: 82 },
+                { word: `how to ${input}`, volume: '22K', difficulty: 'Medium', opportunity: 78 },
+                { word: `${input} explained`, volume: '4.5K', difficulty: 'Low', opportunity: 95 },
+                { word: `${input} meaning`, volume: '7K', difficulty: 'Low', opportunity: 85 }
+            ];
+
+            document.getElementById('keyword-list').innerHTML = keywords.map(k => `
+                <div class="result-card rounded-xl p-4 flex items-center justify-between">
+                    <div>
+                        <p class="text-white font-semibold">${k.word}</p>
+                        <div class="flex items-center gap-4 mt-1 text-xs text-gray-400">
+                            <span>Volume: ${k.volume}</span>
+                            <span>Difficulty: ${k.difficulty}</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-2xl font-black text-lemon">${k.opportunity}</div>
+                        <div class="text-xs text-gray-400">Opportunity</div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('keyword-results').classList.remove('hidden');
+        }
+
+        // Content Ideas
+        function generateContentIdeas() {
+            const ideas = {
+                bible: [
+                    { title: 'The Story of Joseph: From Pit to Palace', type: 'Long-form', trending: true },
+                    { title: '5 Lessons from David and Goliath', type: 'Shorts', trending: false },
+                    { title: 'Understanding the Book of Revelation', type: 'Series', trending: true },
+                    { title: 'Ruth: A Story of Loyalty and Love', type: 'Long-form', trending: false },
+                    { title: 'The Prodigal Son Explained in 60 Seconds', type: 'Shorts', trending: true }
+                ],
+                worship: [
+                    { title: '10 Minute Morning Worship Session', type: 'Long-form', trending: true },
+                    { title: 'How to Play Worship Guitar: Beginner Guide', type: 'Tutorial', trending: false },
+                    { title: 'Spontaneous Worship: Letting the Spirit Lead', type: 'Long-form', trending: true },
+                    { title: 'Worship Team Training: Vocal Techniques', type: 'Tutorial', trending: false },
+                    { title: '3 Chord Worship Songs Anyone Can Play', type: 'Shorts', trending: true }
+                ],
+                gospel: [
+                    { title: 'Top 10 Gospel Songs of 2026', type: 'Long-form', trending: true },
+                    { title: 'How to Write a Gospel Song: Step by Step', type: 'Tutorial', trending: false },
+                    { title: 'Gospel Choir Rehearsal Behind the Scenes', type: 'Vlog', trending: false },
+                    { title: 'Classic Gospel Hits Medley', type: 'Music', trending: true },
+                    { title: 'New Gospel Artist You Need to Hear', type: 'Shorts', trending: true }
+                ],
+                shorts: [
+                    { title: 'Bible Verse of the Day', type: 'Daily', trending: true },
+                    { title: 'Christian Memes That Hit Different', type: 'Entertainment', trending: false },
+                    { title: '30-Second Prayer for Strength', type: 'Prayer', trending: true },
+                    { title: 'When You Finally Understand Scripture', type: 'Comedy', trending: false },
+                    { title: 'POV: God Answers Your Prayer', type: 'Relatable', trending: true }
+                ],
+                ministry: [
+                    { title: 'How to Start a YouTube Ministry', type: 'Tutorial', trending: true },
+                    { title: 'Church Social Media Strategy 2026', type: 'Guide', trending: false },
+                    { title: 'Youth Ministry Ideas That Actually Work', type: 'Ideas', trending: true },
+                    { title: 'Building an Online Church Community', type: 'Guide', trending: false },
+                    { title: 'Ministry Funding: Creative Ideas', type: 'Finance', trending: false }
+                ]
+            };
+
+            const selected = ideas[contentType] || ideas.bible;
+            document.getElementById('content-ideas-list').innerHTML = selected.map(idea => `
+                <div class="result-card rounded-xl p-4 flex items-center justify-between group">
+                    <div>
+                        <p class="text-white font-semibold">${idea.title}</p>
+                        <div class="flex items-center gap-3 mt-1">
+                            <span class="text-xs text-gray-400">${idea.type}</span>
+                            ${idea.trending ? '<span class="badge-new">TRENDING</span>' : ''}
+                        </div>
+                    </div>
+                    <button onclick="copyText(this, '${idea.title.replace(/'/g, "\'")}')" class="copy-btn text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
+                        <i data-lucide="copy" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            `).join('');
+            document.getElementById('content-results').classList.remove('hidden');
+            safeRenderIcons();
+        }
+
+        // Thumbnail Re-Creator
+        function generateThumbnailPrompts() {
+            const input = document.getElementById('thumb-prompt-input').value;
+            if (!input) { showToast('Please describe your thumbnail or video topic'); return; }
+
+            const prompts = {
+                dalle: `Create a high-contrast YouTube thumbnail featuring ${input}. Use bold, readable text overlay with a maximum of 3 words. Vibrant colors with dark background. Professional lighting, cinematic composition, 16:9 aspect ratio, eye-catching and clickable.`,
+                midjourney: `youtube thumbnail, ${input}, bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, professional photography, 16:9, eye-catching, clickable, viral style --ar 16:9 --v 6`,
+                leonardo: `YouTube thumbnail design, ${input}, bold typography, high contrast colors, dramatic lighting, professional quality, 1280x720, engaging composition, dark moody background with bright accents`,
+                ideogram: `A striking YouTube thumbnail showing ${input} with large bold text, high contrast, vibrant lemon and black colors, professional design, 16:9 format, instantly eye-catching`
+            };
+
+            document.getElementById('prompt-dalle').textContent = prompts.dalle;
+            document.getElementById('prompt-midjourney').textContent = prompts.midjourney;
+            document.getElementById('prompt-leonardo').textContent = prompts.leonardo;
+            document.getElementById('prompt-ideogram').textContent = prompts.ideogram;
+            document.getElementById('thumb-prompt-results').classList.remove('hidden');
+        }
+
+        // Music Release
+        function generateMusicRelease() {
+            const song = document.getElementById('song-input').value;
+            const artist = document.getElementById('artist-input').value;
+            if (!song || !artist) { showToast('Please enter song title and artist name'); return; }
+
+            document.getElementById('music-cover-prompt').textContent = 
+                `Album cover art for "${song}" by ${artist}. Christian worship music album, ethereal golden light, abstract spiritual design, cross silhouette, heavenly clouds, warm color palette with gold and deep blue, modern minimalist style, professional music artwork, 3000x3000`;
+
+            document.getElementById('music-yt-desc').textContent = 
+                `${song} - ${artist}
+
+Stream/Download: [Link]
+
+This song is a heartfelt expression of worship and devotion. Recorded with love and prayer, my hope is that it draws you closer to God.
+
+FOLLOW ${artist}:
+Instagram: @[handle]
+Facebook: [page]
+Spotify: [link]
+
+CREDITS:
+Written by: ${artist}
+Produced by: [Producer Name]
+Mixed & Mastered: [Engineer]
+
+#NewMusic #ChristianMusic #Worship #Gospel #${song.replace(/\s/g, '')} #${artist.replace(/\s/g, '')}`;
+
+            document.getElementById('music-captions').innerHTML = `
+                <p class="text-gray-300 text-sm">NEW MUSIC OUT NOW! ${song} is now available everywhere you stream. This one means so much to me. Link in bio!</p>
+                <p class="text-gray-300 text-sm">Worship with me! My new single "${song}" just dropped. Let me know what you think in the comments!</p>
+                <p class="text-gray-300 text-sm">After months of prayer and preparation, ${song} is finally here. God is faithful!</p>
+            `;
+
+            document.getElementById('music-hashtags').innerHTML = 
+                ['#NewMusic', '#ChristianMusic', '#Worship', '#Gospel', '#MusicRelease', '#Spotify', '#AppleMusic', '#YouTubeMusic', '#DistroKid', '#WorshipMusic', '#Praise', '#HolySpirit', '#Faith', '#Jesus', '#GodsPlan']
+                .map(tag => `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium">${tag}</span>`).join('');
+
+            document.getElementById('music-results').classList.remove('hidden');
+        }
+
+        // Calendar Generator
+        function generateCalendarPlan() {
+            const niche = document.getElementById('calendar-niche').value || 'Christian Content';
+            const days = calendarFreq === 'daily' ? 30 : calendarFreq === '3x' ? 12 : 4;
+
+            const contentTypes = ['Long-form Video', 'Shorts', 'Community Post', 'Music Release', 'Live Stream'];
+            const topics = [
+                'Bible Study: Genesis', 'Worship Session', 'Q&A with Pastor', 'Behind the Scenes',
+                'Testimony Tuesday', 'Worship Cover', 'Bible Story Animated', 'Prayer Guide',
+                'Church Vlog', 'Gospel Music Review', 'Scripture Meditation', 'Ministry Tips'
+            ];
+
+            let html = '';
+            for (let i = 1; i <= days; i++) {
+                const type = contentTypes[Math.floor(Math.random() * contentTypes.length)];
+                const topic = topics[Math.floor(Math.random() * topics.length)];
+                const color = type === 'Long-form Video' ? 'bg-lemon/20 border-lemon' : 
+                             type === 'Shorts' ? 'bg-blue-500/20 border-blue-500' :
+                             type === 'Community Post' ? 'bg-purple-500/20 border-purple-500' :
+                             'bg-red-500/20 border-red-500';
+
+                html += `
+                    <div class="result-card rounded-xl p-4 border ${color}">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-gray-400">Day ${i}</span>
+                                <p class="text-white font-semibold">${topic}</p>
+                                <span class="text-xs text-lemon">${type}</span>
+                            </div>
+                            <button onclick="copyText(this, '${topic.replace(/'/g, "\'")}')" class="text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
+                                <i data-lucide="copy" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('calendar-plan-list').innerHTML = html;
+            document.getElementById('calendar-plan-results').classList.remove('hidden');
+            safeRenderIcons();
+        }
+
+        // AI Chat
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addChatMessage(message, 'user');
+            input.value = '';
+
+            setTimeout(() => {
+                const responses = [
+                    'Based on your channel analytics, I recommend focusing on Bible story content which shows 40% higher engagement.',
+                    'For better SEO, try including "worship music" and "Christian meditation" in your next video title.',
+                    'Your thumbnail CTR could improve by adding faces and reducing text to 3 words maximum.',
+                    'Consider posting Shorts 3x per week and long-form on Sundays for optimal audience retention.',
+                    'Trending topics right now: "Bible prophecy 2026", "Christian parenting", and "worship guitar tutorials".'
+                ];
+                addChatMessage(responses[Math.floor(Math.random() * responses.length)], 'ai');
+            }, 1000);
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('chat-input').value = message;
+            sendMessage();
+        }
+
+        function addChatMessage(text, sender) {
+            const container = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.className = 'flex items-start gap-3 ' + (sender === 'user' ? 'flex-row-reverse' : '');
+
+            if (sender === 'ai') {
+                div.innerHTML = `
+                    <div class="w-10 h-10 rounded-full gradient-lemon flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="flame" class="w-5 h-5 text-black"></i>
+                    </div>
+                    <div class="bg-blackLight rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                        <p class="text-white">${text}</p>
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="bg-lemon/10 border border-lemon/20 rounded-2xl rounded-tr-none p-4 max-w-[80%]">
+                        <p class="text-white">${text}</p>
+                    </div>
+                `;
+            }
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            safeRenderIcons();
+        }
+
+        // Calendar
+        function initCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            if (!grid || grid.children.length > 0) return;
+
+            const today = new Date();
+            const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += '<div></div>';
+            }
+
+            const types = [
+                { color: 'bg-lemon/20 border-lemon', label: 'Video' },
+                { color: 'bg-blue-500/20 border-blue-500', label: 'Shorts' },
+                { color: 'bg-purple-500/20 border-purple-500', label: 'Post' },
+                { color: 'bg-red-500/20 border-red-500', label: 'Music' }
+            ];
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                grid.innerHTML += `
+                    <div class="aspect-square rounded-xl border ${type.color} p-2 cursor-pointer hover:opacity-80 transition-opacity">
+                        <div class="text-xs text-gray-400">${day}</div>
+                        <div class="text-[10px] text-lemon mt-1">${type.label}</div>
+                    </div>
+                `;
+            }
+        }
+
+        function generateCalendar() {
+            showToast('Generating 30-day content calendar...');
+            setTimeout(() => {
+                showToast('Calendar generated! Check the Content Calendar tool for details.');
+            }, 1500);
+        }
+
+        // Charts
+        function initCharts() {
+            if (!window.Chart) {
+                showToast('Charts are unavailable until Chart.js loads.');
+                return;
+            }
+
+            const viewsCtx = document.getElementById('viewsChart');
+            const subsCtx = document.getElementById('subscribersChart');
+            if (!viewsCtx || !subsCtx) return;
+
+            if (viewsCtx.chart) viewsCtx.chart.destroy();
+            if (subsCtx.chart) subsCtx.chart.destroy();
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: 'rgba(200,255,0,0.05)' }, ticks: { color: '#888' } },
+                    y: { grid: { color: 'rgba(200,255,0,0.05)' }, ticks: { color: '#888' } }
+                }
+            };
+            const rows = youtubeChannelData?.analytics?.rows || [];
+            const labels = rows.length ? rows.map(row => row[0].slice(5)) : ['Connect', 'Your', 'YouTube', 'Channel'];
+            const viewsData = rows.length ? rows.map(row => Number(row[1] || 0)) : [0, 0, 0, 0];
+            const subscriberData = rows.length ? rows.map(row => Number(row[4] || 0)) : [0, 0, 0, 0];
+
+            viewsCtx.chart = new Chart(viewsCtx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: viewsData,
+                        borderColor: '#C8FF00',
+                        backgroundColor: 'rgba(200,255,0,0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: commonOptions
+            });
+
+            subsCtx.chart = new Chart(subsCtx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: subscriberData,
+                        backgroundColor: '#C8FF00',
+                        borderRadius: 6
+                    }]
+                },
+                options: commonOptions
+            });
+        }
+
+        // Utilities
+        function animateValue(id, start, end, duration, suffix = '') {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start) + suffix;
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            const text = el.textContent || el.innerText;
+            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+        }
+
+        function copyText(btn, text) {
+            if (text) {
+                navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+            } else {
+                const parent = btn.closest('.result-card');
+                const textEl = parent.querySelector('p');
+                if (textEl) navigator.clipboard.writeText(textEl.textContent).then(() => showToast('Copied!'));
+            }
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function formatHours(minutes) {
+            const hours = Math.round(Number(minutes || 0) / 60);
+            if (hours >= 1000000) return `${(hours / 1000000).toFixed(1)}M h`;
+            if (hours >= 1000) return `${(hours / 1000).toFixed(1)}K h`;
+            return `${hours}h`;
+        }
+
+        function listItems(id, items) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = (items || []).map(item => `<li>${item}</li>`).join('');
+        }
+
+        function connectYouTube() {
+            window.location.href = '/api/youtube-auth';
+        }
+
+        async function loadYouTubeChannel(silent = false) {
+            if (!silent) showToast('Loading live YouTube channel data...');
+            const response = await fetch('/api/youtube-channel', { credentials: 'include' });
+            const data = await response.json();
+
+            if (!response.ok || !data.ok) {
+                const message = data.error || 'YouTube channel is not connected yet.';
+                setText('youtube-channel-status', message);
+                if (!silent) showToast(message);
+                return null;
+            }
+
+            renderYouTubeChannel(data);
+            if (!silent) showToast('YouTube channel analysis updated.');
+            return data;
+        }
+
+        function renderYouTubeChannel(data) {
+            youtubeChannelData = data;
+            const channel = data.channel;
+            const stats = channel.statistics || {};
+            const analytics = data.analytics || {};
+            const audit = data.audit || {};
+
+            setText('youtube-channel-title', channel.title || 'Connected YouTube Channel');
+            setText('youtube-channel-status', analytics.unavailable ? `Connected. Analytics limited: ${analytics.reason}` : 'Connected and analyzing live channel data.');
+            setText('youtube-subscribers', channel.compact?.subscribers || stats.subscriberCount || '0');
+            setText('youtube-views', channel.compact?.views || stats.viewCount || '0');
+            setText('youtube-watch-hours', formatHours(analytics.minutesWatched));
+            setText('youtube-uploads', channel.compact?.videos || stats.videoCount || '0');
+            setText('youtube-subscribers-note', 'Live from YouTube');
+            setText('youtube-views-note', 'Lifetime channel views');
+            setText('youtube-watch-note', analytics.unavailable ? 'Analytics permission needed' : 'Last 28 days');
+            setText('youtube-uploads-note', 'Public uploads');
+
+            setText('analytics-subscribers', channel.compact?.subscribers || '0');
+            setText('analytics-views', channel.compact?.views || '0');
+            setText('analytics-watch-hours', formatHours(analytics.minutesWatched));
+            setText('analytics-health-score', `${audit.health || 0}/100`);
+            setText('analytics-subscribers-delta', analytics.subscribersGained ? `+${analytics.subscribersGained}` : 'Live');
+            setText('analytics-views-delta', analytics.views ? `${channel.compact?.views || analytics.views}` : 'Live');
+            setText('analytics-watch-delta', analytics.unavailable ? 'Limited' : '28 days');
+            setText('analytics-health-note', audit.health >= 80 ? 'Strong' : audit.health >= 60 ? 'Improve' : 'Needs work');
+
+            setText('audit-health-score', audit.health || 0);
+            setText('audit-branding-score', audit.brandingScore || 0);
+            setText('audit-seo-score', audit.seoScore || 0);
+            setText('audit-consistency-score', audit.consistencyScore || 0);
+            listItems('audit-strengths', audit.strengths);
+            listItems('audit-weaknesses', audit.weaknesses);
+            listItems('audit-recommendations', audit.recommendations);
+
+            const topVideos = document.getElementById('analytics-top-videos');
+            if (topVideos) {
+                const rows = (data.videos || []).map(video => `
+                    <tr class="border-b border-lemon/5">
+                        <td class="py-4 flex items-center gap-3">
+                            <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
+                            <span class="text-white font-medium">${video.title || 'Untitled video'}</span>
+                        </td>
+                        <td class="py-4 text-gray-300">${video.compact?.views || 0}</td>
+                        <td class="py-4 text-lemon font-semibold">${video.compact?.likes || 0} likes</td>
+                        <td class="py-4 text-gray-300">${video.compact?.comments || 0} comments</td>
+                        <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">${audit.health || 0}/100</span></td>
+                    </tr>
+                `).join('');
+                topVideos.innerHTML = rows || '<tr><td colspan="5" class="py-4 text-gray-400">No recent upload data found.</td></tr>';
+            }
+
+            if (document.getElementById('analytics')?.classList.contains('active')) initCharts();
+            safeRenderIcons();
+        }
+
+        function showNotifications() {
+            showToast('No new notifications');
+        }
+
+        function toggleTheme() {
+            showToast('Theme toggle - Dark mode active');
+        }
+
+        Object.assign(window, {
+            safeRenderIcons,
+            showSection,
+            showTool,
+            hideTool,
+            toggleMobileMenu,
+            filterTools,
+            setTitleType,
+            setDescType,
+            setHashtagCount,
+            setHashtagType,
+            setContentType,
+            setThumbStyle,
+            setMusicPlatform,
+            setCalendarFreq,
+            optimizeTitle,
+            analyzeThumbnail,
+            generateDescription,
+            generateHashtags,
+            researchKeywords,
+            generateContentIdeas,
+            generateThumbnailPrompts,
+            generateMusicRelease,
+            generateCalendarPlan,
+            generateFallbackTool,
+            sendMessage,
+            sendQuickMessage,
+            addChatMessage,
+            initCalendar,
+            generateCalendar,
+            initCharts,
+            animateValue,
+            showToast,
+            setText,
+            loadYouTubeChannel,
+            renderYouTubeChannel,
+            copyToClipboard,
+            copyText,
+            connectYouTube,
+            showNotifications,
+            toggleTheme
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            safeRenderIcons();
+            showSection('dashboard');
+            const params = new URLSearchParams(window.location.search);
+            const youtubeStatus = params.get('youtube');
+            if (youtubeStatus === 'connected') {
+                showToast('YouTube channel connected.');
+                loadYouTubeChannel(true);
+                history.replaceState({}, document.title, window.location.pathname);
+            } else if (youtubeStatus === 'missing-config') {
+                showToast('YouTube credentials are missing on the server.');
+            } else if (youtubeStatus === 'auth-failed') {
+                showToast('YouTube connection failed. Please try again.');
+            } else {
+                loadYouTubeChannel(true).catch(() => {});
+            }
+        });
+    </script>
+</body>
+</html>
