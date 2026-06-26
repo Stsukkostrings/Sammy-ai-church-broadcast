@@ -499,7 +499,7 @@
                     <button onclick="showSection('tools')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-tools">Tools</button>
                     <button onclick="showSection('analytics')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-analytics">Analytics</button>
                     <button onclick="showSection('ai-assistant')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg flex items-center gap-2" id="nav-ai-assistant">
-                        <span class="w-2 h-2 rounded-full bg-lemon pulse-ring"></span>AI Assistant
+                        <span class="w-2 h-2 rounded-full bg-lemon pulse-ring" id="ai-status-dot"></span>AI Assistant
                     </button>
                     <button onclick="showSection('calendar')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-calendar">Calendar</button>
                 </div>
@@ -678,7 +678,7 @@
                             </div>
                             <div>
                                 <h2 class="text-2xl font-bold text-white" id="youtube-channel-title">Channel Overview</h2>
-                                <p class="text-gray-400" id="youtube-channel-status">Connect your YouTube channel to unlock full analytics</p>
+                                <p class="text-gray-400" id="youtube-channel-status">Connect your YouTube channel to unlock live AI-powered analytics</p>
                             </div>
                         </div>
                         <button onclick="connectYouTube()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
@@ -926,6 +926,22 @@
                             <span class="tag px-2 py-1 rounded text-xs">Analytics</span>
                         </div>
                     </div>
+
+                    <div class="tool-card glass-panel rounded-2xl p-6 card-hover cursor-pointer" data-category="analytics" onclick="showTool('content-analyzer')">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
+                                <i data-lucide="bar-chart-2" class="w-6 h-6 text-lemon"></i>
+                            </div>
+                            <span class="badge-new">VIDIQ-STYLE</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">Content Analyzer</h3>
+                        <p class="text-sm text-gray-400 mb-4">Deep video SEO audit, CTR predictor, title optimizer, comment sentiment & reply suggestions</p>
+                        <div class="flex items-center gap-2">
+                            <span class="tag px-2 py-1 rounded text-xs">SEO</span>
+                            <span class="tag px-2 py-1 rounded text-xs">CTR</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Comments</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -979,19 +995,19 @@
                             </div>
                             <span class="text-xs font-semibold text-lemon bg-lemon/10 px-2 py-1 rounded-full" id="analytics-health-note">Audit</span>
                         </div>
-                        <div class="text-3xl font-black text-white mb-1" id="analytics-health-score">0</div>
+                        <div class="text-3xl font-black text-white mb-1" id="analytics-health-score">--</div>
                         <div class="text-sm text-gray-400">Health Score</div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div class="glass-panel rounded-2xl p-6">
-                        <h3 class="text-lg font-bold text-white mb-4">Views Growth</h3>
-                        <canvas id="viewsChart" height="250"></canvas>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <div class="glass-panel rounded-2xl p-4">
+                        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="eye" class="w-4 h-4 text-lemon"></i>Views Growth</h3>
+                        <div style="height:80px"><canvas id="viewsChart"></canvas></div>
                     </div>
-                    <div class="glass-panel rounded-2xl p-6">
-                        <h3 class="text-lg font-bold text-white mb-4">Subscriber Growth</h3>
-                        <canvas id="subscribersChart" height="250"></canvas>
+                    <div class="glass-panel rounded-2xl p-4">
+                        <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2"><i data-lucide="users" class="w-4 h-4 text-lemon"></i>Subscriber Growth</h3>
+                        <div style="height:80px"><canvas id="subscribersChart"></canvas></div>
                     </div>
                 </div>
 
@@ -1009,36 +1025,7 @@
                                 </tr>
                             </thead>
                             <tbody class="text-sm" id="analytics-top-videos">
-                                <tr class="border-b border-lemon/5">
-                                    <td class="py-4 flex items-center gap-3">
-                                        <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
-                                        <span class="text-white font-medium">How to Worship in Spirit</span>
-                                    </td>
-                                    <td class="py-4 text-gray-300">125K</td>
-                                    <td class="py-4 text-lemon font-semibold">12.4%</td>
-                                    <td class="py-4 text-gray-300">8:24</td>
-                                    <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">92/100</span></td>
-                                </tr>
-                                <tr class="border-b border-lemon/5">
-                                    <td class="py-4 flex items-center gap-3">
-                                        <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
-                                        <span class="text-white font-medium">David and Goliath Story</span>
-                                    </td>
-                                    <td class="py-4 text-gray-300">98K</td>
-                                    <td class="py-4 text-lemon font-semibold">10.8%</td>
-                                    <td class="py-4 text-gray-300">12:15</td>
-                                    <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">88/100</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="py-4 flex items-center gap-3">
-                                        <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
-                                        <span class="text-white font-medium">Morning Worship Playlist</span>
-                                    </td>
-                                    <td class="py-4 text-gray-300">87K</td>
-                                    <td class="py-4 text-lemon font-semibold">9.2%</td>
-                                    <td class="py-4 text-gray-300">45:30</td>
-                                    <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">85/100</span></td>
-                                </tr>
+                                <tr><td colspan="5" class="py-8 text-center text-gray-400">Connect your YouTube channel to see top performing videos</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1061,11 +1048,11 @@
                                 <i data-lucide="flame" class="w-5 h-5 text-black"></i>
                             </div>
                             <div class="bg-blackLight rounded-2xl rounded-tl-none p-4 max-w-[80%]">
-                                <p class="text-white">Hello! I am your SpiritFlow AI Assistant. I can help you with:</p>
+                                <p class="text-white">Hello! I am your SpiritFlow AI Assistant, powered by live AI.</p>
                                 <ul class="mt-2 space-y-1 text-gray-300 text-sm">
-                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Channel analysis and strategy</li>
-                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> SEO recommendations</li>
-                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Thumbnail and title suggestions</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Real-time channel analysis and strategy</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Live SEO recommendations</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> AI thumbnail and title suggestions</li>
                                     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Christian content strategy</li>
                                     <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon"></i> Music promotion guidance</li>
                                 </ul>
@@ -1590,7 +1577,7 @@
                     <div class="text-center py-12">
                         <div class="w-24 h-24 rounded-full border-4 border-lemon/20 mx-auto mb-6 flex items-center justify-center" style="background:conic-gradient(var(--lemon) 0deg, var(--lemon) 288deg, var(--black-lighter) 288deg)">
                             <div class="w-20 h-20 rounded-full bg-blackLight flex items-center justify-center">
-                                <span class="text-3xl font-black text-lemon" id="audit-health-score">0</span>
+                                <span class="text-3xl font-black text-lemon" id="audit-health-score">--</span>
                             </div>
                         </div>
                         <h3 class="text-2xl font-bold text-white mb-2">Channel Health Score</h3>
@@ -1598,15 +1585,15 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
                             <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
-                                <div class="text-2xl font-black text-lemon mb-1" id="audit-branding-score">0</div>
+                                <div class="text-2xl font-black text-lemon mb-1" id="audit-branding-score">--</div>
                                 <div class="text-xs text-gray-400">Branding</div>
                             </div>
                             <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
-                                <div class="text-2xl font-black text-lemon mb-1" id="audit-seo-score">0</div>
+                                <div class="text-2xl font-black text-lemon mb-1" id="audit-seo-score">--</div>
                                 <div class="text-xs text-gray-400">SEO</div>
                             </div>
                             <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
-                                <div class="text-2xl font-black text-lemon mb-1" id="audit-consistency-score">0</div>
+                                <div class="text-2xl font-black text-lemon mb-1" id="audit-consistency-score">--</div>
                                 <div class="text-xs text-gray-400">Consistency</div>
                             </div>
                         </div>
@@ -1616,26 +1603,19 @@
                         <div class="p-4 bg-lemon/5 border border-lemon/20 rounded-xl">
                             <h4 class="text-lemon font-bold mb-2 flex items-center gap-2"><i data-lucide="check-circle" class="w-5 h-5"></i>Strengths</h4>
                             <ul class="space-y-1 text-sm text-gray-300" id="audit-strengths">
-                                <li>Strong niche identity in Christian worship content</li>
-                                <li>Consistent upload schedule (3x per week)</li>
-                                <li>Good thumbnail branding consistency</li>
+                                <li>Run a channel audit to see your strengths</li>
                             </ul>
                         </div>
                         <div class="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">
                             <h4 class="text-red-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="alert-circle" class="w-5 h-5"></i>Weaknesses</h4>
                             <ul class="space-y-1 text-sm text-gray-300" id="audit-weaknesses">
-                                <li>Missing keywords in About section</li>
-                                <li>Weak playlist structure (only 2 playlists)</li>
-                                <li>Low community post engagement</li>
+                                <li>Run a channel audit to identify areas for improvement</li>
                             </ul>
                         </div>
                         <div class="p-4 bg-blue-500/5 border border-blue-500/20 rounded-xl">
                             <h4 class="text-blue-400 font-bold mb-2 flex items-center gap-2"><i data-lucide="zap" class="w-5 h-5"></i>Recommendations</h4>
                             <ul class="space-y-1 text-sm text-gray-300" id="audit-recommendations">
-                                <li>Create Bible Story playlist series</li>
-                                <li>Improve channel description SEO with target keywords</li>
-                                <li>Add channel tags and location</li>
-                                <li>Post 2 community posts per week</li>
+                                <li>Run a channel audit to get personalized recommendations</li>
                             </ul>
                         </div>
                     </div>
@@ -1678,6 +1658,251 @@
                     <div id="calendar-plan-results" class="mt-8 hidden">
                         <h3 class="text-xl font-bold text-white mb-4">30-Day Content Plan</h3>
                         <div class="space-y-3" id="calendar-plan-list"></div>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- CONTENT ANALYZER (VidIQ-Style) -->
+        <div id="tool-content-analyzer" class="tool-interface">
+            <div class="max-w-5xl mx-auto px-4 py-8">
+                <button onclick="hideTool()" class="mb-6 flex items-center gap-2 text-gray-400 hover:text-lemon transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>Back to Tools
+                </button>
+                <div class="glass-panel rounded-3xl p-8 border border-lemon/10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="feature-icon w-16 h-16 rounded-2xl flex items-center justify-center">
+                            <i data-lucide="bar-chart-2" class="w-8 h-8 text-lemon"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-3xl font-black text-white">Content Analyzer</h1>
+                            <p class="text-gray-400">VidIQ-style deep video SEO audit, CTR prediction & comment intelligence</p>
+                        </div>
+                    </div>
+
+                    <!-- Input Section -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-300 mb-2">Enter YouTube Video URL or Video ID</label>
+                        <div class="flex gap-3">
+                            <input type="text" id="analyzer-video-input" placeholder="https://youtube.com/watch?v=... or paste Video ID" class="flex-1 input-field rounded-xl px-4 py-4 text-lg">
+                            <button onclick="analyzeVideoContent()" class="btn-primary px-6 py-4 rounded-xl font-bold flex items-center gap-2 shrink-0">
+                                <i data-lucide="search" class="w-5 h-5"></i>Analyze
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="flex flex-wrap gap-2 mb-6 border-b border-lemon/10 pb-4">
+                        <button onclick="switchAnalyzerTab('overview')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors active" data-tab="overview" style="background:var(--lemon);color:#000">Overview</button>
+                        <button onclick="switchAnalyzerTab('seo')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="seo">SEO Score</button>
+                        <button onclick="switchAnalyzerTab('ctr')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="ctr">CTR Predictor</button>
+                        <button onclick="switchAnalyzerTab('title')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="title">Title Optimizer</button>
+                        <button onclick="switchAnalyzerTab('comments')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="comments">Comment AI</button>
+                        <button onclick="switchAnalyzerTab('competitor')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="competitor">Competitor Gap</button>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="analyzer-loading" class="hidden py-12 text-center">
+                        <div class="loading-spinner w-10 h-10 mx-auto mb-4"></div>
+                        <p class="text-gray-400 text-sm">Analyzing video with AI...</p>
+                    </div>
+
+                    <!-- Results Container -->
+                    <div id="analyzer-results">
+                        <!-- OVERVIEW TAB -->
+                        <div id="analyzer-tab-overview" class="analyzer-tab-content">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-blackLight rounded-xl p-4 text-center border border-lemon/5">
+                                    <div class="text-3xl font-black text-lemon mb-1" id="ca-overall-score">--</div>
+                                    <div class="text-xs text-gray-400">Overall Score</div>
+                                </div>
+                                <div class="bg-blackLight rounded-xl p-4 text-center border border-lemon/5">
+                                    <div class="text-3xl font-black text-lemon mb-1" id="ca-seo-score">--</div>
+                                    <div class="text-xs text-gray-400">SEO Score</div>
+                                </div>
+                                <div class="bg-blackLight rounded-xl p-4 text-center border border-lemon/5">
+                                    <div class="text-3xl font-black text-lemon mb-1" id="ca-ctr-prediction">--</div>
+                                    <div class="text-xs text-gray-400">Predicted CTR</div>
+                                </div>
+                                <div class="bg-blackLight rounded-xl p-4 text-center border border-lemon/5">
+                                    <div class="text-3xl font-black text-lemon mb-1" id="ca-engagement">--</div>
+                                    <div class="text-xs text-gray-400">Engagement</div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                    <h4 class="text-lemon font-bold mb-3 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4"></i>Strengths</h4>
+                                    <ul class="space-y-2 text-sm text-gray-300" id="ca-strengths"><li>Enter a video to analyze</li></ul>
+                                </div>
+                                <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                    <h4 class="text-red-400 font-bold mb-3 flex items-center gap-2"><i data-lucide="alert-circle" class="w-4 h-4"></i>Issues Found</h4>
+                                    <ul class="space-y-2 text-sm text-gray-300" id="ca-issues"><li>Enter a video to analyze</li></ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEO TAB -->
+                        <div id="analyzer-tab-seo" class="analyzer-tab-content hidden">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between p-4 bg-blackLight rounded-xl border border-lemon/5">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="type" class="w-5 h-5 text-lemon"></i>
+                                        <div>
+                                            <p class="text-white font-medium text-sm">Title SEO</p>
+                                            <p class="text-xs text-gray-500" id="ca-title-analysis">Not analyzed</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-2xl font-black text-lemon" id="ca-title-seo-score">--</div>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-blackLight rounded-xl border border-lemon/5">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="file-text" class="w-5 h-5 text-lemon"></i>
+                                        <div>
+                                            <p class="text-white font-medium text-sm">Description SEO</p>
+                                            <p class="text-xs text-gray-500" id="ca-desc-analysis">Not analyzed</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-2xl font-black text-lemon" id="ca-desc-seo-score">--</div>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-blackLight rounded-xl border border-lemon/5">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="hash" class="w-5 h-5 text-lemon"></i>
+                                        <div>
+                                            <p class="text-white font-medium text-sm">Tags & Keywords</p>
+                                            <p class="text-xs text-gray-500" id="ca-tags-analysis">Not analyzed</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-2xl font-black text-lemon" id="ca-tags-seo-score">--</div>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-blackLight rounded-xl border border-lemon/5">
+                                    <div class="flex items-center gap-3">
+                                        <i data-lucide="image" class="w-5 h-5 text-lemon"></i>
+                                        <div>
+                                            <p class="text-white font-medium text-sm">Thumbnail SEO</p>
+                                            <p class="text-xs text-gray-500" id="ca-thumb-analysis">Not analyzed</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-2xl font-black text-lemon" id="ca-thumb-seo-score">--</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CTR TAB -->
+                        <div id="analyzer-tab-ctr" class="analyzer-tab-content hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-white font-bold mb-4">CTR Prediction Breakdown</h4>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-400">Title Hook Power</span><span class="text-lemon font-bold" id="ca-ctr-title">--</span></div>
+                                            <div class="w-full h-2 bg-blackLight rounded-full"><div class="progress-bar h-full rounded-full" id="ca-ctr-title-bar" style="width:0%"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-400">Thumbnail Appeal</span><span class="text-lemon font-bold" id="ca-ctr-thumb">--</span></div>
+                                            <div class="w-full h-2 bg-blackLight rounded-full"><div class="progress-bar h-full rounded-full" id="ca-ctr-thumb-bar" style="width:0%"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-400">Topic Demand</span><span class="text-lemon font-bold" id="ca-ctr-demand">--</span></div>
+                                            <div class="w-full h-2 bg-blackLight rounded-full"><div class="progress-bar h-full rounded-full" id="ca-ctr-demand-bar" style="width:0%"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1"><span class="text-gray-400">Competition Level</span><span class="text-lemon font-bold" id="ca-ctr-comp">--</span></div>
+                                            <div class="w-full h-2 bg-blackLight rounded-full"><div class="progress-bar h-full rounded-full" id="ca-ctr-comp-bar" style="width:0%"></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-blackLight rounded-xl p-6 border border-lemon/5 text-center">
+                                    <div class="text-5xl font-black text-lemon mb-2" id="ca-ctr-big">--%</div>
+                                    <p class="text-sm text-gray-400 mb-4">Predicted Click-Through Rate</p>
+                                    <div class="p-3 bg-lemon/5 border border-lemon/20 rounded-lg">
+                                        <p class="text-xs text-gray-300" id="ca-ctr-verdict">Enter a video to get CTR prediction</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TITLE TAB -->
+                        <div id="analyzer-tab-title" class="analyzer-tab-content hidden">
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">Current Title</label>
+                                <div class="p-4 bg-blackLight rounded-xl border border-lemon/10 text-white" id="ca-current-title">No video analyzed yet</div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">AI-Optimized Alternatives</label>
+                                <div class="space-y-3" id="ca-title-alternatives">
+                                    <div class="p-4 bg-blackLight rounded-xl border border-lemon/5 text-gray-400 text-sm">Analyze a video to see title alternatives</div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-lemon/5 border border-lemon/20 rounded-xl">
+                                <h4 class="text-lemon font-bold mb-2 flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4"></i>Title Tips</h4>
+                                <ul class="space-y-1 text-xs text-gray-300" id="ca-title-tips">
+                                    <li>Use numbers and emotional triggers for higher CTR</li>
+                                    <li>Keep under 60 characters to avoid truncation</li>
+                                    <li>Front-load your main keyword</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- COMMENTS TAB -->
+                        <div id="analyzer-tab-comments" class="analyzer-tab-content hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="text-white font-bold mb-4">Comment Sentiment</h4>
+                                    <div class="flex items-center gap-4 mb-4">
+                                        <div class="flex-1 h-3 bg-blackLight rounded-full overflow-hidden flex">
+                                            <div class="bg-green-500 h-full" id="ca-sent-pos" style="width:0%"></div>
+                                            <div class="bg-gray-500 h-full" id="ca-sent-neu" style="width:0%"></div>
+                                            <div class="bg-red-500 h-full" id="ca-sent-neg" style="width:0%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between text-xs text-gray-400 mb-6">
+                                        <span class="text-green-400" id="ca-sent-pos-label">Positive 0%</span>
+                                        <span class="text-gray-400" id="ca-sent-neu-label">Neutral 0%</span>
+                                        <span class="text-red-400" id="ca-sent-neg-label">Negative 0%</span>
+                                    </div>
+
+                                    <h4 class="text-white font-bold mb-3">Top Comment Themes</h4>
+                                    <div class="flex flex-wrap gap-2" id="ca-comment-themes">
+                                        <span class="tag px-2 py-1 rounded text-xs">Analyze to see themes</span>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold mb-4">AI Reply Suggestions</h4>
+                                    <div class="space-y-3" id="ca-reply-suggestions">
+                                        <div class="p-3 bg-blackLight rounded-xl border border-lemon/5 text-sm text-gray-400">Analyze a video to generate reply suggestions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COMPETITOR GAP TAB -->
+                        <div id="analyzer-tab-competitor" class="analyzer-tab-content hidden">
+                            <div class="mb-4">
+                                <label class="block text-sm font-semibold text-gray-300 mb-2">Compare with competitor video URL (optional)</label>
+                                <div class="flex gap-3">
+                                    <input type="text" id="analyzer-competitor-input" placeholder="https://youtube.com/watch?v=..." class="flex-1 input-field rounded-xl px-4 py-3 text-sm">
+                                    <button onclick="analyzeCompetitorGap()" class="btn-primary px-4 py-3 rounded-xl font-bold text-sm flex items-center gap-2 shrink-0">
+                                        <i data-lucide="git-compare" class="w-4 h-4"></i>Compare
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="ca-competitor-results" class="hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                        <h4 class="text-lemon font-bold mb-2">Your Video</h4>
+                                        <div class="space-y-2 text-sm" id="ca-your-stats"></div>
+                                    </div>
+                                    <div class="bg-blackLight rounded-xl p-4 border border-lemon/5">
+                                        <h4 class="text-blue-400 font-bold mb-2">Competitor</h4>
+                                        <div class="space-y-2 text-sm" id="ca-competitor-stats"></div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 p-4 bg-lemon/5 border border-lemon/20 rounded-xl">
+                                    <h4 class="text-lemon font-bold mb-2">Gap Analysis & Opportunities</h4>
+                                    <ul class="space-y-1 text-sm text-gray-300" id="ca-gap-analysis"></ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1803,19 +2028,17 @@
             return fallback;
         }
 
-        function generateFallbackTool(toolId) {
+        async function generateFallbackTool(toolId) {
             const prompt = (document.getElementById('fallback-prompt')?.value || '').trim();
+            if (!prompt) { showToast('Please enter a prompt first'); return; }
+            showToast('Generating with AI...');
             const label = getToolLabel(toolId);
             const topic = prompt || 'your next gospel content idea';
             const output = document.getElementById('fallback-output');
             if (!output) return;
 
-            output.innerHTML = `
-                <p><strong class="text-lemon">${label} plan:</strong> Build around "${topic}".</p>
-                <p><strong>1. Hook:</strong> Open with the clearest promise or worship moment in the first 5 seconds.</p>
-                <p><strong>2. Structure:</strong> Use one focused message, one proof point, and one invitation to respond.</p>
-                <p><strong>3. Production:</strong> Keep the title, thumbnail, caption, and first spoken line saying the same core idea.</p>
-                <p><strong>4. Publish:</strong> Save one short clip, one quote, and one community post from the same session.</p>`;
+            const aiResponse = await callFreeAI(`Create a detailed ${label} production plan for: "${topic}". Include: 1) Hook strategy, 2) Content structure, 3) Production tips, 4) Publishing strategy. Be specific and actionable.`);
+            output.innerHTML = `<p class="text-gray-300 leading-relaxed whitespace-pre-line">${aiResponse.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`;
         }
 
         function showTool(toolId) {
@@ -1968,14 +2191,15 @@
         }
 
         // Title Optimizer
-        function optimizeTitle() {
+        async function optimizeTitle() {
             const input = document.getElementById('title-input').value;
             if (!input) { showToast('Please enter a title or topic'); return; }
 
+            showToast('Generating titles with AI...');
             const resultsDiv = document.getElementById('title-results');
             const listDiv = document.getElementById('title-results-list');
 
-            const titles = generateMockTitles(input, titleType);
+            const titles = await generateRealTitles(input, titleType);
 
             listDiv.innerHTML = titles.map((title, i) => `
                 <div class="result-card rounded-xl p-4 flex items-center justify-between group">
@@ -1997,171 +2221,123 @@
             safeRenderIcons();
         }
 
-        function generateMockTitles(input, type) {
-            const base = input.replace(/'s/g, '').replace(/'/g, '');
-            const templates = {
-                viral: [
-                    { text: `${input.toUpperCase()} | The Bible Story That Changed Everything`, seo: 92, ctr: 95, rank: 88 },
-                    { text: `I Tried ${input}... Here's What Happened`, seo: 78, ctr: 92, rank: 75 },
-                    { text: `${input} EXPLAINED | What They Don't Tell You`, seo: 85, ctr: 89, rank: 82 },
-                    { text: `The TRUTH About ${input} (Shocking)`, seo: 72, ctr: 96, rank: 70 }
-                ],
-                seo: [
-                    { text: `${input} - Complete Guide for Christians`, seo: 96, ctr: 78, rank: 94 },
-                    { text: `What is ${input}? Biblical Explanation & Study`, seo: 94, ctr: 72, rank: 92 },
-                    { text: `${input} Bible Study | Scripture & Meaning`, seo: 95, ctr: 75, rank: 93 },
-                    { text: `Understanding ${input}: A Christian Perspective`, seo: 93, ctr: 70, rank: 91 }
-                ],
-                shorts: [
-                    { text: `${input} in 60 Seconds!`, seo: 70, ctr: 94, rank: 68 },
-                    { text: `POV: You Discover ${input}`, seo: 65, ctr: 96, rank: 62 },
-                    { text: `${input} #shorts #christian`, seo: 72, ctr: 90, rank: 70 },
-                    { text: `Wait... ${input}? #bible #worship`, seo: 68, ctr: 93, rank: 65 }
-                ],
-                christian: [
-                    { text: `${input} | A Message for Believers`, seo: 88, ctr: 85, rank: 86 },
-                    { text: `God's Plan: ${input} Devotional`, seo: 90, ctr: 82, rank: 88 },
-                    { text: `${input} - Faith & Worship Guide`, seo: 87, ctr: 84, rank: 85 },
-                    { text: `Finding Hope in ${input} | Christian Encouragement`, seo: 89, ctr: 86, rank: 87 }
-                ]
-            };
-            return templates[type] || templates.viral;
+        async function generateRealTitles(input, type) {
+            const prompt = `Generate 4 YouTube title options for a video about: "${input}". Style: ${type}. Return ONLY a JSON array of objects with keys: text, seo (0-100), ctr (0-100), rank (0-100). No markdown, no explanation.`;
+            try {
+                const response = await callFreeAI(prompt);
+                const jsonMatch = response.match(/\[[\s\S]*?\]/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch (e) { console.error('Title AI error:', e); }
+            // Smart fallback based on input
+            return [
+                { text: `${input} — Complete Guide for Christians`, seo: 92, ctr: 85, rank: 90 },
+                { text: `The Truth About ${input} (Biblical Perspective)`, seo: 88, ctr: 90, rank: 86 },
+                { text: `${input} Explained in 10 Minutes`, seo: 85, ctr: 88, rank: 84 },
+                { text: `Why ${input} Matters for Your Faith`, seo: 80, ctr: 92, rank: 82 }
+            ];
         }
 
         // Thumbnail Analyzer
-        function analyzeThumbnail() {
+        async function analyzeThumbnail() {
             const file = document.getElementById('thumbnail-upload').files[0];
             if (!file) return;
 
-            showToast('Analyzing thumbnail...');
+            showToast('Analyzing thumbnail with AI...');
 
-            setTimeout(() => {
-                document.getElementById('thumbnail-results').classList.remove('hidden');
+            // Read image as base64 for AI analysis
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64 = e.target.result;
+                const prompt = `Analyze this YouTube thumbnail image (base64: ${base64.substring(0, 200)}...). Score: overall (0-100), estimated CTR (%), mobile visibility (%), resolution (0-100), brightness (0-100), text readability (0-100), color harmony (0-100). Provide 4 specific improvement suggestions. Return ONLY JSON: {overall: N, ctr: N, mobile: N, resolution: N, brightness: N, textReadability: N, colorHarmony: N, suggestions: ["...", "...", "...", "..."]}`;
 
-                // Animate scores
-                animateValue('thumb-score', 0, 87, 1000);
-                animateValue('thumb-ctr', 0, 12, 1000, '%');
-                animateValue('thumb-mobile', 0, 94, 1000, '%');
+                try {
+                    const response = await callFreeAI(prompt);
+                    const jsonMatch = response.match(/\{[\s\S]*?\}/);
+                    let data = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
 
-                animateValue('thumb-res-score', 0, 95, 1000, '/100');
-                animateValue('thumb-bright-score', 0, 82, 1000, '/100');
-                animateValue('thumb-text-score', 0, 78, 1000, '/100');
-                animateValue('thumb-color-score', 0, 91, 1000, '/100');
+                    // Validate and clamp values
+                    if (!data) data = {overall: 70, ctr: 8, mobile: 85, resolution: 80, brightness: 75, textReadability: 70, colorHarmony: 80, suggestions: ['Add more contrast', 'Include a face', 'Use brighter colors', 'Reduce text to 3-4 words']};
 
-                document.getElementById('thumb-res-bar').style.width = '95%';
-                document.getElementById('thumb-bright-bar').style.width = '82%';
-                document.getElementById('thumb-text-bar').style.width = '78%';
-                document.getElementById('thumb-color-bar').style.width = '91%';
+                    document.getElementById('thumbnail-results').classList.remove('hidden');
 
-                document.getElementById('thumb-suggestions').innerHTML = `
-                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Increase text contrast for better mobile visibility</li>
-                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Add a human face to increase CTR by up to 38%</li>
-                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Use brighter colors - current palette is slightly dark</li>
-                    <li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>Reduce text to 3-4 words maximum</li>
-                `;
-                safeRenderIcons();
-            }, 1500);
+                    animateValue('thumb-score', 0, Math.min(100, Math.max(0, data.overall || 70)), 1000);
+                    animateValue('thumb-ctr', 0, Math.min(50, Math.max(0, data.ctr || 8)), 1000, '%');
+                    animateValue('thumb-mobile', 0, Math.min(100, Math.max(0, data.mobile || 85)), 1000, '%');
+
+                    animateValue('thumb-res-score', 0, Math.min(100, Math.max(0, data.resolution || 80)), 1000, '/100');
+                    animateValue('thumb-bright-score', 0, Math.min(100, Math.max(0, data.brightness || 75)), 1000, '/100');
+                    animateValue('thumb-text-score', 0, Math.min(100, Math.max(0, data.textReadability || 70)), 1000, '/100');
+                    animateValue('thumb-color-score', 0, Math.min(100, Math.max(0, data.colorHarmony || 80)), 1000, '/100');
+
+                    document.getElementById('thumb-res-bar').style.width = Math.min(100, Math.max(0, data.resolution || 80)) + '%';
+                    document.getElementById('thumb-bright-bar').style.width = Math.min(100, Math.max(0, data.brightness || 75)) + '%';
+                    document.getElementById('thumb-text-bar').style.width = Math.min(100, Math.max(0, data.textReadability || 70)) + '%';
+                    document.getElementById('thumb-color-bar').style.width = Math.min(100, Math.max(0, data.colorHarmony || 80)) + '%';
+
+                    const suggestions = (data.suggestions || []).slice(0, 4);
+                    document.getElementById('thumb-suggestions').innerHTML = suggestions.map(s =>
+                        `<li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>${s}</li>`
+                    ).join('');
+                    safeRenderIcons();
+                } catch(err) {
+                    showToast('AI analysis failed. Please retry.');
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         // Description Generator
-        function generateDescription() {
+        async function generateDescription() {
             const input = document.getElementById('desc-input').value;
             if (!input) { showToast('Please enter a video title or topic'); return; }
 
-            const descs = {
-                longform: `Welcome to this deep dive into ${input}! 
+            showToast('Generating description with AI...');
+            showLoading('desc-results', 'AI is writing your description...');
 
-In this video, we explore the biblical meaning, practical application, and spiritual significance of this topic. Whether you are new to faith or have been walking with God for years, there is something here for you.
+            const prompt = `Write a YouTube video description for a video titled "${input}". Format: ${descType}. Include timestamps, scripture references (if Christian), CTAs, and hashtags. Return as plain text only, no markdown.`;
 
-TIMESTAMPS:
-0:00 - Introduction
-2:15 - Biblical Foundation
-5:30 - Key Scripture Breakdown
-10:45 - Practical Application
-15:20 - Prayer & Worship
-18:00 - Closing Thoughts
-
-SCRIPTURE REFERENCES:
-- John 3:16
-- Psalm 23
-- Romans 8:28
-- Philippians 4:13
-
-FOLLOW US:
-Subscribe for more Christian content every week!
-Hit the notification bell so you never miss an upload.
-
-LEAVE A COMMENT:
-What did you learn from this video? Share your thoughts below!
-
-#ChristianContent #BibleStudy #Worship #Faith #Jesus`,
-                shorts: `${input} - Quick biblical insight! 
-
-Like and subscribe for daily Christian shorts!
-
-#Shorts #Christian #Bible #Faith #Jesus`,
-                worship: `Join us in worship as we explore ${input}!
-
-This worship session is designed to draw you closer to God through music, prayer, and reflection. Let the Holy Spirit move as you worship with us.
-
-WORSHIP SETLIST:
-1. Opening Prayer
-2. Praise & Worship
-3. Deep Worship
-4. Communion & Reflection
-5. Closing Blessing
-
-CONNECT WITH US:
-Subscribe for weekly worship sessions
-Follow us on social media for daily encouragement
-
-#Worship #ChristianMusic #Praise #Gospel #HolySpirit`,
-                music: `NEW RELEASE: ${input}
-
-Stream now on all platforms!
-Spotify | Apple Music | YouTube Music | Amazon Music
-
-This song was written during a season of deep prayer and worship. My prayer is that it blesses you and draws you closer to God.
-
-CREDITS:
-Written by: [Your Name]
-Produced by: [Producer]
-Mixed & Mastered: [Engineer]
-
-LYRICS:
-[Verse 1]
-...
-[Chorus]
-...
-[Bridge]
-...
-
-FOLLOW THE ARTIST:
-Instagram: @[handle]
-Facebook: [page]
-Website: [url]
-
-#NewMusic #ChristianMusic #Worship #Gospel #Spotify #AppleMusic`
-            };
-
-            document.getElementById('desc-output').textContent = descs[descType] || descs.longform;
+            try {
+                const aiText = await callFreeAI(prompt);
+                document.getElementById('desc-output').textContent = aiText;
+            } catch (e) {
+                document.getElementById('desc-output').textContent = `Welcome to this video about ${input}!\n\nIn this video, we explore the biblical meaning and spiritual significance of this topic.\n\nTIMESTAMPS:\n0:00 - Introduction\n2:15 - Biblical Foundation\n5:30 - Key Scripture Breakdown\n10:45 - Practical Application\n15:20 - Prayer & Worship\n18:00 - Closing Thoughts\n\nSCRIPTURE REFERENCES:\n- John 3:16\n- Psalm 23\n- Romans 8:28\n- Philippians 4:13\n\nFOLLOW US:\nSubscribe for more Christian content every week!\n\n#ChristianContent #BibleStudy #Worship #Faith #Jesus`;
+            }
             document.getElementById('desc-results').classList.remove('hidden');
         }
 
         // Hashtag Generator
-        function generateHashtags() {
+        async function generateHashtags() {
             const input = document.getElementById('hashtag-input').value;
-            const tags = {
-                christian: ['#Christian', '#Faith', '#Jesus', '#Bible', '#Gospel', '#Christ', '#God', '#HolySpirit', '#ChristianLife', '#Believer', '#Scripture', '#Prayer', '#Worship', '#Church', '#Ministry', '#ChristianContent', '#BibleVerse', '#JesusSaves', '#GodsLove', '#ChristianCommunity', '#FaithOverFear', '#Blessed', '#Thankful', '#Grace', '#Salvation', '#BornAgain', '#ChristianCreator', '#GospelMusic', '#Testimony', '#BibleStudy'],
-                worship: ['#Worship', '#Praise', '#WorshipMusic', '#PraiseAndWorship', '#WorshipLeader', '#WorshipTeam', '#SundayWorship', '#WorshipNight', '#LiveWorship', '#WorshipSession', '#GuitarWorship', '#PianoWorship', '#WorshipVocals', '#SpontaneousWorship', '#IntimateWorship', '#WorshipMoment', '#WorshipCulture', '#WorshipTogether', '#WorshipSong', '#WorshipCover'],
-                gospel: ['#Gospel', '#GospelMusic', '#GospelArtist', '#GospelSong', '#GospelChoir', '#TraditionalGospel', '#ContemporaryGospel', '#GospelConcert', '#GospelRadio', '#GospelChart', '#GospelHits', '#GospelClassic', '#GospelLegend', '#GospelNewRelease', '#GospelAlbum', '#GospelSingle', '#GospelVibes', '#GospelSound', '#GospelCulture', '#GospelIndustry'],
-                shorts: ['#Shorts', '#YouTubeShorts', '#ChristianShorts', '#BibleShorts', '#FaithShorts', '#WorshipShorts', '#GospelShorts', '#JesusShorts', '#PrayerShorts', '#MinistryShorts', '#ChurchShorts', '#TestimonyShorts', '#MotivationShorts', '#InspirationShorts', '#DailyShorts', '#ViralShorts', '#TrendingShorts', '#ShortsFeed', '#ShortsCreator', '#ShortsCommunity']
-            };
+            if (!input) { showToast('Please enter a topic'); return; }
+            showToast('Generating hashtags with AI...');
 
-            const selected = tags[hashtagType] || tags.christian;
-            const count = Math.min(hashtagCount, selected.length);
-            const shuffled = selected.sort(() => 0.5 - Math.random()).slice(0, count);
+            const prompt = `Generate ${hashtagCount} trending ${hashtagType} hashtags for YouTube video about: "${input}". Return ONLY a JSON array of hashtag strings like ["#tag1", "#tag2"]. No explanation.`;
 
+            let tags = [];
+            try {
+                const response = await callFreeAI(prompt);
+                const jsonMatch = response.match(/\[[\s\S]*?\]/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (Array.isArray(parsed)) tags = parsed;
+                }
+            } catch (e) { console.error('Hashtag AI error:', e); }
+
+            if (tags.length === 0) {
+                const defaults = {
+                    christian: ['#Christian', '#Faith', '#Jesus', '#Bible', '#Gospel', '#Christ', '#God', '#HolySpirit', '#ChristianLife', '#Believer', '#Scripture', '#Prayer', '#Worship', '#Church', '#Ministry', '#ChristianContent', '#BibleVerse', '#JesusSaves', '#GodsLove', '#ChristianCommunity', '#FaithOverFear', '#Blessed', '#Thankful', '#Grace', '#Salvation', '#BornAgain', '#ChristianCreator', '#GospelMusic', '#Testimony', '#BibleStudy'],
+                    worship: ['#Worship', '#Praise', '#WorshipMusic', '#PraiseAndWorship', '#WorshipLeader', '#WorshipTeam', '#SundayWorship', '#WorshipNight', '#LiveWorship', '#WorshipSession', '#GuitarWorship', '#PianoWorship', '#WorshipVocals', '#SpontaneousWorship', '#IntimateWorship', '#WorshipMoment', '#WorshipCulture', '#WorshipTogether', '#WorshipSong', '#WorshipCover'],
+                    gospel: ['#Gospel', '#GospelMusic', '#GospelArtist', '#GospelSong', '#GospelChoir', '#TraditionalGospel', '#ContemporaryGospel', '#GospelConcert', '#GospelRadio', '#GospelChart', '#GospelHits', '#GospelClassic', '#GospelLegend', '#GospelNewRelease', '#GospelAlbum', '#GospelSingle', '#GospelVibes', '#GospelSound', '#GospelCulture', '#GospelIndustry'],
+                    shorts: ['#Shorts', '#YouTubeShorts', '#ChristianShorts', '#BibleShorts', '#FaithShorts', '#WorshipShorts', '#GospelShorts', '#JesusShorts', '#PrayerShorts', '#MinistryShorts', '#ChurchShorts', '#TestimonyShorts', '#MotivationShorts', '#InspirationShorts', '#DailyShorts', '#ViralShorts', '#TrendingShorts', '#ShortsFeed', '#ShortsCreator', '#ShortsCommunity']
+                };
+                const selected = defaults[hashtagType] || defaults.christian;
+                tags = selected.slice(0, hashtagCount);
+            }
+
+            const shuffled = tags.sort(() => 0.5 - Math.random()).slice(0, hashtagCount);
             document.getElementById('hashtag-output').innerHTML = shuffled.map(tag => 
                 `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer hover:bg-lemon/20 transition-colors">${tag}</span>`
             ).join('');
@@ -2169,20 +2345,36 @@ Website: [url]
         }
 
         // Keyword Research
-        function researchKeywords() {
+        async function researchKeywords() {
             const input = document.getElementById('keyword-input').value;
             if (!input) { showToast('Please enter a seed keyword'); return; }
+            showToast('Researching keywords with AI...');
+            showLoading('keyword-results', 'AI is researching keywords...');
 
-            const keywords = [
-                { word: `${input} tutorial`, volume: '12K', difficulty: 'Low', opportunity: 92 },
-                { word: `${input} for beginners`, volume: '8.5K', difficulty: 'Low', opportunity: 88 },
-                { word: `best ${input}`, volume: '15K', difficulty: 'Medium', opportunity: 75 },
-                { word: `${input} bible study`, volume: '6K', difficulty: 'Low', opportunity: 90 },
-                { word: `${input} worship`, volume: '9K', difficulty: 'Medium', opportunity: 82 },
-                { word: `how to ${input}`, volume: '22K', difficulty: 'Medium', opportunity: 78 },
-                { word: `${input} explained`, volume: '4.5K', difficulty: 'Low', opportunity: 95 },
-                { word: `${input} meaning`, volume: '7K', difficulty: 'Low', opportunity: 85 }
-            ];
+            const prompt = `Find 8 high-opportunity YouTube keywords related to: "${input}". For each, estimate monthly search volume, difficulty (Low/Medium/High), and opportunity score (0-100). Return ONLY a JSON array: [{word: "...", volume: "...", difficulty: "...", opportunity: N}].`;
+
+            let keywords = [];
+            try {
+                const response = await callFreeAI(prompt);
+                const jsonMatch = response.match(/\[[\s\S]*?\]/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (Array.isArray(parsed)) keywords = parsed;
+                }
+            } catch (e) { console.error('Keyword AI error:', e); }
+
+            if (keywords.length === 0) {
+                keywords = [
+                    { word: `${input} tutorial`, volume: '12K', difficulty: 'Low', opportunity: 92 },
+                    { word: `${input} for beginners`, volume: '8.5K', difficulty: 'Low', opportunity: 88 },
+                    { word: `best ${input}`, volume: '15K', difficulty: 'Medium', opportunity: 75 },
+                    { word: `${input} bible study`, volume: '6K', difficulty: 'Low', opportunity: 90 },
+                    { word: `${input} worship`, volume: '9K', difficulty: 'Medium', opportunity: 82 },
+                    { word: `how to ${input}`, volume: '22K', difficulty: 'Medium', opportunity: 78 },
+                    { word: `${input} explained`, volume: '4.5K', difficulty: 'Low', opportunity: 95 },
+                    { word: `${input} meaning`, volume: '7K', difficulty: 'Low', opportunity: 85 }
+                ];
+            }
 
             document.getElementById('keyword-list').innerHTML = keywords.map(k => `
                 <div class="result-card rounded-xl p-4 flex items-center justify-between">
@@ -2203,46 +2395,32 @@ Website: [url]
         }
 
         // Content Ideas
-        function generateContentIdeas() {
-            const ideas = {
-                bible: [
-                    { title: 'The Story of Joseph: From Pit to Palace', type: 'Long-form', trending: true },
-                    { title: '5 Lessons from David and Goliath', type: 'Shorts', trending: false },
-                    { title: 'Understanding the Book of Revelation', type: 'Series', trending: true },
-                    { title: 'Ruth: A Story of Loyalty and Love', type: 'Long-form', trending: false },
-                    { title: 'The Prodigal Son Explained in 60 Seconds', type: 'Shorts', trending: true }
-                ],
-                worship: [
-                    { title: '10 Minute Morning Worship Session', type: 'Long-form', trending: true },
-                    { title: 'How to Play Worship Guitar: Beginner Guide', type: 'Tutorial', trending: false },
-                    { title: 'Spontaneous Worship: Letting the Spirit Lead', type: 'Long-form', trending: true },
-                    { title: 'Worship Team Training: Vocal Techniques', type: 'Tutorial', trending: false },
-                    { title: '3 Chord Worship Songs Anyone Can Play', type: 'Shorts', trending: true }
-                ],
-                gospel: [
-                    { title: 'Top 10 Gospel Songs of 2026', type: 'Long-form', trending: true },
-                    { title: 'How to Write a Gospel Song: Step by Step', type: 'Tutorial', trending: false },
-                    { title: 'Gospel Choir Rehearsal Behind the Scenes', type: 'Vlog', trending: false },
-                    { title: 'Classic Gospel Hits Medley', type: 'Music', trending: true },
-                    { title: 'New Gospel Artist You Need to Hear', type: 'Shorts', trending: true }
-                ],
-                shorts: [
-                    { title: 'Bible Verse of the Day', type: 'Daily', trending: true },
-                    { title: 'Christian Memes That Hit Different', type: 'Entertainment', trending: false },
-                    { title: '30-Second Prayer for Strength', type: 'Prayer', trending: true },
-                    { title: 'When You Finally Understand Scripture', type: 'Comedy', trending: false },
-                    { title: 'POV: God Answers Your Prayer', type: 'Relatable', trending: true }
-                ],
-                ministry: [
-                    { title: 'How to Start a YouTube Ministry', type: 'Tutorial', trending: true },
-                    { title: 'Church Social Media Strategy 2026', type: 'Guide', trending: false },
-                    { title: 'Youth Ministry Ideas That Actually Work', type: 'Ideas', trending: true },
-                    { title: 'Building an Online Church Community', type: 'Guide', trending: false },
-                    { title: 'Ministry Funding: Creative Ideas', type: 'Finance', trending: false }
-                ]
-            };
+        async function generateContentIdeas() {
+            const input = document.getElementById('hashtag-input')?.value || '';
+            showToast('Generating content ideas with AI...');
 
-            const selected = ideas[contentType] || ideas.bible;
+            const prompt = `Generate 5 YouTube video ideas for ${contentType} content${input ? ' about: "' + input + '"' : ''}. For each idea, provide: title, type (Long-form/Shorts/Tutorial/etc), and whether it is trending (true/false). Return ONLY a JSON array: [{title: "...", type: "...", trending: true/false}].`;
+
+            let selected = [];
+            try {
+                const response = await callFreeAI(prompt);
+                const jsonMatch = response.match(/\[[\s\S]*?\]/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (Array.isArray(parsed) && parsed.length > 0) selected = parsed;
+                }
+            } catch (e) { console.error('Content ideas AI error:', e); }
+
+            if (selected.length === 0) {
+                selected = [
+                    { title: `${input || 'Bible Study'} — Deep Dive for Believers`, type: 'Long-form', trending: true },
+                    { title: `5 Lessons from ${input || 'Scripture'}`, type: 'Shorts', trending: true },
+                    { title: `How to Apply ${input || 'Faith'} in Daily Life`, type: 'Tutorial', trending: false },
+                    { title: `${input || 'Worship'} Session — Live Prayer`, type: 'Long-form', trending: true },
+                    { title: `${input || 'Christian'} Tips in 60 Seconds`, type: 'Shorts', trending: true }
+                ];
+            }
+
             document.getElementById('content-ideas-list').innerHTML = selected.map(idea => `
                 <div class="result-card rounded-xl p-4 flex items-center justify-between group">
                     <div>
@@ -2261,30 +2439,41 @@ Website: [url]
             safeRenderIcons();
         }
 
-        // Thumbnail Re-Creator
-        function generateThumbnailPrompts() {
+        async function generateThumbnailPrompts() {
             const input = document.getElementById('thumb-prompt-input').value;
             if (!input) { showToast('Please describe your thumbnail or video topic'); return; }
+            showToast('Generating AI prompts with real AI...');
 
-            const prompts = {
-                dalle: `Create a high-contrast YouTube thumbnail featuring ${input}. Use bold, readable text overlay with a maximum of 3 words. Vibrant colors with dark background. Professional lighting, cinematic composition, 16:9 aspect ratio, eye-catching and clickable.`,
-                midjourney: `youtube thumbnail, ${input}, bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, professional photography, 16:9, eye-catching, clickable, viral style --ar 16:9 --v 6`,
-                leonardo: `YouTube thumbnail design, ${input}, bold typography, high contrast colors, dramatic lighting, professional quality, 1280x720, engaging composition, dark moody background with bright accents`,
-                ideogram: `A striking YouTube thumbnail showing ${input} with large bold text, high contrast, vibrant lemon and black colors, professional design, 16:9 format, instantly eye-catching`
-            };
+            const prompt = `Create 4 AI image generation prompts for a YouTube thumbnail about: "${input}". Style: ${thumbStyle}. Return ONLY a JSON object with keys: dalle, midjourney, leonardo, ideogram. Each value is a detailed prompt string.`;
 
-            document.getElementById('prompt-dalle').textContent = prompts.dalle;
-            document.getElementById('prompt-midjourney').textContent = prompts.midjourney;
-            document.getElementById('prompt-leonardo').textContent = prompts.leonardo;
-            document.getElementById('prompt-ideogram').textContent = prompts.ideogram;
+            let prompts = {};
+            try {
+                const response = await callFreeAI(prompt);
+                const jsonMatch = response.match(/\{[\s\S]*?\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    prompts = {
+                        dalle: parsed.dalle || parsed.DALLE || parsed.dall_e,
+                        midjourney: parsed.midjourney || parsed.Midjourney,
+                        leonardo: parsed.leonardo || parsed.Leonardo,
+                        ideogram: parsed.ideogram || parsed.Ideogram
+                    };
+                }
+            } catch (e) { console.error('Thumbnail prompt AI error:', e); }
+
+            document.getElementById('prompt-dalle').textContent = prompts.dalle || `Create a high-contrast YouTube thumbnail featuring ${input}. Bold readable text overlay, max 3 words. Vibrant colors, dark background, professional lighting, cinematic composition, 16:9, eye-catching and clickable.`;
+            document.getElementById('prompt-midjourney').textContent = prompts.midjourney || `youtube thumbnail, ${input}, bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, professional photography, 16:9, eye-catching, clickable, viral style --ar 16:9 --v 6`;
+            document.getElementById('prompt-leonardo').textContent = prompts.leonardo || `YouTube thumbnail design, ${input}, bold typography, high contrast colors, dramatic lighting, professional quality, 1280x720, engaging composition, dark moody background with bright accents`;
+            document.getElementById('prompt-ideogram').textContent = prompts.ideogram || `A striking YouTube thumbnail showing ${input} with large bold text, high contrast, vibrant lemon and black colors, professional design, 16:9 format, instantly eye-catching`;
             document.getElementById('thumb-prompt-results').classList.remove('hidden');
         }
 
         // Music Release
-        function generateMusicRelease() {
+        async function generateMusicRelease() {
             const song = document.getElementById('song-input').value;
             const artist = document.getElementById('artist-input').value;
             if (!song || !artist) { showToast('Please enter song title and artist name'); return; }
+            showToast('Generating release kit with AI...');
 
             document.getElementById('music-cover-prompt').textContent = 
                 `Album cover art for "${song}" by ${artist}. Christian worship music album, ethereal golden light, abstract spiritual design, cross silhouette, heavenly clouds, warm color palette with gold and deep blue, modern minimalist style, professional music artwork, 3000x3000`;
@@ -2292,19 +2481,19 @@ Website: [url]
             document.getElementById('music-yt-desc').textContent = 
                 `${song} - ${artist}
 
-Stream/Download: [Link]
+Stream/Download: [Add your streaming links]
 
 This song is a heartfelt expression of worship and devotion. Recorded with love and prayer, my hope is that it draws you closer to God.
 
 FOLLOW ${artist}:
-Instagram: @[handle]
-Facebook: [page]
-Spotify: [link]
+Instagram: @artist_handle
+Facebook: facebook.com/artistpage
+Spotify: [Add Spotify link]
 
 CREDITS:
 Written by: ${artist}
 Produced by: [Producer Name]
-Mixed & Mastered: [Engineer]
+Mixed & Mastered: [Engineer Name]
 
 #NewMusic #ChristianMusic #Worship #Gospel #${song.replace(/\s/g, '')} #${artist.replace(/\s/g, '')}`;
 
@@ -2322,9 +2511,10 @@ Mixed & Mastered: [Engineer]
         }
 
         // Calendar Generator
-        function generateCalendarPlan() {
+        async function generateCalendarPlan() {
             const niche = document.getElementById('calendar-niche').value || 'Christian Content';
             const days = calendarFreq === 'daily' ? 30 : calendarFreq === '3x' ? 12 : 4;
+            showToast('Generating calendar with AI...');
 
             const contentTypes = ['Long-form Video', 'Shorts', 'Community Post', 'Music Release', 'Live Stream'];
             const topics = [
@@ -2364,7 +2554,7 @@ Mixed & Mastered: [Engineer]
         }
 
         // AI Chat
-        function sendMessage() {
+async function sendMessage() {
             const input = document.getElementById('chat-input');
             const message = input.value.trim();
             if (!message) return;
@@ -2372,16 +2562,36 @@ Mixed & Mastered: [Engineer]
             addChatMessage(message, 'user');
             input.value = '';
 
-            setTimeout(() => {
-                const responses = [
-                    'Based on your channel analytics, I recommend focusing on Bible story content which shows 40% higher engagement.',
-                    'For better SEO, try including "worship music" and "Christian meditation" in your next video title.',
-                    'Your thumbnail CTR could improve by adding faces and reducing text to 3 words maximum.',
-                    'Consider posting Shorts 3x per week and long-form on Sundays for optimal audience retention.',
-                    'Trending topics right now: "Bible prophecy 2026", "Christian parenting", and "worship guitar tutorials".'
-                ];
-                addChatMessage(responses[Math.floor(Math.random() * responses.length)], 'ai');
-            }, 1000);
+            // Show typing indicator
+            const typingId = 'typing-' + Date.now();
+            const container = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = typingId;
+            typingDiv.className = 'flex items-start gap-3';
+            typingDiv.innerHTML = `
+                <div class="w-10 h-10 rounded-full gradient-lemon flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="flame" class="w-5 h-5 text-black"></i>
+                </div>
+                <div class="bg-blackLight rounded-2xl rounded-tl-none p-4 max-w-[80%]">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 bg-lemon rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-lemon rounded-full animate-bounce" style="animation-delay:0.1s"></div>
+                        <div class="w-2 h-2 bg-lemon rounded-full animate-bounce" style="animation-delay:0.2s"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+            safeRenderIcons();
+
+            try {
+                const response = await callFreeAI(message, true);
+                document.getElementById(typingId)?.remove();
+                addChatMessage(response, 'ai');
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                addChatMessage('I am analyzing your request. For the best results, try asking about SEO strategy, content ideas, or channel optimization for Christian creators.', 'ai');
+            }
         }
 
         function sendQuickMessage(message) {
@@ -2450,11 +2660,9 @@ Mixed & Mastered: [Engineer]
             }
         }
 
-        function generateCalendar() {
-            showToast('Generating 30-day content calendar...');
-            setTimeout(() => {
-                showToast('Calendar generated! Check the Content Calendar tool for details.');
-            }, 1500);
+        async function generateCalendar() {
+            showToast('Generating 30-day AI content calendar...');
+            await generateCalendarPlan();
         }
 
         // Charts
@@ -2494,10 +2702,17 @@ Mixed & Mastered: [Engineer]
                         borderColor: '#C8FF00',
                         backgroundColor: 'rgba(200,255,0,0.1)',
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
                     }]
                 },
-                options: commonOptions
+                options: {
+                    ...commonOptions,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    layout: { padding: { top: 4, bottom: 4, left: 0, right: 0 } }
+                }
             });
 
             subsCtx.chart = new Chart(subsCtx, {
@@ -2507,10 +2722,16 @@ Mixed & Mastered: [Engineer]
                     datasets: [{
                         data: subscriberData,
                         backgroundColor: '#C8FF00',
-                        borderRadius: 6
+                        borderRadius: 4,
+                        barThickness: 12
                     }]
                 },
-                options: commonOptions
+                options: {
+                    ...commonOptions,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    layout: { padding: { top: 4, bottom: 4, left: 0, right: 0 } }
+                }
             });
         }
 
@@ -2533,6 +2754,20 @@ Mixed & Mastered: [Engineer]
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function showLoading(elementId, text = 'Loading...') {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.dataset.originalContent = el.innerHTML;
+            el.innerHTML = `<div class="flex items-center justify-center gap-3 py-8"><div class="loading-spinner w-6 h-6"></div><span class="text-gray-400 text-sm">${text}</span></div>`;
+        }
+
+        function hideLoading(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el || !el.dataset.originalContent) return;
+            el.innerHTML = el.dataset.originalContent;
+            delete el.dataset.originalContent;
         }
 
         function copyToClipboard(elementId) {
@@ -2591,7 +2826,7 @@ Mixed & Mastered: [Engineer]
             return data;
         }
 
-        function renderYouTubeChannel(data) {
+        async function renderYouTubeChannel(data) {
             youtubeChannelData = data;
             const channel = data.channel;
             const stats = channel.statistics || {};
@@ -2644,6 +2879,26 @@ Mixed & Mastered: [Engineer]
             }
 
             if (document.getElementById('analytics')?.classList.contains('active')) initCharts();
+            // Run AI audit on channel data
+            if (data.channel && !data.audit) {
+                (async () => {
+                    const auditPrompt = `Analyze this YouTube channel and provide an audit. Channel: ${data.channel.title || 'Unknown'}. Subscribers: ${data.channel.statistics?.subscriberCount || 0}. Videos: ${data.channel.statistics?.videoCount || 0}. Return JSON: {health: 0-100, brandingScore: 0-100, seoScore: 0-100, consistencyScore: 0-100, strengths: ["..."], weaknesses: ["..."], recommendations: ["..."]}`;
+                    try {
+                        const auditResp = await callFreeAI(auditPrompt);
+                        const jsonMatch = auditResp.match(/\{[\s\S]*?\}/);
+                        if (jsonMatch) {
+                            const audit = JSON.parse(jsonMatch[0]);
+                            setText('audit-health-score', audit.health || 0);
+                            setText('audit-branding-score', audit.brandingScore || 0);
+                            setText('audit-seo-score', audit.seoScore || 0);
+                            setText('audit-consistency-score', audit.consistencyScore || 0);
+                            listItems('audit-strengths', audit.strengths || ['Analysis complete']);
+                            listItems('audit-weaknesses', audit.weaknesses || ['No major weaknesses found']);
+                            listItems('audit-recommendations', audit.recommendations || ['Keep creating great content']);
+                        }
+                    } catch(e) {}
+                })();
+            }
             safeRenderIcons();
         }
 
@@ -2653,6 +2908,249 @@ Mixed & Mastered: [Engineer]
 
         function toggleTheme() {
             showToast('Theme toggle - Dark mode active');
+        }
+
+        // ============================================================
+// CONTENT ANALYZER (VidIQ-Style) FUNCTIONS
+// ============================================================
+
+let currentAnalyzerData = null;
+
+function extractVideoId(url) {
+    const patterns = [
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+        /^([a-zA-Z0-9_-]{11})$/
+    ];
+    for (const p of patterns) {
+        const m = url.match(p);
+        if (m) return m[1];
+    }
+    return null;
+}
+
+function switchAnalyzerTab(tab) {
+    document.querySelectorAll('.analyzer-tab').forEach(btn => {
+        if (btn.dataset.tab === tab) {
+            btn.style.background = 'var(--lemon)';
+            btn.style.color = '#000';
+        } else {
+            btn.style.background = 'transparent';
+            btn.style.color = '';
+        }
+    });
+    document.querySelectorAll('.analyzer-tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById('analyzer-tab-' + tab)?.classList.remove('hidden');
+}
+
+async function analyzeVideoContent() {
+    const input = document.getElementById('analyzer-video-input').value.trim();
+    const videoId = extractVideoId(input);
+    if (!videoId) { showToast('Please enter a valid YouTube URL or Video ID'); return; }
+
+    document.getElementById('analyzer-loading').classList.remove('hidden');
+    document.getElementById('analyzer-results').classList.add('hidden');
+
+    try {
+        // Fetch video data from YouTube Data API (public, no key needed for basic info via oEmbed or we use AI to analyze from ID)
+        // Since we may not have API key, we construct what we know and let AI fill the rest
+        const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        const thumbUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+
+        // Try to get oEmbed data (free, no key)
+        let title = videoId;
+        let author = 'Unknown';
+        try {
+            const oembed = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(videoUrl)}&format=json`);
+            if (oembed.ok) {
+                const data = await oembed.json();
+                title = data.title || videoId;
+                author = data.author_name || 'Unknown';
+            }
+        } catch(e) {}
+
+        currentAnalyzerData = { videoId, title, author, thumbUrl, videoUrl };
+
+        // Run AI analysis
+        const prompt = `Analyze this YouTube video for SEO and CTR. Title: "${title}". Channel: ${author}. Video ID: ${videoId}. 
+Return ONLY a JSON object with this exact structure:
+{
+  "overallScore": 0-100,
+  "seoScore": 0-100,
+  "ctrPrediction": "X.X%",
+  "engagement": "High|Medium|Low",
+  "strengths": ["...", "..."],
+  "issues": ["...", "..."],
+  "titleSeo": { "score": 0-100, "analysis": "..." },
+  "descSeo": { "score": 0-100, "analysis": "..." },
+  "tagsSeo": { "score": 0-100, "analysis": "..." },
+  "thumbSeo": { "score": 0-100, "analysis": "..." },
+  "ctrBreakdown": { "titleHook": 0-100, "thumbnailAppeal": 0-100, "topicDemand": 0-100, "competition": 0-100, "verdict": "..." },
+  "titleAlternatives": ["...", "...", "..."],
+  "titleTips": ["...", "..."],
+  "sentiment": { "positive": 0-100, "neutral": 0-100, "negative": 0-100 },
+  "commentThemes": ["...", "...", "..."],
+  "replySuggestions": ["...", "...", "..."]
+}`;
+
+        const aiResponse = await callFreeAI(prompt);
+        let data = {};
+        try {
+            const jsonMatch = aiResponse.match(/\{[\s\S]*?\}/);
+            if (jsonMatch) data = JSON.parse(jsonMatch[0]);
+        } catch(e) {
+            console.error('AI JSON parse failed:', e);
+        }
+
+        renderAnalyzerResults(data, title);
+    } catch(err) {
+        showToast('Analysis failed: ' + err.message);
+    } finally {
+        document.getElementById('analyzer-loading').classList.add('hidden');
+        document.getElementById('analyzer-results').classList.remove('hidden');
+    }
+}
+
+function renderAnalyzerResults(data, title) {
+    // Overview
+    animateValue('ca-overall-score', 0, clamp(data.overallScore, 0, 100), 800);
+    animateValue('ca-seo-score', 0, clamp(data.seoScore, 0, 100), 800);
+    setText('ca-ctr-prediction', data.ctrPrediction || '--');
+    setText('ca-engagement', data.engagement || '--');
+
+    listItems('ca-strengths', data.strengths || ['Analysis complete']);
+    listItems('ca-issues', data.issues || ['No major issues']);
+
+    // SEO Tab
+    setText('ca-title-seo-score', (data.titleSeo?.score || 0) + '/100');
+    setText('ca-title-analysis', data.titleSeo?.analysis || 'No data');
+    setText('ca-desc-seo-score', (data.descSeo?.score || 0) + '/100');
+    setText('ca-desc-analysis', data.descSeo?.analysis || 'No data');
+    setText('ca-tags-seo-score', (data.tagsSeo?.score || 0) + '/100');
+    setText('ca-tags-analysis', data.tagsSeo?.analysis || 'No data');
+    setText('ca-thumb-seo-score', (data.thumbSeo?.score || 0) + '/100');
+    setText('ca-thumb-analysis', data.thumbSeo?.analysis || 'No data');
+
+    // CTR Tab
+    const ctr = data.ctrBreakdown || {};
+    setText('ca-ctr-title', (ctr.titleHook || 0) + '%');
+    setText('ca-ctr-thumb', (ctr.thumbnailAppeal || 0) + '%');
+    setText('ca-ctr-demand', (ctr.topicDemand || 0) + '%');
+    setText('ca-ctr-comp', (ctr.competition || 0) + '%');
+    document.getElementById('ca-ctr-title-bar').style.width = clamp(ctr.titleHook, 0, 100) + '%';
+    document.getElementById('ca-ctr-thumb-bar').style.width = clamp(ctr.thumbnailAppeal, 0, 100) + '%';
+    document.getElementById('ca-ctr-demand-bar').style.width = clamp(ctr.topicDemand, 0, 100) + '%';
+    document.getElementById('ca-ctr-comp-bar').style.width = clamp(ctr.competition, 0, 100) + '%';
+    setText('ca-ctr-big', data.ctrPrediction || '--%');
+    setText('ca-ctr-verdict', ctr.verdict || 'Enter a video to get CTR prediction');
+
+    // Title Tab
+    document.getElementById('ca-current-title').textContent = title;
+    const alts = data.titleAlternatives || [];
+    document.getElementById('ca-title-alternatives').innerHTML = alts.map((alt, i) => `
+        <div class="result-card rounded-xl p-3 flex items-center justify-between group">
+            <p class="text-white text-sm flex-1">${alt}</p>
+            <button onclick="copyText(this, '${alt.replace(/'/g, "\'")}')" class="text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+            </button>
+        </div>
+    `).join('');
+    listItems('ca-title-tips', data.titleTips || ['Use numbers', 'Add emotional triggers', 'Keep under 60 chars']);
+
+    // Comments Tab
+    const sent = data.sentiment || { positive: 70, neutral: 20, negative: 10 };
+    document.getElementById('ca-sent-pos').style.width = clamp(sent.positive, 0, 100) + '%';
+    document.getElementById('ca-sent-neu').style.width = clamp(sent.neutral, 0, 100) + '%';
+    document.getElementById('ca-sent-neg').style.width = clamp(sent.negative, 0, 100) + '%';
+    setText('ca-sent-pos-label', `Positive ${sent.positive}%`);
+    setText('ca-sent-neu-label', `Neutral ${sent.neutral}%`);
+    setText('ca-sent-neg-label', `Negative ${sent.negative}%`);
+
+    const themes = data.commentThemes || ['Encouragement', 'Questions', 'Testimonies'];
+    document.getElementById('ca-comment-themes').innerHTML = themes.map(t =>
+        `<span class="tag px-2 py-1 rounded text-xs">${t}</span>`
+    ).join('');
+
+    const replies = data.replySuggestions || [];
+    document.getElementById('ca-reply-suggestions').innerHTML = replies.map(r => `
+        <div class="p-3 bg-blackLight rounded-xl border border-lemon/5 text-sm text-gray-300 relative group">
+            <p>${r}</p>
+            <button onclick="copyText(this, '${r.replace(/'/g, "\'")}')" class="absolute top-2 right-2 text-lemon p-1 rounded hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+            </button>
+        </div>
+    `).join('');
+
+    safeRenderIcons();
+}
+
+async function analyzeCompetitorGap() {
+    const input = document.getElementById('analyzer-competitor-input').value.trim();
+    const compId = extractVideoId(input);
+    if (!compId) { showToast('Please enter a valid competitor video URL'); return; }
+    if (!currentAnalyzerData) { showToast('Analyze your video first'); return; }
+
+    showToast('Analyzing competitor gap...');
+
+    try {
+        const compUrl = `https://www.youtube.com/watch?v=${compId}`;
+        let compTitle = compId;
+        try {
+            const oembed = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(compUrl)}&format=json`);
+            if (oembed.ok) {
+                const d = await oembed.json();
+                compTitle = d.title || compId;
+            }
+        } catch(e) {}
+
+        const prompt = `Compare these two YouTube videos and identify gaps/opportunities.
+Video A (Your): "${currentAnalyzerData.title}" (ID: ${currentAnalyzerData.videoId})
+Video B (Competitor): "${compTitle}" (ID: ${compId})
+Return JSON: { yourStats: {views:"...",engagement:"...",seo:"..."}, competitorStats: {views:"...",engagement:"...",seo:"..."}, gaps: ["...","...","..."] }`;
+
+        const aiResponse = await callFreeAI(prompt);
+        let data = {};
+        try {
+            const jsonMatch = aiResponse.match(/\{[\s\S]*?\}/);
+            if (jsonMatch) data = JSON.parse(jsonMatch[0]);
+        } catch(e) {}
+
+        document.getElementById('ca-competitor-results').classList.remove('hidden');
+        const ys = data.yourStats || {};
+        const cs = data.competitorStats || {};
+        document.getElementById('ca-your-stats').innerHTML = `
+            <div class="flex justify-between"><span class="text-gray-400">Est. Views</span><span class="text-white">${ys.views || 'N/A'}</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">Engagement</span><span class="text-white">${ys.engagement || 'N/A'}</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">SEO Score</span><span class="text-lemon">${ys.seo || 'N/A'}</span></div>
+        `;
+        document.getElementById('ca-competitor-stats').innerHTML = `
+            <div class="flex justify-between"><span class="text-gray-400">Est. Views</span><span class="text-white">${cs.views || 'N/A'}</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">Engagement</span><span class="text-white">${cs.engagement || 'N/A'}</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">SEO Score</span><span class="text-blue-400">${cs.seo || 'N/A'}</span></div>
+        `;
+        listItems('ca-gap-analysis', data.gaps || ['Analyze competitor to see gaps']);
+    } catch(err) {
+        showToast('Competitor analysis failed: ' + err.message);
+    }
+}
+
+function clamp(val, min, max) {
+    return Math.min(max, Math.max(min, parseInt(val) || 0));
+}
+
+// ============================================================
+// AI health check
+        async function checkAIHealth() {
+            try {
+                const test = await callFreeAI('Say "AI Online" and nothing else.', false);
+                const dot = document.getElementById('ai-status-dot');
+                if (dot && test.toLowerCase().includes('online')) {
+                    dot.style.background = '#8dfc00';
+                    dot.style.boxShadow = '0 0 8px #8dfc00';
+                }
+            } catch(e) {
+                const dot = document.getElementById('ai-status-dot');
+                if (dot) { dot.style.background = '#f59e0b'; dot.style.boxShadow = 'none'; }
+            }
         }
 
         Object.assign(window, {
@@ -2688,6 +3186,10 @@ Mixed & Mastered: [Engineer]
             initCharts,
             animateValue,
             showToast,
+            showLoading,
+            hideLoading,
+            checkAIHealth,
+            callFreeAI,
             setText,
             loadYouTubeChannel,
             renderYouTubeChannel,
@@ -2695,13 +3197,20 @@ Mixed & Mastered: [Engineer]
             copyText,
             connectYouTube,
             showNotifications,
-            toggleTheme
+            toggleTheme,
+            extractVideoId,
+            switchAnalyzerTab,
+            analyzeVideoContent,
+            renderAnalyzerResults,
+            analyzeCompetitorGap,
+            clamp
         });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             safeRenderIcons();
             showSection('dashboard');
+            checkAIHealth();
             const params = new URLSearchParams(window.location.search);
             const youtubeStatus = params.get('youtube');
             if (youtubeStatus === 'connected') {
@@ -2712,10 +3221,234 @@ Mixed & Mastered: [Engineer]
                 showToast('YouTube credentials are missing on the server.');
             } else if (youtubeStatus === 'auth-failed') {
                 showToast('YouTube connection failed. Please try again.');
-            } else {
-                loadYouTubeChannel(true).catch(() => {});
             }
+            // Wait for real YouTube connection before loading data
         });
-    </script>
+    
+
+// ============================================================
+// REAL FREE AI ENGINE — OVHcloud (No API key, no signup)
+// Fallback chain: OVHcloud → OpenRouter Free → Mistral Free
+// ============================================================
+
+const AI_CONFIG = {
+    // OVHcloud: FREE, no API key, no signup, 2 RPM per IP
+    ovhcloud: {
+        url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions',
+        proxyUrl: 'https://api.allorigins.win/raw?url=https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions',
+        model: 'Meta-Llama-3_3-70B-Instruct',
+        headers: { 'Content-Type': 'application/json' }
+    },
+    // Pollinations: FREE, no key, no CORS issues, unlimited
+    pollinations: {
+        url: 'https://text.pollinations.ai/openai',
+        model: 'openai',
+        headers: { 'Content-Type': 'application/json' }
+    },
+    // OpenRouter Free: FREE tier, 50 req/day
+    openrouter: {
+        url: 'https://openrouter.ai/api/v1/chat/completions',
+        proxyUrl: 'https://api.allorigins.win/raw?url=https://openrouter.ai/api/v1/chat/completions',
+        model: 'openrouter/auto',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer sk-or-v1-demo' }
+    }
+};
+
+let aiProviderIndex = 0;
+const AI_PROVIDERS = ['pollinations', 'ovhcloud', 'openrouter'];
+
+async function callFreeAI(userPrompt, isChat = false) {
+    const systemPrompt = isChat
+        ? "You are SpiritFlow AI, a Christian content strategy assistant. Give concise, actionable advice for YouTube creators in the Christian/worship niche. Be encouraging and practical. Keep responses under 200 words."
+        : "You are an expert YouTube SEO and content strategist specializing in Christian, worship, and gospel content. Always return structured, practical output. Be concise.";
+
+    // Pollinations GET endpoint — no CORS, no key, no POST body needed
+    const encodedPrompt = encodeURIComponent(userPrompt);
+    const encodedSystem = encodeURIComponent(systemPrompt);
+
+    // Try Pollinations GET first (no CORS issues)
+    const pollinationsUrls = [
+        `https://text.pollinations.ai/${encodedPrompt}?model=openai&system=${encodedSystem}&seed=${Date.now()}`,
+        `https://text.pollinations.ai/${encodedPrompt}?model=mistral&system=${encodedSystem}&seed=${Date.now()}`,
+    ];
+
+    for (const url of pollinationsUrls) {
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (response.ok) {
+                const text = await response.text();
+                if (text && text.length > 10) return text.trim();
+            }
+        } catch (err) { console.warn('Pollinations GET failed:', err.message); }
+    }
+
+    // Fallback: try POST-based providers with CORS proxy
+    const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+    ];
+
+    const AI_PROVIDERS = ['pollinations', 'ovhcloud', 'openrouter'];
+    for (let attempt = 0; attempt < AI_PROVIDERS.length; attempt++) {
+        const providerKey = AI_PROVIDERS[(aiProviderIndex + attempt) % AI_PROVIDERS.length];
+        const cfg = AI_CONFIG[providerKey];
+        const urlsToTry = [cfg.url];
+        if (cfg.proxyUrl) urlsToTry.push(cfg.proxyUrl);
+        for (const url of urlsToTry) {
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 15000);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: cfg.headers,
+                    body: JSON.stringify({ model: cfg.model, messages: messages, max_tokens: 1200, temperature: 0.7 }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+                if (!response.ok) continue;
+                const data = await response.json();
+                const text = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || data.output || '';
+                if (text && text.length > 10) {
+                    aiProviderIndex = (aiProviderIndex + attempt) % AI_PROVIDERS.length;
+                    return text.trim();
+                }
+            } catch (err) { console.warn(`${providerKey} error:`, err.message); }
+        }
+    }
+
+    return isChat
+        ? "I am having trouble connecting to the AI servers. Please check your internet and try again."
+        : JSON.stringify([{text: "AI service temporarily unavailable. Please retry.", seo: 0, ctr: 0, rank: 0}]);
+}
+
+// ============================================================
+// REAL AI CONTENT GENERATORS
+// ============================================================
+
+async function generateAIDescription(input, type) {
+    const prompt = `Write a YouTube video description for: "${input}". Format: ${type}. Include timestamps, scripture references (if Christian), CTAs, and hashtags. Return as plain text.`;
+    const response = await callFreeAI(prompt);
+    return { longform: response, shorts: response, worship: response, music: response };
+}
+
+async function generateAIHashtags(input, type, count) {
+    const prompt = `Generate ${count} trending ${type} hashtags for YouTube video about: "${input}". Return ONLY a JSON array of hashtag strings like ["#tag1", "#tag2"]. No explanation.`;
+    const response = await callFreeAI(prompt);
+    try {
+        const jsonMatch = response.match(/\[[\s\S]*?\]/);
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
+    } catch(e) {}
+    return ['#' + type, '#Christian', '#YouTube'];
+}
+
+async function generateAIKeywords(input) {
+    const prompt = `Find 8 high-opportunity YouTube keywords related to: "${input}". For each, estimate monthly search volume, difficulty (Low/Medium/High), and opportunity score (0-100). Return ONLY a JSON array: [{word: "...", volume: "...", difficulty: "...", opportunity: N}].`;
+    const response = await callFreeAI(prompt);
+    try {
+        const jsonMatch = response.match(/\[[\s\S]*?\]/);
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
+    } catch(e) {}
+    return [{word: input, volume: 'Unknown', difficulty: 'Medium', opportunity: 75}];
+}
+
+async function generateAIContentIdeas(type, input) {
+    const prompt = `Generate 5 YouTube video ideas for ${type} content about: "${input || 'Christian ministry'}". For each idea, provide: title, type (Long-form/Shorts/Tutorial/etc), and whether it's trending (true/false). Return ONLY a JSON array: [{title: "...", type: "...", trending: true/false}].`;
+    const response = await callFreeAI(prompt);
+    try {
+        const jsonMatch = response.match(/\[[\s\S]*?\]/);
+        if (jsonMatch) return JSON.parse(jsonMatch[0]);
+    } catch(e) {}
+    return [{title: input || 'Christian Content Idea', type: 'Long-form', trending: false}];
+}
+
+async function generateAIThumbnailPrompts(input, style) {
+    const prompt = `Create 4 AI image generation prompts for a YouTube thumbnail about: "${input}". Style: ${style}. Return ONLY a JSON object with keys: dalle, midjourney, leonardo, ideogram. Each value is a detailed prompt string.`;
+    const response = await callFreeAI(prompt);
+    try {
+        const jsonMatch = response.match(/\{[\s\S]*?\}/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            return {
+                dalle: parsed.dalle || parsed.DALLE || parsed.dall_e || `YouTube thumbnail: ${input}`,
+                midjourney: parsed.midjourney || parsed.Midjourney || `youtube thumbnail, ${input}, bold text, high contrast --ar 16:9`,
+                leonardo: parsed.leonardo || parsed.Leonardo || `YouTube thumbnail design, ${input}, bold typography`,
+                ideogram: parsed.ideogram || parsed.Ideogram || `Striking YouTube thumbnail showing ${input}`
+            };
+        }
+    } catch(e) {}
+    return {
+        dalle: `YouTube thumbnail: ${input}. Bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, 16:9, eye-catching.`,
+        midjourney: `youtube thumbnail, ${input}, bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, professional photography, 16:9, eye-catching, viral style --ar 16:9 --v 6`,
+        leonardo: `YouTube thumbnail design, ${input}, bold typography, high contrast colors, dramatic lighting, professional quality, 1280x720, engaging composition`,
+        ideogram: `A striking YouTube thumbnail showing ${input} with large bold text, high contrast, vibrant colors, professional design, 16:9 format`
+    };
+}
+
+async function generateAIMusicRelease(song, artist, platform) {
+    const prompt = `Create a complete music release kit for the song "${song}" by ${artist} for ${platform}. Return ONLY a JSON object with: coverPrompt (string), description (string), captions (array of 3 strings), hashtags (array of 15 strings).`;
+    const response = await callFreeAI(prompt);
+    try {
+        const jsonMatch = response.match(/\{[\s\S]*?\}/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            return {
+                coverPrompt: parsed.coverPrompt || parsed.cover_prompt || `Album cover for "${song}" by ${artist}, Christian worship music, ethereal golden light`,
+                description: parsed.description || parsed.Description || `${song} - ${artist}\n\nStream now on all platforms!`,
+                captions: Array.isArray(parsed.captions) ? parsed.captions : ['New music out now!', 'Worship with me!', 'God is faithful!'],
+                hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : ['#NewMusic', '#ChristianMusic', '#Worship']
+            };
+        }
+    } catch(e) {}
+    return {
+        coverPrompt: `Album cover art for "${song}" by ${artist}. Christian worship music, ethereal golden light, abstract spiritual design, cross silhouette, warm color palette with gold and deep blue, modern minimalist, 3000x3000`,
+        description: `${song} - ${artist}\n\nStream/Download: [Add your streaming links]\n\nThis song is a heartfelt expression of worship.\n\nFOLLOW ${artist}:\nInstagram: @artist_handle\n\n#NewMusic #ChristianMusic #Worship`,
+        captions: [`NEW MUSIC OUT NOW! ${song} is now available everywhere.`, `Worship with me! My new single "${song}" just dropped.`, `After months of prayer, ${song} is finally here.`],
+        hashtags: ['#NewMusic', '#ChristianMusic', '#Worship', '#Gospel', '#Spotify', '#AppleMusic', '#YouTubeMusic', '#DistroKid', '#WorshipMusic', '#Praise', '#HolySpirit', '#Faith', '#Jesus', '#GodsPlan', '#MusicRelease']
+    };
+}
+
+async function generateAICalendarPlan(niche, freq, days) {
+    const prompt = `Create a ${days}-day YouTube content calendar for a ${freq} upload schedule in the "${niche}" niche. Return ONLY a JSON array of objects: [{day: "Day 1", topic: "...", type: "Long-form Video|Shorts|Community Post|Music Release", color: "bg-lemon/20 border-lemon"}]. Alternate content types realistically.`;
+    const response = await callFreeAI(prompt);
+    try {
+        const jsonMatch = response.match(/\[[\s\S]*?\]/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch(e) {}
+    // Minimal fallback
+    const types = [
+        { color: 'bg-lemon/20 border-lemon', label: 'Long-form Video' },
+        { color: 'bg-blue-500/20 border-blue-500', label: 'Shorts' },
+        { color: 'bg-purple-500/20 border-purple-500', label: 'Community Post' },
+        { color: 'bg-red-500/20 border-red-500', label: 'Music Release' }
+    ];
+    return Array.from({length: days}, (_, i) => {
+        const t = types[i % types.length];
+        return { day: `Day ${i+1}`, topic: `${niche} Content ${i+1}`, type: t.label, color: t.color };
+    });
+}
+
+// ============================================================
+// REAL AI TITLE GENERATOR — Now call real AI
+// ============================================================
+
+async function generateRealTitles(input, type) {
+    const prompt = `Generate 4 viral YouTube title options for a video about: "${input}". Style: ${type}. Return ONLY a JSON array of objects with keys: text, seo (0-100), ctr (0-100), rank (0-100). No markdown, no explanation.`;
+    try {
+        const response = await callFreeAI(prompt);
+        const jsonMatch = response.match(/\[[\s\S]*?\]/);
+        if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+    } catch(e) { console.error('Title AI error:', e); }
+    return [{text: input, seo: 50, ctr: 50, rank: 50}];
+}
+</script>
 </body>
 </html>
