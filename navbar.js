@@ -19,6 +19,7 @@ function renderNavbar() {
         pathname.endsWith("/index.html") ||
         pathname === "/" ||
         pathname.endsWith("/omnicast-ai") ||
+        pathname.endsWith("/omnicast-ai.html") ||
         pathname.endsWith("/ai-church-broadcast");
 
     const logoLink = isStudioPage || isChurchStudioPage || isLyricsPage ? "index.html" : isHomePage ? "home.html#studio" : "index.html";
@@ -39,6 +40,7 @@ function renderNavbar() {
                 <a href="spiritflow_creator_studio.html">Creator Studio</a>
                 <a href="omnicast_lyrics.html">Lyrics</a>
                 <a href="studio.html">Main Studio</a>
+                <a href="spiritflow-sounds-radio.html">SpiritFlow Radio</a>
                 <a href="#about">About</a>
             </div>
         </div>

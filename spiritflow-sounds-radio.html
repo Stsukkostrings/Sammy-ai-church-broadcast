@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpiritFlow Sounds Radio | Afro-Gospel, Worship &amp; Inspiration 24/7</title>
+<meta name="description" content="Listen to SpiritFlow Sounds Radio — 24/7 Afro-Gospel, worship, African Christian music and inspirational sounds. Where Faith Meets Sound.">
+<link rel="icon" type="image/jpeg" href="channels4_profile.jpg">
+<link rel="apple-touch-icon" href="channels4_profile.jpg">
+<!-- Canonical + social metadata.
+     SITE_URL below is the verified production origin. When an authorised
+     custom domain is added in Vercel, update it here and in sitemap.xml. -->
+<link rel="canonical" href="https://omnicast-ai.vercel.app/spiritflow-sounds-radio">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SpiritFlow Sounds">
+<meta property="og:title" content="SpiritFlow Sounds Radio | Afro-Gospel, Worship &amp; Inspiration 24/7">
+<meta property="og:description" content="Listen to SpiritFlow Sounds Radio - 24/7 Afro-Gospel, worship, African Christian music and inspirational sounds. Where Faith Meets Sound.">
+<meta property="og:url" content="https://omnicast-ai.vercel.app/spiritflow-sounds-radio">
+<meta property="og:image" content="https://omnicast-ai.vercel.app/channels4_banner.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SpiritFlow Sounds Radio | Where Faith Meets Sound">
+<meta name="twitter:description" content="24/7 Afro-Gospel, worship and inspirational radio. Where Faith Meets Sound.">
+<meta name="twitter:image" content="https://omnicast-ai.vercel.app/channels4_banner.jpg">
+<!--
+  ============================================================
+  SPIRITFLOW SOUNDS RADIO — standalone, isolated module
+  ------------------------------------------------------------
+  Shared files used by this page AND the homepage (index.html):
+    spiritflow-radio.css  -> scoped .sfr- styles
+    spiritflow-player.js  -> SPIRITFLOW_CONFIG, stream service, UI wiring
+
+  ENVIRONMENT-STYLE CONFIGURATION (set in SPIRITFLOW_CONFIG inside
+  spiritflow-player.js, or map these to your framework's env vars):
+
+  PUBLIC (safe for client):
+    SPIRITFLOW_STREAM_URL          -> config.streamUrl
+    SPIRITFLOW_YOUTUBE_LIVE_URL    -> config.youtubeLiveUrl
+    SPIRITFLOW_YOUTUBE_CHANNEL_URL -> config.youtubeChannelUrl
+
+  SERVER-SIDE ONLY (never expose to client):
+    SPIRITFLOW_AZURACAST_API_URL    -> proxy through an API route, see radioService
+    SPIRITFLOW_AZURACAST_STATION_ID -> proxy through an API route
+    SPIRITFLOW_AZURACAST_API_KEY    -> server-side only, never in this file
+
+  Brand assets (local files next to this page):
+    channels4_banner.jpg  — station banner
+    channels4_profile.jpg — page icon / logo / default artwork
+
+  This file contains NO mock radio data. When the stream / API are
+  not configured, the UI reports CONNECTING / OFFLINE / "being
+  configured" — it never pretends to be live.
+  ============================================================
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="spiritflow-radio.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SPIRITFLOW SOUNDS RADIO — isolated section
+     Anchor: #spiritflow-radio
+     ============================================================ -->
+<div class="sfr" id="spiritflow-radio">
+
+  <!-- Nav -->
+  <nav class="sfr-nav" aria-label="SpiritFlow Radio">
+    <div class="sfr-wrap">
+      <a class="sfr-brand" href="index.html">
+        <span class="sfr-brand-mark" aria-hidden="true">
+          <img src="channels4_profile.jpg" alt="">
+        </span>
+        SpiritFlow
+      </a>
+      <div class="sfr-nav-links">
+        <a href="index.html">Home</a>
+        <a href="#spiritflow-listen">Listen</a>
+        <a href="#spiritflow-schedule">Schedule</a>
+        <a href="#spiritflow-youtube">Watch</a>
+        <a href="#spiritflow-submit">Submit Music</a>
+        <a href="omnicast-ai.html">Omnicast AI</a>
+      </div>
+      <span class="sfr-status" data-state="offline" id="sfrStatusTop">
+        <span class="sfr-dot" aria-hidden="true"></span><span class="sfr-status-text">Offline</span>
+      </span>
+    </div>
+  </nav>
+
+  <!-- Station banner (brand asset) -->
+  <figure class="sfr-banner">
+    <img src="channels4_banner.jpg" alt="SpiritFlow Sounds — Afro-Gospel, Worship, Inspirational Music" fetchpriority="high">
+  </figure>
+
+  <!-- ============ A. HERO / STATION IDENTITY ============ -->
+  <header class="sfr-hero">
+    <div class="sfr-wrap sfr-hero-grid">
+      <div>
+        <span class="sfr-eyebrow">SpiritFlow Sounds Radio</span>
+        <h1>Where <span class="sfr-gold-i">Faith</span><br>Meets <span class="sfr-gold-i">Sound</span></h1>
+        <p class="sfr-tagline">Afro-Gospel &bull; Worship &bull; Inspiration</p>
+        <p class="sfr-genres"><b>24/7</b>&nbsp; Digital Radio &nbsp;&mdash;&nbsp; Made in Africa, heard worldwide</p>
+        <div class="sfr-hero-cta">
+          <button class="sfr-btn sfr-btn-gold" id="sfrListenHero" aria-label="Listen live to SpiritFlow Sounds Radio">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+            Listen Live
+          </button>
+          <a class="sfr-btn sfr-btn-ghost" href="#spiritflow-schedule">View Schedule</a>
+          <span class="sfr-247">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            24/7
+          </span>
+        </div>
+      </div>
+
+      <div class="sfr-hero-visual" aria-hidden="true">
+        <div class="sfr-orbit"></div>
+        <img class="sfr-logo-round" src="channels4_profile.jpg" alt="">
+        <svg class="sfr-wave" style="bottom:16%" viewBox="0 0 400 40">
+          <path d="M0 20 Q 25 4 50 20 T 100 20 T 150 20 T 200 20 T 250 20 T 300 20 T 350 20 T 400 20"/>
+          <path d="M0 28 Q 25 14 50 28 T 100 28 T 150 28 T 200 28 T 250 28 T 300 28 T 350 28 T 400 28" opacity=".6"/>
+        </svg>
+        <div class="sfr-eq" id="sfrEq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+  <!-- ============ B+C+D. LIVE PLAYER / NOW PLAYING / RECENTLY PLAYED ============ -->
+  <section class="sfr-section sfr-live" id="spiritflow-listen" aria-label="Live player and now playing">
+    <div class="sfr-wrap">
+      <span class="sfr-eyebrow">On Air</span>
+      <h2 class="sfr-h2">Listen Live</h2>
+      <p class="sfr-sub">One stream. Every hour. Afro-Gospel, worship and inspirational sound flowing day and night.</p>
+
+      <div class="sfr-live-grid" style="margin-top:2.6rem">
+        <!-- LEFT: station identity / artwork -->
+        <div class="sfr-panel">
+          <div class="sfr-art">
+            <img class="sfr-art-logo" src="channels4_profile.jpg" alt="">
+            <span class="sfr-art-badge" id="sfrArtBadge">SpiritFlow Sounds Radio</span>
+          </div>
+          <div>
+            <p class="sfr-panel-label">Now Playing</p>
+            <p class="sfr-track-title" id="sfrTrackTitle">SpiritFlow Sounds Radio</p>
+            <p class="sfr-track-artist" id="sfrTrackArtist">Where Faith Meets Sound</p>
+          </div>
+          <div class="sfr-controls">
+            <button class="sfr-play" id="sfrPlayBtn" aria-label="Play live stream" aria-pressed="false">
+              <svg id="sfrPlayIcon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+            </button>
+            <div class="sfr-vol">
+              <button id="sfrMuteBtn" aria-label="Mute" aria-pressed="false">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor" stroke="none"/><path class="sfr-vol-waves" d="M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12"/></svg>
+              </button>
+              <input type="range" id="sfrVol" min="0" max="1" step="0.01" value="0.9" aria-label="Volume">
+            </div>
+          </div>
+          <div class="sfr-livebar" id="sfrLivebar">
+            <span class="sfr-status" data-state="offline" id="sfrStatusPlayer"><span class="sfr-dot" aria-hidden="true"></span><span class="sfr-status-text">Offline</span></span>
+            <span class="sfr-track" aria-hidden="true"><i></i></span>
+            <span>Live</span>
+          </div>
+          <p class="sfr-config-note" id="sfrConfigNote" hidden>Radio connection is being configured. The live stream and now-playing data will appear here once the AzuraCast stream URL is connected.</p>
+        </div>
+
+        <!-- RIGHT: recently played -->
+        <div class="sfr-panel">
+          <p class="sfr-panel-label">Recently Played</p>
+          <div class="sfr-recent" id="sfrRecent" aria-live="polite">
+            <p class="sfr-recent-empty">Recently played tracks will appear here once the station is connected.</p>
+          </div>
+          <p class="sfr-config-note" id="sfrRecentNote" hidden>Track history is provided by AzuraCast and will populate automatically once the API is connected.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ E. TODAY ON SPIRITFLOW (configurable programming) ============ -->
+  <section class="sfr-section sfr-programs" aria-label="Today's programs">
+    <div class="sfr-wrap">
+      <span class="sfr-eyebrow">Programming</span>
+      <h2 class="sfr-h2">Today on SpiritFlow</h2>
+      <p class="sfr-sub">A day shaped around rhythm, prayer and praise — from the first morning chords to late-night worship.</p>
+      <div class="sfr-prog-grid" id="sfrPrograms"><!-- populated from SPIRITFLOW_CONFIG.programs --></div>
+      <span class="sfr-config-flag">Sample configuration &mdash; connect to AzuraCast scheduling to go live</span>
+    </div>
+  </section>
+
+  <!-- ============ F. RADIO SCHEDULE ============ -->
+  <section class="sfr-section" id="spiritflow-schedule" aria-label="Radio schedule">
+    <div class="sfr-wrap">
+      <span class="sfr-eyebrow">Schedule</span>
+      <h2 class="sfr-h2">Daily Schedule</h2>
+      <p class="sfr-sub">Every hour has a sound. Tune in to the moment that carries you.</p>
+      <div class="sfr-sched-list" id="sfrSchedule"><!-- populated from SPIRITFLOW_CONFIG.schedule --></div>
+      <span class="sfr-config-flag" style="margin-top:1.4rem">Editable configuration &mdash; syncs with AzuraCast when connected</span>
+    </div>
+  </section>
+
+  <!-- ============ I. YOUTUBE LIVE ============ -->
+  <section class="sfr-section sfr-yt" id="spiritflow-youtube" aria-label="YouTube live">
+    <div class="sfr-wrap">
+      <span class="sfr-eyebrow">Watch</span>
+      <h2 class="sfr-h2">Watch Live on YouTube</h2>
+      <p class="sfr-sub" style="margin-inline:auto">SpiritFlow Sounds Radio &mdash; 24/7. Join the visual worship experience, services and live sessions.</p>
+      <div style="margin-top:2rem">
+        <a class="sfr-btn sfr-btn-gold" id="sfrYtBtn" href="#" target="_blank" rel="noopener" aria-disabled="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23 12s0-3.9-.5-5.6c-.3-1-1.1-1.8-2.1-2C18.6 4 12 4 12 4s-6.6 0-8.4.4c-1 .3-1.8 1-2.1 2C1 8.1 1 12 1 12s0 3.9.5 5.6c.3 1 1.1 1.8 2.1 2 1.8.4 8.4.4 8.4.4s6.6 0 8.4-.4c-1 0 1.8-1 2.1-2 .5-1.7.5-5.6.5-5.6ZM9.8 15.6V8.4L15.9 12l-6.1 3.6Z"/></svg>
+          Watch Live
+        </a>
+      </div>
+      <div class="sfr-yt-frame" id="sfrYtFrame">
+        <div class="sfr-yt-soon">
+          <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="4"/><path d="m10 9.5 5 2.5-5 2.5v-5Z" fill="currentColor" stroke="none"/></svg>
+          <p><strong style="color:var(--sfr-cream)">YouTube Live coming soon.</strong><br>The livestream embed will appear here once the channel URL is configured.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ J. SUBMIT YOUR MUSIC ============ -->
+  <section class="sfr-section sfr-submit" id="spiritflow-submit" aria-label="Submit your music">
+    <div class="sfr-wrap">
+      <div class="sfr-submit-card">
+        <span class="sfr-eyebrow">Artists</span>
+        <h2 class="sfr-h2">Get Your Music on SpiritFlow Radio</h2>
+        <p class="sfr-sub" style="margin:0 auto 2rem">Are you an African gospel artist? Submit your music for consideration on SpiritFlow Sounds Radio and let your sound travel further.</p>
+        <a class="sfr-btn sfr-btn-gold" id="sfrSubmitBtn" href="contact.html">Submit Your Music</a>
+        <div class="sfr-socials" id="sfrSocials"><!-- populated from SPIRITFLOW_CONFIG.socialLinks --></div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <footer class="sfr-footer">
+    SpiritFlow Sounds Radio &nbsp;&mdash;&nbsp; Where Faith Meets Sound &nbsp;&mdash;&nbsp; 24/7
+    <nav aria-label="Site links" style="margin-top:.9rem;display:flex;gap:1.4rem;justify-content:center;flex-wrap:wrap;letter-spacing:.14em">
+      <a href="index.html" style="color:var(--sfr-gold-soft)">Home</a>
+      <a href="omnicast-ai.html" style="color:var(--sfr-gold-soft)">Omnicast AI</a>
+      <a href="contact.html" style="color:var(--sfr-gold-soft)">Contact</a>
+    </nav>
+  </footer>
+
+  <audio id="sfrAudio" preload="none" crossorigin="anonymous"></audio>
+</div>
+
+<script src="spiritflow-player.js"></script>
+</body>
+</html>

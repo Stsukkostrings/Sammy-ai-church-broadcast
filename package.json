@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node -e \"const fs=require('fs'); for (const file of ['api/youtube-auth.js','api/youtube-callback.js','api/youtube-channel.js','api/_youtubeCore.js']) { if(!fs.existsSync(file)) throw new Error(file+' missing'); } const html=fs.readFileSync('spiritflow_creator_studio.html','utf8'); [...html.matchAll(/<script(?: [^>]*)?>([\\s\\S]*?)<\\/script>/g)].forEach((m,i)=>{ if(m[1].trim()) new Function(m[1]); }); console.log('Smoke checks passed');\""
+    "test": "node -e \"const fs=require('fs'); for (const file of ['api/youtube-auth.js','api/youtube-callback.js','api/youtube-channel.js','api/_youtubeCore.js']) { if(!fs.existsSync(file)) throw new Error(file+' missing'); } const html=fs.readFileSync('spiritflow_creator_studio.html','utf8'); [...html.matchAll(/<script(?: [^>]*)?>([\\s\\S]*?)<\\/script>/g)].forEach((m,i)=>{ if(m[1].trim()) new Function(m[1]); }); console.log('Smoke checks passed');\"",
+    "check": "node check-pages.js",
+    "test:all": "npm test && npm run check"
   },
   "keywords": [
     "ai",

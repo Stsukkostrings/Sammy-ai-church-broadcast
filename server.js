@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { authHandler, callbackHandler, channelHandler } = require('./api/_youtubeCore');
+const { spiritFlowConfigHandler, spiritFlowNowPlayingHandler } = require('./api/_spiritFlowCore');
 const PORT = process.env.PORT || 8081;
 
 const MIME_TYPES = {
@@ -31,6 +32,12 @@ const server = http.createServer(async (req, res) => {
         }
         if (req.url.startsWith('/api/youtube-channel')) {
             return sendServerlessResult(res, await channelHandler(req));
+        }
+        if (req.url.startsWith('/api/spiritflow-config')) {
+            return sendServerlessResult(res, spiritFlowConfigHandler());
+        }
+        if (req.url.startsWith('/api/spiritflow/nowplaying')) {
+            return sendServerlessResult(res, await spiritFlowNowPlayingHandler());
         }
     } catch (error) {
         res.writeHead(500, { 'Content-Type': 'application/json' });

@@ -1,0 +1,314 @@
+<!--
+ OmniCast AI
+ (c) 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omnicast AI | Creator Studio &amp; Broadcast Tools</title>
+    <meta name="description" content="Omnicast AI is the creator platform inside SpiritFlow Sounds: church studio, main studio, creator tools, lyrics detection, lower thirds and publishing workflows.">
+    <!-- Canonical uses the verified production origin. Update it when an
+         authorised custom domain is connected in Vercel. -->
+    <link rel="canonical" href="https://omnicast-ai.vercel.app/omnicast-ai">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Omnicast AI">
+    <meta property="og:title" content="Omnicast AI | Creator Studio &amp; Broadcast Tools">
+    <meta property="og:description" content="Every Omnicast AI tool in one place: live capture, broadcast tools, creator studio, lyrics and publishing.">
+    <meta property="og:url" content="https://omnicast-ai.vercel.app/omnicast-ai">
+    <meta property="og:image" content="https://omnicast-ai.vercel.app/channels4_banner.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Omnicast AI | Creator Studio &amp; Broadcast Tools">
+    <meta name="twitter:description" content="Every Omnicast AI tool in one place: live capture, broadcast tools, creator studio, lyrics and publishing.">
+    <link rel="icon" type="image/jpeg" href="channels4_profile.jpg">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8dfc00">
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .hub-hero {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: clamp(2.5rem, 6vw, 4.5rem) 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .hub-hero .eyebrow {
+            color: var(--accent, #8dfc00);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+        }
+
+        .hub-hero h1 {
+            font-size: clamp(1.7rem, 4vw, 2.7rem);
+            font-weight: 800;
+            color: var(--accent-strong, #c8ff65);
+            margin: 0.6rem 0 0.8rem;
+            line-height: 1.15;
+        }
+
+        .hub-hero p {
+            color: var(--muted, #bdd79f);
+            font-size: 0.9rem;
+            line-height: 1.65;
+            max-width: 62ch;
+            margin: 0 auto;
+        }
+
+        .hub-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin-top: 1.4rem;
+        }
+
+        .hub-actions .button-primary,
+        .hub-actions .button-secondary {
+            font-family: inherit;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.65rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hub-actions .button-primary {
+            background: var(--accent, #8dfc00);
+            color: #000;
+        }
+
+        .hub-actions .button-secondary {
+            background: transparent;
+            color: var(--accent, #8dfc00);
+            border: 1px solid var(--line, rgba(191, 255, 89, 0.18));
+        }
+
+        .hub-actions .button-primary:hover {
+            background: var(--accent-strong, #c8ff65);
+        }
+
+        .hub-actions .button-secondary:hover {
+            background: var(--accent, #8dfc00);
+            color: #000;
+        }
+
+        .hub-actions .return-link {
+            background: linear-gradient(135deg, #d4af37, #a8821f);
+            color: #171307;
+        }
+
+        .hub-actions .return-link:hover {
+            background: linear-gradient(135deg, #e8cf8a, #d4af37);
+            color: #171307;
+        }
+
+        .hub-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem 1.5rem 3rem;
+        }
+
+        .hub-group {
+            margin-top: 2rem;
+        }
+
+        .hub-group-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+            color: var(--accent, #8dfc00);
+        }
+
+        .hub-group-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--line, rgba(191, 255, 89, 0.18)), transparent);
+        }
+
+        .hub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+
+        .hub-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+            background: rgba(33, 21, 17, 0.7);
+            border: 1px solid var(--line, rgba(191, 255, 89, 0.18));
+            border-radius: 14px;
+            padding: 1.2rem 1.25rem;
+            text-decoration: none;
+            color: var(--text, #f3ffe2);
+            transition: transform 0.22s ease, border-color 0.22s ease;
+        }
+
+        .hub-card:hover,
+        .hub-card:focus-visible {
+            transform: translateY(-4px);
+            border-color: rgba(141, 252, 0, 0.5);
+            outline: none;
+        }
+
+        .hub-card h3 {
+            font-size: 0.98rem;
+            color: var(--accent-strong, #c8ff65);
+        }
+
+        .hub-card p {
+            font-size: 0.78rem;
+            color: var(--muted, #bdd79f);
+            line-height: 1.55;
+            flex: 1;
+        }
+
+        .hub-card .hub-open {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent, #8dfc00);
+        }
+
+        .hub-about {
+            border-top: 1px solid var(--line, rgba(191, 255, 89, 0.18));
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+        }
+
+        .hub-about h2 {
+            font-size: 1.15rem;
+            color: var(--accent-strong, #c8ff65);
+            margin-bottom: 0.6rem;
+        }
+
+        .hub-about p {
+            color: var(--muted, #bdd79f);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            max-width: 70ch;
+            margin-bottom: 0.6rem;
+        }
+    </style>
+</head>
+<body class="index-body">
+    <div class="page-shell">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <header id="navbar"></header>
+
+        <main>
+            <section class="hub-hero">
+                <p class="eyebrow">Omnicast AI</p>
+                <h1>The creator platform inside SpiritFlow Sounds</h1>
+                <p>Every working Omnicast AI tool in one place: capture live speech, build broadcast overlays, prepare worship lyrics, create channel content and publish — no login required to start.</p>
+                <div class="hub-actions">
+                    <a class="button-primary" href="church_studio.html">Launch Church Studio</a>
+                    <a class="button-secondary" href="studio.html">Open Main Studio</a>
+                    <a class="button-secondary" href="spiritflow_creator_studio.html">Open Creator Studio</a>
+                    <a class="button-primary return-link" href="spiritflow-sounds-radio.html">&#8592; Back to SpiritFlow Radio</a>
+                </div>
+            </section>
+
+            <section class="hub-section" aria-label="Omnicast AI tools">
+                <div class="hub-group">
+                    <h2 class="hub-group-title">Broadcast &amp; Capture</h2>
+                    <div class="hub-grid">
+                        <a class="hub-card" href="church_studio.html">
+                            <h3>Church Studio</h3>
+                            <p>Live speech capture, editable notes, scripture references, overlays and recordings for services.</p>
+                            <span class="hub-open">Open tool &rarr;</span>
+                        </a>
+                        <a class="hub-card" href="studio.html">
+                            <h3>Main Studio</h3>
+                            <p>The full workspace: notes, OBS browser source, session archive, captions and sharing.</p>
+                            <span class="hub-open">Open tool &rarr;</span>
+                        </a>
+                        <a class="hub-card" href="lower-third.html">
+                            <h3>Scripture Lower Third</h3>
+                            <p>Scripture graphics for OBS as a browser source during services and broadcasts.</p>
+                            <span class="hub-open">Open tool &rarr;</span>
+                        </a>
+                        <a class="hub-card" href="home.html">
+                            <h3>Web Studio</h3>
+                            <p>Browser workspace with live capture, planner, session archive and publishing helpers.</p>
+                            <span class="hub-open">Open tool &rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hub-group">
+                    <h2 class="hub-group-title">Creation &amp; Publishing</h2>
+                    <div class="hub-grid">
+                        <a class="hub-card" href="spiritflow_creator_studio.html">
+                            <h3>Creator Studio</h3>
+                            <p>YouTube title, thumbnail and channel tools for Christian and worship content.</p>
+                            <span class="hub-open">Open tool &rarr;</span>
+                        </a>
+                        <a class="hub-card" href="omnicast_lyrics.html">
+                            <h3>Omnicast Lyrics</h3>
+                            <p>Worship lyrics detection and preparation for live services and lyric videos.</p>
+                            <span class="hub-open">Open tool &rarr;</span>
+                        </a>
+                        <a class="hub-card" href="contact.html">
+                            <h3>Support &amp; Onboarding</h3>
+                            <p>Questions, custom deployment and workflow help from the team behind the platform.</p>
+                            <span class="hub-open">Contact us &rarr;</span>
+                        </a>
+                        <a class="hub-card" href="about.html">
+                            <h3>About the Product</h3>
+                            <p>What Omnicast AI does, who it is built for and how teams use it.</p>
+                            <span class="hub-open">Read more &rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hub-about" id="about">
+                    <h2>Part of SpiritFlow Sounds</h2>
+                    <p>Omnicast AI is the creator product; SpiritFlow Sounds is its public home for gospel music and radio listening. You can move between the two at any time — the radio page keeps playing while the studio tools stay one click away.</p>
+                    <p>All tools above open the existing implementation in this application. No features are simulated or replaced on this page.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="site-footer">
+            <div class="footer-panel">
+                <div class="footer-copy">
+                    <p>&copy; 2026 OmniCast AI. All rights reserved.</p>
+                    <p>Developed by Sammy G Concept.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">SpiritFlow Sounds</a>
+                    <a href="spiritflow-sounds-radio.html">SpiritFlow Radio</a>
+                    <a href="privacy.html">Privacy</a>
+                    <a href="terms.html">Terms</a>
+                    <a href="about.html">About</a>
+                    <a href="contact.html">Contact Us</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="navbar.js"></script>
+</body>
+</html>
