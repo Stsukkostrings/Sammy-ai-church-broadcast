@@ -17,6 +17,8 @@
   --sfr-charcoal-2:#1b1813;
   --sfr-charcoal-3:#241f18;
   --sfr-line:rgba(212,175,55,.22);
+  --sfr-hover:#8dfc00;
+  --sfr-hover-strong:#c8ff65;
   --sfr-live:#3ddc84;
   --sfr-off:#e0604f;
 }
@@ -30,7 +32,8 @@
 .sfr *,.sfr *::before,.sfr *::after{box-sizing:border-box;margin:0;padding:0}
 .sfr img{max-width:100%;display:block}
 .sfr a{color:inherit;text-decoration:none}
-.sfr button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.sfr a.sfr-btn-gold{color:var(--btn-text,#171307)}
+.sfr button:not(.sfr-btn){font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .sfr :focus-visible{outline:2px solid var(--sfr-gold);outline-offset:3px;border-radius:4px}
 
 /* ---------- shared layout ---------- */
@@ -84,13 +87,25 @@
   background:linear-gradient(135deg,var(--sfr-gold) 0%,var(--sfr-gold-deep) 100%);
   color:#171307;box-shadow:0 8px 28px rgba(212,175,55,.28);
 }
-.sfr-btn-gold:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(212,175,55,.4)}
+.sfr-btn-gold:hover{
+  transform:translateY(-2px);
+  background:linear-gradient(135deg,var(--sfr-hover) 0%,var(--sfr-hover-strong) 100%);
+  color:var(--btn-text,#171307);
+  box-shadow:0 14px 34px rgba(141,252,0,.32);
+}
 .sfr-btn-ghost{
   border:1px solid var(--sfr-line);color:var(--sfr-cream);
   background:rgba(247,241,227,.03);
 }
 .sfr-btn-ghost:hover{border-color:var(--sfr-gold);color:var(--sfr-gold-soft);transform:translateY(-2px)}
 .sfr-btn[disabled]{opacity:.45;cursor:not-allowed;transform:none!important;box-shadow:none}
+.sfr-btn-gold[disabled]:hover,
+.sfr-btn-gold[aria-disabled="true"]:hover{
+  background:linear-gradient(135deg,var(--sfr-gold) 0%,var(--sfr-gold-deep) 100%);
+  color:var(--btn-text,#171307);
+  box-shadow:0 8px 28px rgba(212,175,55,.28);
+  transform:none;
+}
 
 /* ---------- nav ---------- */
 .sfr-nav{

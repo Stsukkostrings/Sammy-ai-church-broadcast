@@ -85,8 +85,8 @@
         }
 
         .hub-actions .button-primary {
-            background: var(--accent, #8dfc00);
-            color: #000;
+            background: linear-gradient(135deg, var(--btn-gold, #d4af37), var(--btn-gold-deep, #a8821f));
+            color: var(--btn-text, #171307);
         }
 
         .hub-actions .button-secondary {
@@ -96,7 +96,13 @@
         }
 
         .hub-actions .button-primary:hover {
-            background: var(--accent-strong, #c8ff65);
+            background: linear-gradient(135deg, var(--btn-hover, #8dfc00), var(--btn-hover-strong, #c8ff65));
+            color: var(--btn-text, #171307);
+        }
+
+        .hub-actions .button-primary:focus-visible {
+            outline: 2px solid var(--btn-hover-strong, #c8ff65);
+            outline-offset: 2px;
         }
 
         .hub-actions .button-secondary:hover {
@@ -110,8 +116,8 @@
         }
 
         .hub-actions .return-link:hover {
-            background: linear-gradient(135deg, #e8cf8a, #d4af37);
-            color: #171307;
+            background: linear-gradient(135deg, var(--btn-hover, #8dfc00), var(--btn-hover-strong, #c8ff65));
+            color: var(--btn-text, #171307);
         }
 
         .hub-section {
