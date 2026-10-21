@@ -37,8 +37,8 @@
     <link rel="stylesheet" href="spiritflow-radio.css">
     <style>
         :root {
-            --text: #f3ffe2;
-            --muted: #bdd79f;
+            --text: var(--ds-text, #f7f1e3);
+            --muted: var(--ds-text-dim, #cfc6b0);
             --accent: #8dfc00;
             --accent-strong: #c8ff65;
             --line: rgba(191, 255, 89, 0.18);
@@ -99,7 +99,7 @@
         .ambient-two {
             width: 420px;
             height: 420px;
-            background: var(--accent);
+            background: var(--ds-accent-soft, rgba(212, 175, 55, 0.14));
             bottom: -140px;
             right: -140px;
             opacity: 0.07;
@@ -116,16 +116,15 @@
             gap: 1rem;
             flex-wrap: wrap;
             padding: 0.8rem clamp(1rem, 4vw, 2.4rem);
-            background: rgba(13, 11, 9, 0.92);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--sfr-line, rgba(212, 175, 55, 0.22));
+            background: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
+            border-bottom: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
         }
 
         .nav-brand {
             display: inline-flex;
             align-items: center;
             gap: 0.6rem;
-            color: var(--sfr-cream, #f7f1e3);
+            color: var(--ds-nav-text, #171307);
             font-weight: 800;
             font-size: 0.95rem;
             text-decoration: none;
@@ -138,11 +137,11 @@
             height: 34px;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid var(--sfr-gold, #d4af37);
+            border: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
         }
 
         .nav-brand span b {
-            color: var(--sfr-gold, #d4af37);
+            color: var(--ds-nav-text-accent, #4a3808);
         }
 
         .nav-links {
@@ -154,7 +153,7 @@
         }
 
         .nav-links a {
-            color: var(--sfr-cream-dim, #cfc6b0);
+            color: var(--ds-nav-text, #171307);
             text-decoration: none;
             font-size: 0.74rem;
             font-weight: 700;
@@ -168,20 +167,27 @@
 
         .nav-links a:hover,
         .nav-links a:focus-visible {
-            color: var(--sfr-gold-soft, #e8cf8a);
-            border-color: var(--sfr-line, rgba(212, 175, 55, 0.22));
+            background: var(--ds-nav-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: transparent;
             outline: none;
         }
 
         .nav-links a.nav-cta {
-            background: linear-gradient(135deg, var(--sfr-gold, #d4af37), var(--sfr-gold-deep, #a8821f));
-            color: #171307;
+            background: var(--ds-nav-text, #171307);
+            color: var(--sfr-cream, #f7f1e3);
             border-color: transparent;
         }
 
         .nav-links a.nav-cta:hover {
-            color: #171307;
-            box-shadow: 0 6px 18px rgba(212, 175, 55, 0.3);
+            background: var(--ds-nav-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            box-shadow: 0 6px 18px rgba(23, 19, 7, 0.28);
+        }
+
+        /* Status chip sits on the gold bar — dark chip keeps the state colour legible. */
+        #navbar.site-nav .sfr-status {
+            background: var(--ds-nav-text, #171307);
         }
 
         /* ===== PAGE LAYOUT ===== */
@@ -366,16 +372,16 @@
         }
 
         .omni-section .sfr-eyebrow {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
         }
 
         .omni-section .sfr-eyebrow::before,
         .omni-section .sfr-eyebrow::after {
-            background: linear-gradient(90deg, transparent, var(--accent));
+            background: linear-gradient(90deg, transparent, var(--ds-text-accent, #d4af37));
         }
 
         .omni-section .sfr-eyebrow::after {
-            background: linear-gradient(90deg, var(--accent), transparent);
+            background: linear-gradient(90deg, var(--ds-text-accent, #d4af37), transparent);
         }
 
         .omni-grid {
@@ -396,7 +402,7 @@
             font-family: 'Cormorant Garamond', serif;
             font-weight: 700;
             font-size: clamp(1.9rem, 3.6vw, 2.9rem);
-            color: var(--accent-strong);
+            color: var(--ds-text, #f7f1e3);
             line-height: 1.12;
         }
 
@@ -433,7 +439,7 @@
         }
 
         .feature-pill strong {
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             font-size: 0.78rem;
         }
 
@@ -489,14 +495,14 @@
 
         .button-secondary {
             background: transparent;
-            color: var(--accent);
+            color: var(--ds-text, #f7f1e3);
             border: 1px solid var(--line);
         }
 
         .button-secondary:hover {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: var(--ds-text-link-hover, #8dfc00);
         }
 
         .auth-panel {
@@ -510,7 +516,7 @@
         }
 
         .auth-panel .eyebrow {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -519,7 +525,7 @@
 
         .auth-panel h3 {
             font-size: 0.98rem;
-            color: var(--accent-strong);
+            color: var(--ds-text, #f7f1e3);
             font-weight: 700;
         }
 
@@ -549,7 +555,7 @@
         }
 
         .overlay-preview strong {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-size: 0.76rem;
             display: block;
             margin-bottom: 0.25rem;
@@ -589,16 +595,16 @@
         }
 
         .tools-section .sfr-eyebrow {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
         }
 
         .tools-section .sfr-eyebrow::before,
         .tools-section .sfr-eyebrow::after {
-            background: linear-gradient(90deg, transparent, var(--accent));
+            background: linear-gradient(90deg, transparent, var(--ds-text-accent, #d4af37));
         }
 
         .tools-section .sfr-eyebrow::after {
-            background: linear-gradient(90deg, var(--accent), transparent);
+            background: linear-gradient(90deg, var(--ds-text-accent, #d4af37), transparent);
         }
 
         .tool-group {
@@ -613,7 +619,7 @@
             font-weight: 800;
             letter-spacing: 0.26em;
             text-transform: uppercase;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
         }
 
         .tool-group-title::after {
@@ -653,7 +659,7 @@
 
         .tool-card h3 {
             font-size: 0.98rem;
-            color: var(--accent-strong);
+            color: var(--ds-text, #f7f1e3);
             font-weight: var(--ds-weight-bold, 700);
             line-height: var(--ds-leading-snug, 1.35);
             letter-spacing: var(--ds-tracking-heading, -0.01em);
@@ -671,7 +677,7 @@
             font-weight: 800;
             letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
         }
 
         /* ===== FOOTER ===== */
@@ -715,7 +721,7 @@
         }
 
         .footer-links a {
-            color: var(--sfr-gold);
+            color: var(--sfr-cream-dim, var(--ds-text-dim, #cfc6b0));
             text-decoration: none;
             font-size: 0.76rem;
             font-weight: 600;
@@ -723,7 +729,7 @@
         }
 
         .footer-links a:hover {
-            color: var(--sfr-gold-soft);
+            color: var(--ds-text-link-hover, #8dfc00);
         }
 
         /* ===== RESPONSIVE ===== */

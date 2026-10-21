@@ -7,8 +7,8 @@
     --panel: rgba(33, 21, 17, 0.88);
     --panel-solid: #160e0b;
     --line: rgba(191, 255, 89, 0.2);
-    --text: #f3ffe2;
-    --muted: #bdd79f;
+    --text: var(--ds-text, #f7f1e3);
+    --muted: var(--ds-text-dim, #cfc6b0);
     --accent: #8dfc00;
     --accent-strong: #c8ff65;
     --accent-soft: rgba(141, 252, 0, 0.14);
@@ -64,7 +64,11 @@ p {
 }
 
 a {
-    color: var(--accent);
+    color: var(--text);
+}
+
+a:hover {
+    color: var(--ds-text-link-hover, var(--accent));
 }
 
 button,
@@ -97,12 +101,12 @@ video {
     justify-content: space-between;
     gap: 24px;
     padding: 0 34px;
-    background: rgba(0, 0, 0, 0.94);
-    border-bottom: 1px solid var(--line);
+    background: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
+    border-bottom: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
 }
 
 .logo {
-    color: var(--text);
+    color: var(--ds-nav-text, #171307);
     text-decoration: none;
     font-size: clamp(20px, 2.4vw, 30px);
     font-weight: 900;
@@ -118,29 +122,33 @@ video {
 }
 
 .links a {
-    color: var(--accent-strong);
+    color: var(--ds-nav-text, #171307);
     text-decoration: none;
     font-size: 15px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .links a:hover {
-    color: var(--accent);
+    color: var(--ds-nav-text, #171307);
+    background: var(--ds-nav-text-hover-bg, #8dfc00);
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    margin: -0.35rem -0.6rem;
 }
 
 .index-nav {
-    min-height: 36px;
+    min-height: 44px;
     padding: 0 16px;
-    background: var(--accent);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    background: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
+    border-bottom: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
 }
 
 .index-nav .logo,
 .index-nav .links a {
-    height: 36px;
+    height: 44px;
     display: inline-flex;
     align-items: center;
-    color: #000;
+    color: var(--ds-nav-text, #171307);
     font-size: 13px;
     font-weight: 900;
     text-decoration: none;
@@ -162,8 +170,8 @@ video {
 
 .index-nav .links a:hover,
 .index-nav .logo:hover {
-    background: #000;
-    color: var(--accent);
+    background: var(--ds-nav-hover, #8dfc00);
+    color: var(--ds-nav-text, #171307);
 }
 
 /* ===== Marketing / Legal Pages ===== */
@@ -227,7 +235,7 @@ video {
 .eyebrow,
 .card-eyebrow {
     margin: 0 0 10px;
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     font-size: 12px;
     font-weight: 800;
     text-transform: uppercase;
@@ -618,9 +626,9 @@ select:focus {
     align-items: center;
     gap: 0;
     padding: 0 12px;
-    background: var(--accent);
-    color: #000;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.28);
+    background: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
+    color: var(--ds-nav-text, #171307);
+    border-bottom: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
     position: sticky;
     top: 0;
     z-index: 200;
@@ -637,15 +645,15 @@ select:focus {
     padding: 0 12px;
     cursor: pointer;
     list-style: none;
-    color: #000;
+    color: var(--ds-nav-text, #171307);
     font-size: 12px;
     font-weight: 800;
 }
 
 .studio-menu[open] summary,
 .studio-menu summary:hover {
-    background: #000;
-    color: var(--accent);
+    background: var(--ds-nav-hover, #8dfc00);
+    color: var(--ds-nav-text, #171307);
 }
 
 .studio-menu-list {
@@ -673,13 +681,13 @@ select:focus {
 }
 
 .studio-menu-list button:hover {
-    color: var(--accent);
-    background: var(--accent-soft);
+    color: var(--ds-nav-text, #171307);
+    background: var(--ds-text-link-hover, #8dfc00);
 }
 
 .church-menu-feedback {
     margin-left: auto;
-    color: #000;
+    color: var(--ds-text-accent-soft, #e8cf8a);
     font-weight: 800;
     opacity: 0;
 }
@@ -710,7 +718,7 @@ select:focus {
     gap: 8px;
     min-height: 32px;
     white-space: nowrap;
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     text-decoration: none;
     font-weight: 900;
 }
@@ -719,7 +727,7 @@ select:focus {
     min-height: 32px;
     padding: 0 10px;
     border-radius: 6px;
-    background: var(--accent-soft);
+    background: var(--ds-accent-soft, rgba(212, 175, 55, 0.14));
 }
 
 .btn-lyrics {
@@ -742,8 +750,8 @@ select:focus {
     width: 8px;
     height: 8px;
     border-radius: 999px;
-    background: var(--accent);
-    box-shadow: 0 0 14px var(--accent);
+    background: var(--ds-status-live, #3ddc84);
+    box-shadow: 0 0 14px rgba(61, 220, 132, 0.45);
 }
 
 .active-indicator,
@@ -775,16 +783,22 @@ select:focus {
     border: 1px solid var(--line);
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.04);
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     cursor: pointer;
     padding: 0;
 }
 
 .church-icon-btn.is-listening,
 .church-icon-btn:hover {
+    color: var(--ds-nav-text, #171307);
+    background: var(--ds-text-link-hover, #8dfc00);
+    border-color: var(--ds-text-link-hover, #8dfc00);
+}
+
+.church-icon-btn.is-listening {
     color: #000;
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--ds-status-live, #3ddc84);
+    border-color: var(--ds-status-live, #3ddc84);
 }
 
 .mic-signal,
@@ -821,7 +835,7 @@ select:focus {
 
 .mic-signal.is-live span,
 .mic-signal-pill.is-live .mic-signal span {
-    background: var(--accent);
+    background: var(--ds-status-live, #3ddc84);
     opacity: 1;
     animation: micSignal 0.68s ease-in-out infinite;
 }
@@ -846,13 +860,13 @@ select:focus {
     padding: 0 12px;
     border: 1px solid var(--line);
     border-radius: 999px;
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     background: rgba(255, 255, 255, 0.04);
 }
 
 .mic-signal-pill.is-live {
-    border-color: var(--accent);
-    background: var(--accent-soft);
+    border-color: rgba(61, 220, 132, 0.4);
+    background: rgba(61, 220, 132, 0.12);
 }
 
 @keyframes micSignal {
@@ -914,7 +928,7 @@ select:focus {
 .church-panel-title,
 .preview-label,
 .matches-title {
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -1031,7 +1045,7 @@ select:focus {
     place-items: center;
     border-radius: 999px;
     border: 1px solid var(--line);
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -1040,7 +1054,7 @@ select:focus {
 .empty-title,
 .live-bible-match-top strong,
 .scripture-feed-top strong {
-    color: var(--accent);
+    color: var(--ds-text-accent, #d4af37);
     font-weight: 900;
 }
 
@@ -1083,9 +1097,22 @@ select:focus {
 .nav-tab.active,
 .match-action-btn:hover,
 .hidden-badge.is-live {
+    color: var(--ds-nav-text, #171307);
+    background: var(--ds-text-link-hover, #8dfc00);
+    border-color: var(--ds-text-link-hover, #8dfc00);
+}
+
+.feed-tab.active,
+.nav-tab.active {
+    color: var(--ds-nav-text, #171307);
+    background: var(--ds-text-accent, #d4af37);
+    border-color: var(--ds-text-accent, #d4af37);
+}
+
+.hidden-badge.is-live {
     color: #000;
-    background: var(--accent);
-    border-color: var(--accent);
+    background: var(--ds-status-live, #3ddc84);
+    border-color: var(--ds-status-live, #3ddc84);
 }
 
 .search-input-wrapper {
@@ -1146,7 +1173,7 @@ select:focus {
 }
 
 .reference {
-    color: var(--accent);
+    color: var(--ds-text-accent-soft, #e8cf8a);
     font-size: clamp(28px, 5vw, 54px);
     font-weight: 900;
 }

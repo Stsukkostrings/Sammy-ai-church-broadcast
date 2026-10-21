@@ -20,14 +20,14 @@
            CSS VARIABLES — Neon Green on Black Theme
            ============================================ */
         :root {
-            --text: #8dfc00;
-            --muted: #6bb300;
+            --text: var(--ds-text, #f7f1e3);
+            --muted: var(--ds-text-dim, #cfc6b0);
             --accent: #8dfc00;
             --accent-strong: #c8ff65;
             --line: rgba(141, 252, 0, 0.25);
             --panel: rgba(20, 20, 20, 0.95);
             --bg: #000000;
-            --nav-bg: #8dfc00;
+            --nav-bg: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
             --danger: #ff4444;
             --btn-gold: #d4af37;
             --btn-gold-deep: #a8821f;
@@ -63,18 +63,13 @@
         }
 
         /* ============================================
-           NAVBAR (Neon Green Background, Black Text)
+           NAVBAR PLACEHOLDER
+           navbar.js empties this mount on the studio pages
+           (the real bar is .church-window-menu below), so it
+           must not render an empty coloured strip.
            ============================================ */
         #navbar {
-            background: var(--nav-bg);
-            color: var(--bg);
-            padding: 10px 20px;
-            font-weight: 700;
-            font-size: 14px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(141, 252, 0, 0.2);
+            display: none;
         }
 
         /* ============================================
@@ -92,8 +87,8 @@
             display: flex;
             align-items: center;
             gap: 2px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--line);
+            background: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
+            border-bottom: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
             padding: 4px 12px;
             flex-wrap: wrap;
         }
@@ -109,7 +104,7 @@
             border-radius: 4px;
             font-size: 12px;
             font-weight: 600;
-            color: var(--text);
+            color: var(--ds-nav-text, #171307);
             transition: all 0.2s ease;
             user-select: none;
         }
@@ -119,13 +114,13 @@
         }
 
         .studio-menu > summary:hover {
-            background: var(--accent);
-            color: var(--bg);
+            background: var(--ds-nav-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
         }
 
         .studio-menu[open] > summary {
-            background: var(--accent);
-            color: var(--bg);
+            background: var(--ds-nav-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
         }
 
         .studio-menu-list {
@@ -134,7 +129,7 @@
             left: 0;
             min-width: 200px;
             background: var(--panel);
-            border: 1px solid var(--line);
+            border: 1px solid var(--ds-accent-line, rgba(212, 175, 55, 0.24));
             border-radius: 6px;
             padding: 6px;
             z-index: 200;
@@ -157,20 +152,20 @@
         }
 
         .studio-menu-list button:hover {
-            background: var(--accent);
-            color: var(--bg);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
         }
 
         .church-menu-feedback {
             margin-left: auto;
             font-size: 11px;
-            color: var(--accent);
+            color: var(--ds-text-accent-soft, #e8cf8a);
             opacity: 0;
             transition: opacity 0.3s ease;
             padding: 4px 10px;
-            background: rgba(141, 252, 0, 0.1);
+            background: var(--ds-nav-text, #171307);
             border-radius: 4px;
-            border: 1px solid var(--line);
+            border: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
         }
 
         .church-menu-feedback.is-visible {
@@ -193,14 +188,14 @@
         .church-brand {
             font-size: 14px;
             font-weight: 800;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             text-decoration: none;
             letter-spacing: 0.3px;
             transition: color 0.2s;
         }
 
         .church-brand:hover {
-            color: var(--accent-strong);
+            color: var(--ds-text-accent-soft, #e8cf8a);
         }
 
         .church-license-pill {
@@ -220,11 +215,11 @@
             gap: 5px;
             font-size: 10px;
             font-weight: 700;
-            color: var(--accent);
-            background: rgba(141, 252, 0, 0.1);
+            color: var(--ds-status-live, #3ddc84);
+            background: rgba(61, 220, 132, 0.12);
             padding: 3px 10px;
             border-radius: 4px;
-            border: 1px solid var(--accent);
+            border: 1px solid rgba(61, 220, 132, 0.4);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -232,7 +227,7 @@
         .active-dot {
             width: 6px;
             height: 6px;
-            background: var(--accent);
+            background: var(--ds-status-live, #3ddc84);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -263,7 +258,7 @@
         }
 
         .church-session-title::placeholder {
-            color: rgba(141, 252, 0, 0.4);
+            color: var(--ds-text-faint, #a49a82);
         }
 
         .church-device-pill {
@@ -279,7 +274,7 @@
         }
 
         .church-device-pill i {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
         }
 
         .mic-signal {
@@ -302,7 +297,7 @@
         .mic-signal span:nth-child(4) { height: 6px; }
 
         .mic-signal.is-live span {
-            background: var(--accent);
+            background: var(--ds-status-live, #3ddc84);
             animation: micSignal 0.5s ease-in-out infinite alternate;
         }
 
@@ -332,17 +327,17 @@
         }
 
         .church-icon-btn:hover {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: var(--ds-text-link-hover, #8dfc00);
             box-shadow: 0 0 10px rgba(141, 252, 0, 0.2);
             transform: translateY(-1px);
         }
 
         .church-icon-btn.is-listening {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-status-live, #3ddc84);
+            color: #000;
+            border-color: var(--ds-status-live, #3ddc84);
             animation: pulseGlow 1.5s infinite;
         }
 
@@ -361,7 +356,7 @@
             background: rgba(141, 252, 0, 0.1);
             border: 1px solid var(--accent);
             border-radius: var(--ds-btn-radius, 8px);
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-family: inherit;
             font-size: var(--ds-btn-font-size-xs, 0.6875rem);
             font-weight: var(--ds-btn-font-weight, 700);
@@ -372,8 +367,8 @@
         }
 
         .btn-lyrics:hover {
-            background: var(--accent);
-            color: var(--bg);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
             box-shadow: 0 0 12px rgba(141, 252, 0, 0.3);
         }
 
@@ -402,15 +397,15 @@
         }
 
         .church-dropdown-trigger:hover {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: var(--ds-text-link-hover, #8dfc00);
         }
 
         .church-nav-dropdown[open] .church-dropdown-trigger {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: var(--ds-text-link-hover, #8dfc00);
         }
 
         .church-dropdown-trigger i {
@@ -493,7 +488,7 @@
         .church-panel-title {
             font-size: 10px;
             font-weight: 700;
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
@@ -601,9 +596,9 @@
         }
 
         .hidden-badge:hover {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: var(--ds-text-link-hover, #8dfc00);
         }
 
         .hidden-badge.is-live {
@@ -626,7 +621,7 @@
         }
 
         .size-slider span:last-child {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-weight: 700;
             min-width: 26px;
         }
@@ -643,7 +638,8 @@
         }
 
         .church-toggle.active {
-            background: var(--accent);
+            background: var(--ds-text-accent, #d4af37);
+            color: var(--ds-nav-text, #171307);
         }
 
         .church-toggle::after {
@@ -717,7 +713,7 @@
 
         .card-icon {
             font-size: 28px;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             opacity: 0.5;
             margin-bottom: 8px;
         }
@@ -737,7 +733,7 @@
         .live-card .verse-ref {
             font-size: 12px;
             font-weight: 700;
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             margin-bottom: 6px;
         }
 
@@ -772,7 +768,7 @@
         }
 
         .church-preview-controls input::placeholder {
-            color: rgba(141, 252, 0, 0.4);
+            color: var(--ds-text-faint, #a49a82);
         }
 
         .btn-display {
@@ -836,7 +832,7 @@
         }
 
         .feed-count span {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-weight: 700;
         }
 
@@ -863,7 +859,7 @@
         }
 
         .feed-tab.active {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             border-bottom-color: var(--accent);
             background: rgba(141, 252, 0, 0.05);
         }
@@ -926,7 +922,7 @@
         }
 
         .scripture-feed-top strong {
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             font-size: 11px;
         }
 
@@ -952,7 +948,7 @@
         }
 
         .version-dropdown:hover {
-            color: var(--accent);
+            color: var(--ds-text-link-hover, #8dfc00);
         }
 
         .navigator-tabs {
@@ -978,7 +974,7 @@
         }
 
         .nav-tab.active {
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             border-bottom-color: var(--accent);
             background: rgba(141, 252, 0, 0.05);
         }
@@ -1021,7 +1017,7 @@
         }
 
         .search-input-wrapper input::placeholder {
-            color: rgba(141, 252, 0, 0.4);
+            color: var(--ds-text-faint, #a49a82);
         }
 
         .scripture-content {
@@ -1043,7 +1039,7 @@
 
         .empty-icon {
             font-size: 24px;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             opacity: 0.4;
         }
 
@@ -1055,7 +1051,7 @@
 
         .empty-subtitle {
             font-size: 10px;
-            color: rgba(141, 252, 0, 0.5);
+            color: var(--ds-text-dim, #cfc6b0);
         }
 
         .verse-row {
@@ -1084,7 +1080,7 @@
         .verse-num {
             font-size: 10px;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             min-width: 20px;
         }
 
@@ -1096,7 +1092,7 @@
         .add-verse-btn {
             font-size: 14px;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             padding: 0 4px;
         }
 
@@ -1143,7 +1139,7 @@
         .card-eyebrow {
             font-size: 10px;
             font-weight: 700;
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             text-transform: uppercase;
             letter-spacing: 0.6px;
             margin-bottom: 4px;
@@ -1174,7 +1170,7 @@
 
         .live-bible-empty i {
             font-size: 24px;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             opacity: 0.35;
         }
 
@@ -1212,7 +1208,7 @@
         }
 
         .live-bible-match-top strong {
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             font-size: 11px;
         }
 
@@ -1223,7 +1219,7 @@
 
         .live-bible-phrase {
             font-size: 11px;
-            color: var(--accent);
+            color: var(--ds-text-accent-soft, #e8cf8a);
         }
 
         .live-bible-text {
@@ -1312,8 +1308,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--accent);
-            color: var(--bg);
+            background: var(--ds-text-accent, #d4af37);
+            color: var(--ds-nav-text, #171307);
             font-size: 10px;
             font-weight: 700;
             border-radius: 50%;
@@ -1358,7 +1354,7 @@
             padding-top: 8px;
             border-top: 1px solid var(--line);
             font-size: 10px;
-            color: rgba(141, 252, 0, 0.6);
+            color: var(--ds-text-dim, #cfc6b0);
             font-style: italic;
         }
 
@@ -1384,7 +1380,7 @@
         .matches-title {
             font-size: 10px;
             font-weight: 700;
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             text-transform: uppercase;
             letter-spacing: 0.8px;
             display: flex;
@@ -1395,7 +1391,7 @@
         .ai-dot {
             width: 6px;
             height: 6px;
-            background: var(--accent);
+            background: var(--ds-status-live, #3ddc84);
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -1412,15 +1408,15 @@
             font-weight: 600;
             cursor: pointer;
             border: 1px solid var(--line);
-            background: rgba(141, 252, 0, 0.08);
+            background: var(--ds-accent-softer, rgba(212, 175, 55, 0.08));
             color: var(--muted);
             transition: all 0.2s ease;
         }
 
         .match-action-btn.live {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-status-live, #3ddc84);
+            color: #000;
+            border-color: var(--ds-status-live, #3ddc84);
         }
 
         .match-action-btn:hover:not(.live) {
@@ -1447,7 +1443,7 @@
         .church-label {
             font-size: 10px;
             font-weight: 700;
-            color: var(--accent-strong);
+            color: var(--ds-text-accent, #d4af37);
             text-transform: uppercase;
             letter-spacing: 0.6px;
         }
@@ -1475,7 +1471,7 @@
         }
 
         .inline-form input::placeholder {
-            color: rgba(141, 252, 0, 0.4);
+            color: var(--ds-text-faint, #a49a82);
         }
 
         .overlay-preview {
@@ -1518,7 +1514,7 @@
         }
 
         .notes-panel textarea::placeholder {
-            color: rgba(141, 252, 0, 0.4);
+            color: var(--ds-text-faint, #a49a82);
         }
 
         .notes-panel input[type="url"] {
@@ -1539,7 +1535,7 @@
         }
 
         .notes-panel input[type="url"]::placeholder {
-            color: rgba(141, 252, 0, 0.4);
+            color: var(--ds-text-faint, #a49a82);
         }
 
         /* ============================================
@@ -1658,9 +1654,9 @@
         }
 
         .button-secondary:hover {
-            background: var(--accent);
-            color: var(--bg);
-            border-color: var(--accent);
+            background: var(--ds-text-link-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            border-color: var(--ds-text-link-hover, #8dfc00);
             box-shadow: 0 0 10px rgba(141, 252, 0, 0.2);
             transform: translateY(-1px);
         }
@@ -1729,7 +1725,7 @@
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
+            background: var(--ds-nav-bg-deep, #a8821f);
         }
 
         /* ============================================
@@ -1993,7 +1989,7 @@
         .fetch-screen-text {
             font-size: 16px;
             font-weight: 700;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             text-transform: uppercase;
             letter-spacing: 2px;
             animation: fetchPulse 1.5s ease-in-out infinite;
@@ -2024,7 +2020,7 @@
         .fetch-screen-progress-bar {
             height: 100%;
             width: 0%;
-            background: var(--accent);
+            background: var(--ds-text-accent, #d4af37);
             border-radius: 2px;
             transition: width 0.3s ease;
             animation: fetchProgress 2s ease-in-out infinite;
@@ -2075,7 +2071,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-size: 12px;
             font-weight: 800;
             letter-spacing: 0.12em;
@@ -2086,12 +2082,12 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 18px var(--accent);
+            background: var(--ds-status-live, #3ddc84);
+            box-shadow: 0 0 18px rgba(61, 220, 132, 0.5);
         }
 
         .church-standalone-reference {
-            color: var(--accent-strong);
+            color: var(--ds-text-accent-soft, #e8cf8a);
             font-size: clamp(17px, 2vw, 25px);
             font-weight: 900;
             letter-spacing: 0.08em;

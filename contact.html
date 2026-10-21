@@ -16,8 +16,8 @@
     <link rel="stylesheet" href="design-tokens.css">
     <style>
         :root {
-            --text: #f3ffe2;
-            --muted: #bdd79f;
+            --text: var(--ds-text, #f7f1e3);
+            --muted: var(--ds-text-dim, #cfc6b0);
             --accent: #8dfc00;
             --accent-strong: #c8ff65;
             --line: rgba(191, 255, 89, 0.18);
@@ -70,7 +70,7 @@
         .ambient-one {
             width: 500px;
             height: 500px;
-            background: var(--accent);
+            background: var(--ds-accent-soft, rgba(212, 175, 55, 0.14));
             top: -150px;
             left: -150px;
         }
@@ -78,14 +78,14 @@
         .ambient-two {
             width: 400px;
             height: 400px;
-            background: var(--accent-strong);
+            background: var(--ds-accent-soft, rgba(212, 175, 55, 0.14));
             bottom: -100px;
             right: -100px;
         }
 
         /* ===== NAVBAR ===== */
         #navbar {
-            background: var(--accent);
+            background: var(--ds-nav-bg-gradient, linear-gradient(135deg, #d4af37 0%, #a8821f 100%));
             padding: 0.5rem 1.5rem;
             display: flex;
             align-items: center;
@@ -93,11 +93,12 @@
             gap: 1rem;
             flex-shrink: 0;
             z-index: 100;
-            box-shadow: 0 2px 20px rgba(141, 252, 0, 0.15);
+            border-bottom: 1px solid var(--ds-nav-border, rgba(23, 19, 7, 0.25));
+            box-shadow: 0 2px 20px rgba(23, 19, 7, 0.18);
         }
 
         .nav-brand {
-            color: #000;
+            color: var(--ds-nav-text, #171307);
             font-weight: 800;
             font-size: 0.95rem;
             text-decoration: none;
@@ -112,20 +113,22 @@
         }
 
         .nav-links a {
-            color: #000;
+            color: var(--ds-nav-text, #171307);
             text-decoration: none;
             font-size: 0.75rem;
             font-weight: 600;
             padding: 0.35rem 0.7rem;
             border-radius: 6px;
-            transition: background 0.2s ease;
+            transition: background 0.2s ease, color 0.2s ease;
         }
 
-        .nav-links a:hover {
-            background: rgba(0,0,0,0.15);
+        .nav-links a:hover,
+        .nav-links a:focus-visible {
+            background: var(--ds-nav-hover, #8dfc00);
+            color: var(--ds-nav-text, #171307);
+            outline: none;
         }
-
-        /* ===== MAIN ===== */
+/* ===== MAIN ===== */
         main {
             position: relative;
             z-index: 1;
@@ -154,7 +157,7 @@
 
         .contact-card .eyebrow {
             font-size: var(--ds-text-xs, 0.72rem);
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-weight: var(--ds-weight-bold, 700);
             text-transform: uppercase;
             letter-spacing: var(--ds-tracking-label, 0.12em);
@@ -162,7 +165,7 @@
 
         .contact-card h1 {
             font-size: var(--ds-text-lg, 1.15rem);
-            color: var(--accent-strong);
+            color: var(--ds-text, #f7f1e3);
             font-weight: var(--ds-weight-bold, 700);
             line-height: var(--ds-leading-snug, 1.35);
         }
@@ -188,7 +191,7 @@
 
         .form-group label {
             font-size: var(--ds-text-xs, 0.72rem);
-            color: var(--accent);
+            color: var(--ds-text-accent, #d4af37);
             font-weight: var(--ds-weight-semibold, 600);
             letter-spacing: 0.02em;
         }
@@ -312,7 +315,7 @@
         }
 
         .footer-links a {
-            color: var(--accent);
+            color: var(--ds-text-dim, #cfc6b0);
             text-decoration: none;
             font-size: 0.75rem;
             font-weight: 600;
@@ -320,7 +323,7 @@
         }
 
         .footer-links a:hover {
-            color: var(--accent-strong);
+            color: var(--ds-text-link-hover, #8dfc00);
         }
 
         /* ===== SCROLLBAR ===== */
@@ -333,7 +336,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--accent);
+            background: var(--ds-text-accent, #d4af37);
             border-radius: 2px;
         }
     </style>

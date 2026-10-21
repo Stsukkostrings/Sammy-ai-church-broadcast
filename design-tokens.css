@@ -15,6 +15,39 @@
     /* Code / reference output */
     --ds-font-mono: "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
+    /* Unified text colors (from SpiritFlow Sounds Radio) ---- */
+    --ds-text: #f7f1e3;            /* primary text — radio cream */
+    --ds-text-dim: #cfc6b0;         /* secondary / supporting text — radio cream-dim */
+    --ds-text-accent: #d4af37;      /* eyebrows, labels, accent text — radio gold */
+    --ds-text-accent-soft: #e8cf8a; /* soft emphasis — radio gold-soft */
+    --ds-text-faint: #a49a82;       /* tertiary / placeholder text */
+    --ds-text-ghost: #8a8170;       /* lowest-emphasis text */
+    --ds-text-link: #f7f1e3;        /* links on dark surfaces */
+    --ds-text-link-hover: #8dfc00;  /* Omnicast lemon-green hover */
+
+    /* Semantic status colors (preserved from radio) --------- */
+    --ds-status-live: #3ddc84;
+    --ds-status-off: #e0604f;
+
+    /* Tinted surfaces (gold family) ------------------------- */
+    --ds-accent-soft: rgba(212, 175, 55, 0.14);
+    --ds-accent-softer: rgba(212, 175, 55, 0.08);
+    --ds-accent-line: rgba(212, 175, 55, 0.24);
+
+    /* Hover tint (Omnicast lemon-green) --------------------- */
+    --ds-hover-soft: rgba(141, 252, 0, 0.16);
+
+    /* Unified navbar colors (SpiritFlow gold buttons) -------- */
+    --ds-nav-bg: #d4af37;
+    --ds-nav-bg-deep: #a8821f;
+    --ds-nav-bg-gradient: linear-gradient(135deg, #d4af37 0%, #a8821f 100%);
+    --ds-nav-text: #171307;
+    --ds-nav-text-accent: #4a3808;    /* emphasized brand word on gold */
+    --ds-nav-text-hover-bg: #8dfc00; /* lemon-green hover pill */
+    --ds-nav-hover: #8dfc00;
+    --ds-nav-hover-strong: #c8ff65;
+    --ds-nav-border: rgba(23, 19, 7, 0.25);
+
     /* Type scale ------------------------------------------- */
     --ds-text-xs: 0.72rem;      /* eyebrows, meta, labels */
     --ds-text-sm: 0.8rem;       /* supporting copy, buttons */

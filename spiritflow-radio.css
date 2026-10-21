@@ -116,19 +116,34 @@ body{
 
 /* ---------- nav ---------- */
 .sfr-nav{
-  position:absolute;inset:0 0 auto 0;z-index:5;padding:1.4rem 0;
+  position:relative;z-index:5;padding:.8rem 0;
+  background:var(--ds-nav-bg-gradient, linear-gradient(135deg,#d4af37 0%,#a8821f 100%));
+  border-bottom:1px solid var(--ds-nav-border, rgba(23,19,7,.25));
+  box-shadow:0 2px 20px rgba(23,19,7,.18);
 }
 .sfr-nav .sfr-wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem}
-.sfr-brand{display:flex;align-items:center;gap:.7rem;font-weight:800;letter-spacing:.14em;font-size:.85rem;text-transform:uppercase}
-.sfr-brand-mark{
+.sfr-nav .sfr-brand{
+  display:flex;align-items:center;gap:.7rem;font-weight:800;letter-spacing:.14em;
+  font-size:.85rem;text-transform:uppercase;color:var(--ds-nav-text,#171307);
+}
+.sfr-nav .sfr-brand-mark{
   width:38px;height:38px;flex:none;border-radius:50%;overflow:hidden;
-  border:1px solid var(--sfr-gold);display:grid;place-items:center;
-  box-shadow:0 0 18px rgba(212,175,55,.3);background:#0d0b09;
+  border:1px solid var(--ds-nav-border, rgba(23,19,7,.25));display:grid;place-items:center;
+  box-shadow:0 4px 14px rgba(23,19,7,.22);background:#0d0b09;
 }
 .sfr-brand-mark img{width:100%;height:100%;object-fit:cover}
-.sfr-nav-links{display:flex;gap:2rem;font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--sfr-cream-dim)}
-.sfr-nav-links a{transition:color .2s}
-.sfr-nav-links a:hover{color:var(--sfr-gold-soft)}
+.sfr-nav .sfr-nav-links{
+  display:flex;gap:.4rem;font-size:.75rem;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--ds-nav-text,#171307);
+}
+.sfr-nav-links a{
+  transition:background .2s,color .2s;padding:.4rem .75rem;border-radius:999px;
+}
+.sfr-nav-links a:hover,.sfr-nav-links a:focus-visible{
+  background:var(--ds-nav-hover,#8dfc00);color:var(--ds-nav-text,#171307);outline:none;
+}
+/* Status chip sits on the gold bar — dark chip keeps the state colour legible. */
+.sfr-nav .sfr-status{background:var(--ds-nav-text,#171307)}
 @media(max-width:640px){.sfr-nav-links{display:none}}
 
 /* ---------- banner ---------- */
