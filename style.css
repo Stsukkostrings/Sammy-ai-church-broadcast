@@ -21,6 +21,12 @@
     --btn-text: #171307;
     --btn-hover: #8dfc00;
     --btn-hover-strong: #c8ff65;
+    /* Shared typography + geometry aliases (see design-tokens.css) */
+    --font-sans: var(--ds-font-sans, "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif);
+    --font-display: var(--ds-font-display, "Cormorant Garamond", Georgia, "Times New Roman", serif);
+    --font-mono: var(--ds-font-mono, "Courier New", ui-monospace, monospace);
+    --btn-radius: var(--ds-btn-radius, 8px);
+    --btn-transition: var(--ds-btn-transition, transform 180ms ease, background 180ms ease, box-shadow 180ms ease, border-color 180ms ease, color 180ms ease);
 }
 
 * {
@@ -37,8 +43,24 @@ body {
     min-height: 100vh;
     color: var(--text);
     background: #000;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: var(--ds-leading-body, 1.6);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-weight: var(--ds-weight-bold, 700);
+    line-height: var(--ds-leading-tight, 1.15);
+    letter-spacing: var(--ds-tracking-heading, -0.01em);
+}
+
+p {
+    line-height: var(--ds-leading-body, 1.6);
 }
 
 a {
@@ -212,7 +234,6 @@ video {
     letter-spacing: 0.08em;
 }
 
-.hero-text,
 .section-heading h1,
 .legal-shell h1,
 .about-container h2 {
@@ -221,6 +242,18 @@ video {
     font-size: clamp(34px, 6vw, 76px);
     line-height: 0.95;
     letter-spacing: 0;
+}
+
+.hero-copy h1 {
+    font-size: var(--ds-text-2xl, clamp(1.7rem, 4vw, 2.7rem));
+    line-height: var(--ds-leading-tight, 1.15);
+}
+
+.hero-text {
+    margin: 0;
+    color: var(--text);
+    font-size: var(--ds-text-md, 1rem);
+    line-height: var(--ds-leading-relaxed, 1.65);
 }
 
 .index-body .page-shell {
@@ -300,13 +333,20 @@ video {
 .social-share-button,
 .btn,
 button.primary {
-    min-height: 32px;
-    border-radius: 6px;
-    padding: 7px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--ds-btn-height, 38px);
+    border-radius: var(--btn-radius);
+    padding: var(--ds-btn-pad, 0.6rem 1.2rem);
     cursor: pointer;
-    font-weight: 800;
+    font-family: inherit;
+    font-size: var(--ds-btn-font-size, 0.8rem);
+    font-weight: var(--ds-btn-font-weight, 700);
+    line-height: var(--ds-btn-line-height, 1);
+    letter-spacing: var(--ds-tracking-button, 0.01em);
     text-decoration: none;
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    transition: var(--btn-transition);
 }
 
 .button-primary,

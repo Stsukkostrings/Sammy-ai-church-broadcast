@@ -7,6 +7,10 @@
    SpiritFlow Sounds Radio — scoped styles (.sfr- prefix)
    Isolated: will not affect any existing page styles.
    ========================================================== */
+body{
+  font-family:var(--ds-font-spirit,'Manrope',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif);
+  line-height:var(--ds-leading-body,1.6);
+}
 :root{
   --sfr-gold:#d4af37;
   --sfr-gold-soft:#e8cf8a;
@@ -23,7 +27,7 @@
   --sfr-off:#e0604f;
 }
 .sfr{
-  font-family:'Manrope',system-ui,sans-serif;
+  font-family:var(--ds-font-spirit,'Manrope',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif);
   background:var(--sfr-charcoal);
   color:var(--sfr-cream);
   overflow-x:hidden;
@@ -46,7 +50,7 @@
 .sfr-eyebrow::before,.sfr-eyebrow::after{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--sfr-gold));}
 .sfr-eyebrow::after{background:linear-gradient(90deg,var(--sfr-gold),transparent)}
 .sfr-h2{
-  font-family:'Cormorant Garamond',serif;font-weight:600;
+  font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-weight:600;
   font-size:clamp(2rem,4.6vw,3.2rem);line-height:1.08;margin:.85rem 0 .6rem;
 }
 .sfr-sub{color:var(--sfr-cream-dim);font-size:.98rem;line-height:1.7;max-width:56ch}
@@ -77,8 +81,11 @@
 /* ---------- buttons ---------- */
 .sfr-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:.7rem;
-  padding:1rem 2.1rem;border-radius:999px;
-  font-size:.8rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  min-height:var(--ds-btn-height-xl,54px);
+  padding:var(--ds-btn-pad-xl,1rem 2.1rem);border-radius:var(--ds-btn-radius-pill,999px);
+  font-family:var(--ds-font-spirit,'Manrope',system-ui,sans-serif);
+  font-size:var(--ds-btn-font-size,.8rem);font-weight:var(--ds-weight-black,800);
+  line-height:var(--ds-btn-line-height,1);letter-spacing:.18em;text-transform:uppercase;
   transition:transform .25s ease,box-shadow .25s ease,background .25s ease,opacity .25s ease;
   will-change:transform;
 }
@@ -142,7 +149,7 @@
 }
 .sfr-hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(2rem,5vw,5rem);align-items:center}
 .sfr-hero h1{
-  font-family:'Cormorant Garamond',serif;font-weight:700;
+  font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-weight:700;
   font-size:clamp(2.6rem,6.4vw,5rem);line-height:1.02;letter-spacing:.01em;
   margin:1.2rem 0 1rem;
 }
@@ -151,7 +158,7 @@
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .sfr-tagline{
-  font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:500;
+  font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-style:italic;font-weight:500;
   font-size:clamp(1.25rem,2.6vw,1.8rem);color:var(--sfr-gold-soft);margin-bottom:.9rem;
 }
 .sfr-genres{font-size:.74rem;font-weight:800;letter-spacing:.3em;text-transform:uppercase;color:var(--sfr-cream-dim);margin-bottom:2rem}
@@ -217,7 +224,7 @@
   background:rgba(13,11,9,.72);backdrop-filter:blur(6px);
   border:1px solid var(--sfr-line);border-radius:999px;padding:.4rem .9rem;color:var(--sfr-cream);
 }
-.sfr-track-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:600;line-height:1.15}
+.sfr-track-title{font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:600;line-height:1.15}
 .sfr-track-artist{color:var(--sfr-cream-dim);font-size:.95rem;margin-top:.25rem}
 .sfr-config-note{
   font-size:.82rem;color:var(--sfr-cream-dim);line-height:1.6;
@@ -253,7 +260,7 @@
   border:1px solid transparent;transition:.2s;
 }
 .sfr-recent-item:hover{border-color:var(--sfr-line);background:rgba(212,175,55,.04)}
-.sfr-recent-item .sfr-idx{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--sfr-gold);width:1.6rem;flex:none}
+.sfr-recent-item .sfr-idx{font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-size:1.25rem;color:var(--sfr-gold);width:1.6rem;flex:none}
 .sfr-recent-item .sfr-rart{width:42px;height:42px;border-radius:9px;flex:none;overflow:hidden;background:#241f18;border:1px solid var(--sfr-line)}
 .sfr-recent-item .sfr-rart img{width:100%;height:100%;object-fit:cover}
 .sfr-recent-item .sfr-rt{min-width:0}
@@ -271,7 +278,7 @@
 }
 .sfr-prog:hover{transform:translateY(-4px);border-color:var(--sfr-gold)}
 .sfr-prog-time{font-size:.7rem;font-weight:800;letter-spacing:.26em;text-transform:uppercase;color:var(--sfr-gold)}
-.sfr-prog h3{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:600;margin:.6rem 0 .45rem}
+.sfr-prog h3{font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-size:1.45rem;font-weight:600;margin:.6rem 0 .45rem}
 .sfr-prog p{font-size:.86rem;color:var(--sfr-cream-dim);line-height:1.65}
 .sfr-config-flag{
   display:inline-flex;align-items:center;gap:.5rem;margin-top:1.8rem;
@@ -286,7 +293,7 @@
   padding:1.3rem .4rem;border-bottom:1px solid var(--sfr-line);transition:background .2s,padding-left .25s;
 }
 .sfr-sched-row:hover{background:rgba(212,175,55,.04);padding-left:1rem}
-.sfr-sched-time{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--sfr-gold-soft)}
+.sfr-sched-time{font-family:var(--ds-font-display,'Cormorant Garamond',Georgia,serif);font-size:1.5rem;font-weight:600;color:var(--sfr-gold-soft)}
 .sfr-sched-name{font-weight:700;font-size:1.02rem}
 .sfr-sched-tag{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sfr-cream-dim);border:1px solid var(--sfr-line);border-radius:999px;padding:.35rem .85rem;white-space:nowrap}
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omnicast Lyrics</title>
+    <link rel="stylesheet" href="design-tokens.css">
     <link rel="stylesheet" href="style.css?v=20260503-omnicast-global">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -32,12 +33,13 @@
         }
 
         body {
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             color: var(--text);
             background: #000;
             height: 100vh;
             overflow: hidden;
             font-size: 13px;
+            line-height: 1.5;
         }
 
         /* ===== TOP MENU BAR ===== */
@@ -67,7 +69,7 @@
             display: flex;
             align-items: center;
             transition: all 0.2s;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             cursor: pointer;
             user-select: none;
         }
@@ -113,7 +115,7 @@
             cursor: pointer;
             transition: all 0.15s;
             border-bottom: 1px solid rgba(191, 255, 89, 0.06);
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
         }
 
         .dropdown-item:last-child {
@@ -224,15 +226,17 @@
             background: rgba(255,255,255,0.04);
             border: 1px solid var(--line);
             color: var(--muted);
-            padding: 7px 16px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
+            padding: var(--ds-btn-pad-xs, 0.4rem 0.7rem);
+            min-height: var(--ds-btn-height-xs, 30px);
+            border-radius: var(--ds-btn-radius-pill, 999px);
+            font-size: var(--ds-btn-font-size-xs, 0.6875rem);
+            font-weight: var(--ds-btn-font-weight, 700);
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: inherit;
             letter-spacing: 0.08em;
             text-decoration: none;
         }
@@ -365,7 +369,7 @@
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             border: 1px solid var(--line);
             background: transparent;
             color: var(--muted);
@@ -619,7 +623,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             font-weight: 600;
             letter-spacing: 0.5px;
             transition: all 0.2s;
@@ -706,7 +710,7 @@
             padding: 10px;
             text-align: left;
             cursor: pointer;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             transition: border-color 0.2s, background 0.2s, transform 0.2s;
         }
 
@@ -749,7 +753,7 @@
             border: 1px solid var(--line);
             border-radius: 8px;
             padding: 12px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             font-size: 13px;
             line-height: 1.55;
             outline: none;
@@ -817,7 +821,7 @@
             color: var(--text);
             font-size: 12px;
             outline: none;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
         }
 
         .search-input-wrapper input::placeholder {
@@ -882,7 +886,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             box-shadow: 0 12px 28px rgba(212, 175, 55, 0.24);
             transition: all 0.2s;
         }
@@ -943,7 +947,7 @@
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
-            font-family: Georgia, "Times New Roman", serif;
+            font-family: var(--ds-font-sans, "Segoe UI", system-ui, sans-serif);
             letter-spacing: 0.5px;
             margin-top: 8px;
             transition: all 0.2s;

@@ -6,7 +6,7 @@
     <title>SpiritFlow Creator Studio Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind = {
             config: {
@@ -28,6 +28,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="design-tokens.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -50,9 +51,10 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--ds-font-spirit, 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif);
             background: var(--black);
             color: #fff;
+            line-height: var(--ds-leading-body, 1.6);
             overflow-x: hidden;
         }
 
@@ -90,8 +92,9 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--btn-gold), var(--btn-gold-deep));
             color: var(--btn-text);
-            font-weight: 700;
-            transition: all 0.25s ease;
+            font-family: inherit;
+            font-weight: var(--ds-btn-font-weight, 700);
+            transition: var(--ds-btn-transition, all 0.25s ease);
             border: none;
             cursor: pointer;
             box-shadow: 0 8px 22px rgba(212, 175, 55, 0.22);
@@ -111,7 +114,9 @@
             border: 1px solid var(--lemon);
             color: var(--lemon);
             background: transparent;
-            transition: all 0.3s ease;
+            font-family: inherit;
+            font-weight: var(--ds-weight-semibold, 600);
+            transition: var(--ds-btn-transition, all 0.25s ease);
             cursor: pointer;
         }
         .btn-outline:hover {

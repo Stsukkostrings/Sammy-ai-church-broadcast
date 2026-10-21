@@ -13,6 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8dfc00">
     <script src="auth.js"></script>
+    <link rel="stylesheet" href="design-tokens.css">
     <style>
         :root {
             --text: #f3ffe2;
@@ -42,9 +43,10 @@
         }
 
         body {
-            font-family: var(--font-sans);
+            font-family: var(--ds-font-sans, var(--font-sans));
             background: var(--bg);
             color: var(--text);
+            line-height: var(--ds-leading-body, 1.6);
             -webkit-font-smoothing: antialiased;
         }
 
@@ -151,24 +153,24 @@
         }
 
         .contact-card .eyebrow {
-            font-size: 0.65rem;
+            font-size: var(--ds-text-xs, 0.72rem);
             color: var(--accent);
-            font-weight: 700;
+            font-weight: var(--ds-weight-bold, 700);
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: var(--ds-tracking-label, 0.12em);
         }
 
         .contact-card h1 {
-            font-size: 1.1rem;
+            font-size: var(--ds-text-lg, 1.15rem);
             color: var(--accent-strong);
-            font-weight: 700;
-            line-height: 1.3;
+            font-weight: var(--ds-weight-bold, 700);
+            line-height: var(--ds-leading-snug, 1.35);
         }
 
         .contact-card p {
-            font-size: 0.78rem;
+            font-size: var(--ds-text-sm, 0.8rem);
             color: var(--muted);
-            line-height: 1.5;
+            line-height: var(--ds-leading-body, 1.6);
         }
 
         .contact-form {
@@ -185,9 +187,10 @@
         }
 
         .form-group label {
-            font-size: 0.7rem;
+            font-size: var(--ds-text-xs, 0.72rem);
             color: var(--accent);
-            font-weight: 600;
+            font-weight: var(--ds-weight-semibold, 600);
+            letter-spacing: 0.02em;
         }
 
         .form-group input,
@@ -223,13 +226,16 @@
 
         .button-primary {
             font-family: inherit;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 0.55rem 1.2rem;
-            border-radius: 8px;
+            font-size: var(--ds-btn-font-size, 0.8rem);
+            font-weight: var(--ds-btn-font-weight, 700);
+            line-height: var(--ds-btn-line-height, 1);
+            letter-spacing: var(--ds-tracking-button, 0.01em);
+            min-height: var(--ds-btn-height, 38px);
+            padding: var(--ds-btn-pad, 0.6rem 1.2rem);
+            border-radius: var(--ds-btn-radius, 8px);
             cursor: pointer;
             border: none;
-            transition: all 0.2s ease;
+            transition: var(--ds-btn-transition, all 0.2s ease);
             text-decoration: none;
             display: inline-flex;
             align-items: center;

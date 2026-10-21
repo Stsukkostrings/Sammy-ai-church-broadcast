@@ -1,0 +1,68 @@
+/* ==========================================================
+   Omnicast AI + SpiritFlow Sounds — shared design tokens
+   Loaded before each page's own stylesheet/inline styles.
+   Values only: no layout or component rules live here.
+   ========================================================== */
+
+:root {
+    /* Brand font families ---------------------------------- */
+    /* Omnicast AI UI + body */
+    --ds-font-sans: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* SpiritFlow body/UI (loaded from Google Fonts on SpiritFlow pages) */
+    --ds-font-spirit: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    /* SpiritFlow display/serif headings */
+    --ds-font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    /* Code / reference output */
+    --ds-font-mono: "Courier New", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* Type scale ------------------------------------------- */
+    --ds-text-xs: 0.72rem;      /* eyebrows, meta, labels */
+    --ds-text-sm: 0.8rem;       /* supporting copy, buttons */
+    --ds-text-base: 0.9rem;     /* body copy */
+    --ds-text-md: 1rem;         /* larger body / card lead */
+    --ds-text-lg: 1.15rem;      /* card + utility page titles */
+    --ds-text-xl: clamp(1.35rem, 2.6vw, 1.75rem);
+    --ds-text-2xl: clamp(1.7rem, 4vw, 2.7rem);
+    --ds-text-3xl: clamp(1.9rem, 3.6vw, 2.9rem);
+
+    /* Weights ---------------------------------------------- */
+    --ds-weight-regular: 400;
+    --ds-weight-medium: 500;
+    --ds-weight-semibold: 600;
+    --ds-weight-bold: 700;
+    --ds-weight-black: 800;
+
+    /* Line height + tracking ------------------------------- */
+    --ds-leading-tight: 1.15;
+    --ds-leading-snug: 1.35;
+    --ds-leading-body: 1.6;
+    --ds-leading-relaxed: 1.65;
+    --ds-tracking-label: 0.12em;
+    --ds-tracking-heading: -0.01em;
+    --ds-tracking-button: 0.01em;
+
+    /* Button geometry -------------------------------------- */
+    --ds-btn-height-xs: 30px;   /* dense studio toolbars */
+    --ds-btn-height-sm: 32px;   /* compact app controls */
+    --ds-btn-height: 38px;      /* default app/utility action */
+    --ds-btn-height-lg: 48px;   /* large CTA */
+    --ds-btn-height-xl: 54px;   /* SpiritFlow hero + radio */
+
+    --ds-btn-pad-xs: 0.4rem 0.7rem;
+    --ds-btn-pad-sm: 0.45rem 0.9rem;
+    --ds-btn-pad: 0.6rem 1.2rem;
+    --ds-btn-pad-lg: 1rem 2rem;
+    --ds-btn-pad-xl: 1rem 2.1rem;
+
+    --ds-btn-radius: 8px;
+    --ds-btn-radius-sm: 6px;
+    --ds-btn-radius-pill: 999px;
+
+    --ds-btn-font-size-xs: 0.6875rem;
+    --ds-btn-font-size-sm: 0.72rem;
+    --ds-btn-font-size: 0.8rem;
+    --ds-btn-font-weight: 700;
+    --ds-btn-line-height: 1;
+    --ds-btn-transition: transform 180ms ease, background 180ms ease,
+        box-shadow 180ms ease, border-color 180ms ease, color 180ms ease;
+}

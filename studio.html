@@ -15,6 +15,7 @@
     <script src="auth.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108904240723527"
      crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="design-tokens.css">
     <style>
         :root {
             --text: #f3ffe2;
@@ -302,14 +303,17 @@
         .tool-card h3 {
             font-size: 0.95rem;
             color: var(--accent-strong);
-            font-weight: 700;
+            font-weight: var(--ds-weight-bold, 700);
+            line-height: var(--ds-leading-snug, 1.35);
+            letter-spacing: var(--ds-tracking-heading, -0.01em);
         }
 
         .studio-card h4,
         .tool-card h4 {
             font-size: 0.85rem;
             color: var(--accent);
-            font-weight: 600;
+            font-weight: var(--ds-weight-semibold, 600);
+            line-height: var(--ds-leading-snug, 1.35);
         }
 
         .status-chip {
@@ -387,13 +391,16 @@
         .button-primary,
         .button-secondary {
             font-family: inherit;
-            font-size: 0.7rem;
-            font-weight: 600;
-            padding: 0.45rem 0.9rem;
-            border-radius: 8px;
+            font-size: var(--ds-btn-font-size-sm, 0.72rem);
+            font-weight: var(--ds-btn-font-weight, 700);
+            line-height: var(--ds-btn-line-height, 1);
+            letter-spacing: var(--ds-tracking-button, 0.01em);
+            min-height: var(--ds-btn-height-sm, 32px);
+            padding: var(--ds-btn-pad-sm, 0.45rem 0.9rem);
+            border-radius: var(--ds-btn-radius, 8px);
             cursor: pointer;
             border: none;
-            transition: all 0.2s ease;
+            transition: var(--ds-btn-transition, all 0.2s ease);
             text-decoration: none;
             display: inline-flex;
             align-items: center;

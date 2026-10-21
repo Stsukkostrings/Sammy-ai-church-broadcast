@@ -35,6 +35,7 @@ const requiredFiles = [
     'sitemap.xml',
     'navbar.js',
     'style.css',
+    'design-tokens.css',
     'app.js',
     'auth.js'
 ];

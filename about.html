@@ -14,6 +14,7 @@
     <meta name="theme-color" content="#8dfc00">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2108904240723527"
      crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="design-tokens.css">
     <style>
         :root {
             --text: #f3ffe2;
@@ -38,9 +39,10 @@
         }
 
         body {
-            font-family: var(--font-sans);
+            font-family: var(--ds-font-sans, var(--font-sans));
             background: var(--bg);
             color: var(--text);
+            line-height: var(--ds-leading-body, 1.6);
             -webkit-font-smoothing: antialiased;
         }
 
@@ -148,18 +150,18 @@
         }
 
         .about-container h2 {
-            font-size: 0.7rem;
+            font-size: var(--ds-text-xs, 0.72rem);
             color: var(--accent);
-            font-weight: 700;
+            font-weight: var(--ds-weight-bold, 700);
             text-transform: uppercase;
-            letter-spacing: 0.12em;
+            letter-spacing: var(--ds-tracking-label, 0.12em);
         }
 
         .about-container h3 {
-            font-size: 1.1rem;
+            font-size: var(--ds-text-lg, 1.15rem);
             color: var(--accent-strong);
-            font-weight: 700;
-            line-height: 1.3;
+            font-weight: var(--ds-weight-bold, 700);
+            line-height: var(--ds-leading-snug, 1.35);
         }
 
         .about-container h3 strong {
@@ -168,9 +170,9 @@
         }
 
         .about-container p {
-            font-size: 0.78rem;
+            font-size: var(--ds-text-sm, 0.8rem);
             color: var(--muted);
-            line-height: 1.55;
+            line-height: var(--ds-leading-body, 1.6);
             text-align: center;
         }
 
