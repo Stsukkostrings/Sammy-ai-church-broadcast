@@ -41,6 +41,8 @@ var SPIRITFLOW_CONFIG = {
     },
     youtubeLiveUrl: "",       // PUBLIC
     youtubeChannelUrl: "",    // PUBLIC
+    rumbleLiveUrl: "",        // PUBLIC (embed or livestream URL)
+    rumbleChannelUrl: "",     // PUBLIC
     submitMusicUrl: "contact.html",
     socialLinks: [            // leave href empty to hide an icon
         { label: "Instagram", href: "", svg: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none"/></svg>' },
@@ -309,11 +311,52 @@ function startSpiritFlow() {
                 ytBtn.href = ytUrl;
                 ytBtn.removeAttribute("aria-disabled");
                 if (SPIRITFLOW_CONFIG.youtubeLiveUrl) {
-                    ytFrame.innerHTML = '<iframe src="' + SPIRITFLOW_CONFIG.youtubeLiveUrl.replace("watch?v=", "embed/") + '" title="SpiritFlow Sounds Radio live on YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+                    var ytEmbed = SPIRITFLOW_CONFIG.youtubeLiveUrl;
+                    if (ytEmbed.indexOf("watch?v=") !== -1) {
+                        ytEmbed = ytEmbed.replace("watch?v=", "embed/");
+                    } else if (ytEmbed.indexOf("youtu.be/") !== -1) {
+                        ytEmbed = ytEmbed.replace("youtu.be/", "www.youtube.com/embed/");
+                    }
+                    ytFrame.innerHTML = '<iframe src="' + ytEmbed + '" title="SpiritFlow Sounds Radio live on YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
                 }
             } else {
                 ytBtn.setAttribute("aria-disabled", "true");
                 ytBtn.addEventListener("click", function (e) { e.preventDefault(); });
+            }
+        }
+
+        /* ---- Rumble (additive, no broken embeds, no stream keys, ever) ---- */
+        var rumbleBtn = $("sfrRumbleBtn"), rumbleFrame = $("sfrRumbleFrame"), rumbleStatus = $("sfrRumbleStatus"), rumbleStatusText = $("sfrRumbleStatusText");
+        if (rumbleBtn || rumbleFrame) {
+            var rumbleUrl = SPIRITFLOW_CONFIG.rumbleLiveUrl || SPIRITFLOW_CONFIG.rumbleChannelUrl;
+            if (rumbleBtn) {
+                if (rumbleUrl) {
+                    rumbleBtn.href = rumbleUrl;
+                    rumbleBtn.removeAttribute("aria-disabled");
+                } else {
+                    rumbleBtn.setAttribute("aria-disabled", "true");
+                    rumbleBtn.addEventListener("click", function (e) { e.preventDefault(); });
+                }
+            }
+            if (rumbleFrame && SPIRITFLOW_CONFIG.rumbleLiveUrl) {
+                var rUrl = SPIRITFLOW_CONFIG.rumbleLiveUrl;
+                // Try to embed common Rumble patterns if it's an embed URL or a video URL; otherwise leave graceful message
+                if (rUrl.indexOf("embed") !== -1 || rUrl.indexOf("/v") !== -1 || rUrl.indexOf("rumble.com") !== -1) {
+                    // Rumble embed typically uses iframes; use as-is if it looks like an embed, else try to keep as provided
+                    rumbleFrame.innerHTML = '<iframe src="' + rUrl + '" title="SpiritFlow Sounds Radio live on Rumble" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+                }
+            }
+            if (rumbleStatus && rumbleStatusText) {
+                if (SPIRITFLOW_CONFIG.rumbleLiveUrl) {
+                    rumbleStatus.dataset.state = "live";
+                    rumbleStatusText.textContent = "Live";
+                } else if (SPIRITFLOW_CONFIG.rumbleChannelUrl) {
+                    rumbleStatus.dataset.state = "connecting";
+                    rumbleStatusText.textContent = "Channel";
+                } else {
+                    rumbleStatus.dataset.state = "offline";
+                    rumbleStatusText.textContent = "Offline";
+                }
             }
         }
 
@@ -348,6 +391,8 @@ function startSpiritFlow() {
             if (cfg.streamUrl) SPIRITFLOW_CONFIG.streamUrl = cfg.streamUrl;
             if (cfg.youtubeLiveUrl) SPIRITFLOW_CONFIG.youtubeLiveUrl = cfg.youtubeLiveUrl;
             if (cfg.youtubeChannelUrl) SPIRITFLOW_CONFIG.youtubeChannelUrl = cfg.youtubeChannelUrl;
+            if (cfg.rumbleLiveUrl) SPIRITFLOW_CONFIG.rumbleLiveUrl = cfg.rumbleLiveUrl;
+            if (cfg.rumbleChannelUrl) SPIRITFLOW_CONFIG.rumbleChannelUrl = cfg.rumbleChannelUrl;
             if (cfg.submitMusicUrl) SPIRITFLOW_CONFIG.submitMusicUrl = cfg.submitMusicUrl;
             if (cfg.nowPlayingEndpoint) SPIRITFLOW_CONFIG.azuracast.apiProxyEndpoint = '/api/spiritflow/';
         }
