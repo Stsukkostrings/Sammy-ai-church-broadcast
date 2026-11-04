@@ -1,6 +1,7 @@
 .git
 .idea
 node_modules
+opencode-desktop-win-x64.exe
 .data
 .data/**
 .secrets
