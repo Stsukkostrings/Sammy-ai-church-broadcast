@@ -49,9 +49,6 @@ const server = http.createServer((req, res) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
     
-    // CORS for local development
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    
     let filePath = '.' + req.url;
     if (filePath === './') filePath = './studio.html';
     

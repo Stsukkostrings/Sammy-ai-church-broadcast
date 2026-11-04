@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <script src="storage-scope.js"></script>
+    <script src="overlay-relay.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scripture Lower Third</title>
     <link rel="stylesheet" href="design-tokens.css">
@@ -235,14 +238,11 @@
         const verseText = document.getElementById("verseText");
         const lowerThirdCard = document.getElementById("lowerThirdCard");
         const liveOverlayChannel = createLiveOverlayChannel();
+        const relayToken = window.OmnicastOverlayRelay?.tokenFromLocation() || "";
         let lastSignature = "";
 
         function createLiveOverlayChannel() {
-            try {
-                return "BroadcastChannel" in window ? new BroadcastChannel(OVERLAY_STORAGE_KEY) : null;
-            } catch (error) {
-                return null;
-            }
+            return window.OmnicastStorage?.channel(OVERLAY_STORAGE_KEY) || null;
         }
 
         function applyOverlayPayload(payload) {
@@ -275,7 +275,8 @@
         function renderOverlay() {
             let payload = null;
             try {
-                payload = JSON.parse(localStorage.getItem(OVERLAY_STORAGE_KEY) || localStorage.getItem(LEGACY_OVERLAY_STORAGE_KEY) || "null");
+                payload = JSON.parse(window.OmnicastStorage?.getItem(OVERLAY_STORAGE_KEY)
+                    || window.OmnicastStorage?.getItem(LEGACY_OVERLAY_STORAGE_KEY) || "null");
             } catch (error) {
                 payload = null;
             }
@@ -283,18 +284,29 @@
             applyOverlayPayload(payload);
         }
 
-        window.addEventListener("storage", (event) => {
-            if (event.key === OVERLAY_STORAGE_KEY || event.key === LEGACY_OVERLAY_STORAGE_KEY) {
-                renderOverlay();
-            }
-        });
+        if (relayToken) {
+            /* OBS has its own browser process and no studio login. The public,
+             * revocable token is the only data source in this mode. */
+            window.OmnicastOverlayRelay?.poll(
+                relayToken,
+                (overlay) => applyOverlayPayload(overlay?.payload),
+                (message) => applyOverlayPayload({
+                    reference: "OBS Overlay Unavailable",
+                    text: message,
+                    visible: true
+                })
+            );
+        } else {
+            window.OmnicastStorage?.onStorage(OVERLAY_STORAGE_KEY, renderOverlay);
+            window.OmnicastStorage?.onStorage(LEGACY_OVERLAY_STORAGE_KEY, renderOverlay);
 
-        liveOverlayChannel?.addEventListener("message", (event) => {
-            applyOverlayPayload(event.data);
-        });
+            liveOverlayChannel?.addEventListener("message", (event) => {
+                applyOverlayPayload(event.data);
+            });
 
-        renderOverlay();
-        setInterval(renderOverlay, 700);
+            renderOverlay();
+            setInterval(renderOverlay, 700);
+        }
     </script>
 </body>
 </html>

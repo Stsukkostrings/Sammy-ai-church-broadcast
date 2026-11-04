@@ -8,6 +8,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="storage-scope.js"></script>
+    <script src="auth.js" defer></script>
+    <script>document.addEventListener('DOMContentLoaded', () => window.AuthStore?.mountAccountWidget('omnicast-account-widget'));</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Studio | OmniCast AI</title>
     <link rel="manifest" href="manifest.json">
@@ -56,11 +59,12 @@
 
                 <aside class="auth-panel reveal" id="authPanel">
                     <p class="eyebrow">Instant Access</p>
-                    <h3>Open the studio without login</h3>
+                    <h3>Start with local studio tools</h3>
+                    <div id="omnicast-account-widget" aria-live="polite"></div>
                     <p>Start listening right away, capture live notes in real time, prepare overlays, and send browser-source output into OBS.</p>
                     <div class="auth-form">
                         <a class="button-primary auth-submit" href="studio.html">Open Workspace</a>
-                        <a class="button-secondary auth-submit" href="studio.html#presentationSection">Setup OBS Overlay</a>
+                        <a class="button-secondary auth-submit" href="overlay-settings.html?key=lower-third">Setup OBS Overlay</a>
                     </div>
                     <div class="overlay-preview">
                         <strong>Live workflow</strong>
@@ -143,6 +147,7 @@
     <script src="navbar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/obs-websocket-js"></script>
     <script src="ads.js"></script>
+    <script src="overlay-relay.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

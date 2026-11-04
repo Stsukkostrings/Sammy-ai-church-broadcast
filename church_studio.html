@@ -8,6 +8,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="no-referrer">
+    <script src="storage-scope.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Church Studio | OmniCast AI</title>
     <link rel="manifest" href="manifest.json">
@@ -2176,7 +2178,8 @@
                 <div class="studio-menu-list">
                     <button type="button" data-menu-action="open-lower-third">Open Lower Third</button>
                     <button type="button" data-menu-action="open-main-studio">Open Main Studio</button>
-                    <button type="button" data-menu-action="copy-obs-url">Copy OBS Browser Source</button>
+                    <button type="button" data-menu-action="copy-obs-url">Copy Preview Overlay URL</button>
+                    <button type="button" data-menu-action="open-overlay-settings">Open Secure OBS Settings</button>
                 </div>
             </details>
             <details class="studio-menu">
@@ -2225,6 +2228,10 @@
                         <a class="btn-lyrics" id="obsLinkButton" href="church_studio.html?overlay=lower-third" target="_blank" title="Open OBS Overlay">
                 OBS LINK
                 <i class="fas fa-link"></i>
+            </a>
+            <a class="btn-lyrics" href="overlay-settings.html?key=church" title="Manage secure OBS overlay link">
+                OBS SETUP
+                <i class="fas fa-shield-halved"></i>
             </a>
 <a class="btn-lyrics" id="autoLyricsLink" href="omnicast_lyrics.html" title="Open Auto Lyrics">
                 Auto
@@ -2446,6 +2453,7 @@
 
     
 <script src="navbar.js"></script>
+    <script src="overlay-relay.js"></script>
     <script src="ads.js"></script>
     <script src="desktop-whisper.js"></script>
         <script>
@@ -2459,8 +2467,9 @@
         const liveVisibilityButton = document.getElementById("liveVisibilityButton");
         const CHURCH_OVERLAY_STORAGE_KEY = "omnicast_church_live_overlay_v1";
         const CHURCH_OVERLAY_URL = new URL("church_studio.html?overlay=lower-third", window.location.href).toString();
+        const churchRelayToken = window.OmnicastOverlayRelay?.tokenFromLocation() || "";
         const isChurchStandaloneOverlay = new URLSearchParams(window.location.search).get("overlay") === "lower-third";
-        const liveOverlayChannel = createLiveOverlayChannel();
+        const churchLiveOverlayChannel = createLiveOverlayChannel();
         const churchMenuFeedback = document.getElementById("churchMenuFeedback");
         document.getElementById("openObsOverlayLink")?.setAttribute("href", CHURCH_OVERLAY_URL);
         document.getElementById("obsLinkButton")?.setAttribute("href", CHURCH_OVERLAY_URL);
@@ -2563,11 +2572,7 @@
         buildLiveBibleWordIndex();
 
         function createLiveOverlayChannel() {
-            try {
-                return "BroadcastChannel" in window ? new BroadcastChannel(CHURCH_OVERLAY_STORAGE_KEY) : null;
-            } catch (error) {
-                return null;
-            }
+            return window.OmnicastStorage?.channel(CHURCH_OVERLAY_STORAGE_KEY) || null;
         }
 
         function applyChurchStandaloneOverlay(payload) {
@@ -2588,7 +2593,7 @@
         function renderChurchStandaloneOverlay() {
             let payload = null;
             try {
-                payload = JSON.parse(localStorage.getItem(CHURCH_OVERLAY_STORAGE_KEY) || "null");
+                payload = JSON.parse(window.OmnicastStorage?.getItem(CHURCH_OVERLAY_STORAGE_KEY) || "null");
             } catch (error) {
                 payload = null;
             }
@@ -2596,16 +2601,26 @@
         }
 
         if (isChurchStandaloneOverlay) {
-            renderChurchStandaloneOverlay();
-            window.addEventListener("storage", (event) => {
-                if (event.key === CHURCH_OVERLAY_STORAGE_KEY) {
-                    renderChurchStandaloneOverlay();
-                }
-            });
-            liveOverlayChannel?.addEventListener("message", (event) => {
-                applyChurchStandaloneOverlay(event.data);
-            });
-            setInterval(renderChurchStandaloneOverlay, 700);
+            if (churchRelayToken) {
+                /* OBS is a separate browser process. Poll the owner-scoped
+                 * public token instead of relying on this browser's storage. */
+                window.OmnicastOverlayRelay?.poll(
+                    churchRelayToken,
+                    (overlay) => applyChurchStandaloneOverlay(overlay?.payload),
+                    (message) => applyChurchStandaloneOverlay({
+                        reference: "OBS Overlay Unavailable",
+                        text: message,
+                        visible: true
+                    })
+                );
+            } else {
+                renderChurchStandaloneOverlay();
+                window.OmnicastStorage?.onStorage(CHURCH_OVERLAY_STORAGE_KEY, renderChurchStandaloneOverlay);
+                churchLiveOverlayChannel?.addEventListener("message", (event) => {
+                    applyChurchStandaloneOverlay(event.data);
+                });
+                setInterval(renderChurchStandaloneOverlay, 700);
+            }
         }
 
         const fallbackPlannerItems = [
@@ -2618,7 +2633,7 @@
 
         function readFallbackPlannerDone() {
             try {
-                return JSON.parse(localStorage.getItem("omnicast_planner_progress_v2") || "[]");
+                return JSON.parse(window.OmnicastStorage?.getItem("omnicast_planner_progress_v2") || "[]");
             } catch (error) {
                 return [];
             }
@@ -2662,7 +2677,7 @@
             const nextDoneItems = doneItems.includes(itemId)
                 ? doneItems.filter((entry) => entry !== itemId)
                 : [...doneItems, itemId];
-            localStorage.setItem("omnicast_planner_progress_v2", JSON.stringify(nextDoneItems));
+            window.OmnicastStorage?.setItem("omnicast_planner_progress_v2", JSON.stringify(nextDoneItems));
             renderFallbackPlanner(true);
         }, true);
 
@@ -3765,7 +3780,7 @@
             const archiveKey = "omnicast_archive_sessions_v2";
             let archive = [];
             try {
-                archive = JSON.parse(localStorage.getItem(archiveKey) || "[]");
+                archive = JSON.parse(window.OmnicastStorage?.getItem(archiveKey) || "[]");
             } catch (error) {
                 archive = [];
             }
@@ -3776,7 +3791,7 @@
                 summary: notes.split(/\s+/).slice(0, 40).join(" "),
                 createdAt: new Date().toISOString()
             });
-            localStorage.setItem(archiveKey, JSON.stringify(archive));
+            window.OmnicastStorage?.setItem(archiveKey, JSON.stringify(archive));
             document.getElementById("archiveCount").textContent = String(archive.length);
             setMenuFeedback("Session archived");
         }
@@ -3892,8 +3907,11 @@
                 "open-lyrics": () => {
                     window.location.href = "omnicast_lyrics.html";
                 },
+                "open-overlay-settings": () => {
+                    window.location.href = "overlay-settings.html?key=church";
+                },
                 "show-help": () => {
-                    alert("Use Start Listening to capture speech and spoken Bible references. Use Copy OBS URL or Open Lower Third to show scripture in livestream software. Use Auto Lyrics to open the dedicated lyrics page for live singing detection.");
+                    alert("Use Start Listening to capture speech and spoken Bible references. Use Open Secure OBS Settings to create the read-only URL for OBS; the preview URL only works in this browser. Use Auto Lyrics for live singing detection.");
                     setMenuFeedback("Help opened");
                 },
                 "open-about": () => {
@@ -4028,8 +4046,9 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
-            liveOverlayChannel?.postMessage(payload);
+            window.OmnicastStorage?.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
+            churchLiveOverlayChannel?.postMessage(payload);
+            window.OmnicastOverlayRelay?.publish("church", payload);
         }
 
         async function fetchVerseFromPreviewInput() {
@@ -4208,14 +4227,15 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
-            liveOverlayChannel?.postMessage(payload);
+            window.OmnicastStorage?.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
+            churchLiveOverlayChannel?.postMessage(payload);
+            window.OmnicastOverlayRelay?.publish("church", payload);
         }
 
         function clearFetchOverlay() {
             let currentPayload = null;
             try {
-                currentPayload = JSON.parse(localStorage.getItem(CHURCH_OVERLAY_STORAGE_KEY) || "null");
+                currentPayload = JSON.parse(window.OmnicastStorage?.getItem(CHURCH_OVERLAY_STORAGE_KEY) || "null");
             } catch (error) {
                 currentPayload = null;
             }
@@ -4231,8 +4251,9 @@
                 updatedAt: new Date().toISOString()
             };
 
-            localStorage.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
-            liveOverlayChannel?.postMessage(payload);
+            window.OmnicastStorage?.setItem(CHURCH_OVERLAY_STORAGE_KEY, JSON.stringify(payload));
+            churchLiveOverlayChannel?.postMessage(payload);
+            window.OmnicastOverlayRelay?.publish("church", payload);
         }
 
         // Hook into existing fetch functions

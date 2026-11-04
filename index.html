@@ -8,6 +8,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="storage-scope.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpiritFlow Sounds | Gospel Radio &amp; Omnicast AI Creator Studio</title>
     <meta name="description" content="SpiritFlow Sounds is the home of Afro-gospel, worship and inspirational radio - listen live, then explore Omnicast AI, the creator studio for churches, media teams and broadcasters.">
@@ -30,6 +31,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#12100d">
     <script src="auth.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', () => window.AuthStore?.mountAccountWidget('omnicast-account-widget'));</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -995,7 +997,7 @@
                             <div class="hero-actions">
                                 <a class="button-primary" href="church_studio.html">Open Church Studio</a>
                                 <a class="button-secondary" href="studio.html">Open Main Studio</a>
-                                <a class="button-secondary" href="downloads/OmniCast-AI.exe" download="OmniCast-AI.exe">Download Desktop App</a>
+                                <span class="button-secondary" aria-disabled="true" title="The Windows installer has not been released">Windows installer unavailable</span>
                                 <button class="button-secondary install-button" id="installBtn" type="button" style="display:none;">Install App</button>
                             </div>
 
@@ -1004,9 +1006,10 @@
 
                         <aside class="auth-panel" id="authPanel">
                             <p class="eyebrow">Instant Access</p>
-                            <h3>Open the studio without login</h3>
-                            <p>Start listening right away, capture live notes in real time, prepare scripture overlays, detect worship lyrics, and send browser-source output into livestream software.</p>
+                            <h3>Start with local studio tools</h3>
+                            <p>Use local broadcast tools right away. Sign in with Google to connect YouTube, save account settings, and use protected Creator Studio features.</p>
                             <div class="auth-form">
+                                <div id="omnicast-account-widget" aria-live="polite"></div>
                                 <a class="button-primary auth-submit" href="church_studio.html">Launch Church Studio</a>
                             </div>
                             <div class="overlay-preview">
@@ -1105,6 +1108,7 @@
     </div>
 
     <script src="ads.js"></script>
+    <script src="overlay-relay.js"></script>
     <script src="app.js"></script>
     <script src="spiritflow-player.js"></script>
     <script>

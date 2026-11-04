@@ -37,7 +37,13 @@ const requiredFiles = [
     'style.css',
     'design-tokens.css',
     'app.js',
-    'auth.js'
+    'auth.js',
+    'overlay-relay.js',
+    'overlay-settings.js',
+    'overlay-settings.html',
+    'api/overlay-channel.js',
+    'api/overlay-publish.js',
+    'api/overlay-public.js'
 ];
 
 requiredFiles.forEach((file) => {
@@ -68,22 +74,12 @@ htmlFiles.forEach((file) => {
     });
 
     /* internal links must exist */
-    const KNOWN_MISSING = {
-        /* Pre-existing on the deployed site: the desktop installer binary is not
-           in the repository and returns 404 in production too. The button is kept
-           for parity and reported in the final project report. */
-        'downloads/OmniCast-AI.exe': 'pre-existing: desktop installer binary is not in the repository'
-    };
     [...html.matchAll(/(?:href|src)="([^"]+)"/g)].forEach((m) => {
         let target = m[1].trim();
         if (/^(https?:|\/\/|#|mailto:|tel:|data:|javascript:)/i.test(target)) return;
         target = target.split('#')[0].split('?')[0];
         if (!target) return;
         if (target.startsWith('/')) target = target.slice(1);
-        if (KNOWN_MISSING[target]) {
-            notes.push(`${file}: known missing target ${target} (${KNOWN_MISSING[target]})`);
-            return;
-        }
         if (!extensionlessExists(target)) fail(`${file}: broken internal reference -> ${m[1]}`);
     });
 });

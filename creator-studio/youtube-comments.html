@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Comment Manager | SpiritFlow Sounds - OmniCast AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../design-tokens.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #d4af37;
+            --gold-deep: #a8821f;
+            --gold-soft: #e8cf8a;
+            --lemon: #8dfc00;
+            --cream: #f7f1e3;
+            --cream-dim: #cfc6b0;
+            --bg: #0a0a0a;
+            --bg2: #141414;
+            --bg3: #1e1e1e;
+            --line: rgba(212, 175, 55, 0.22);
+        }
+        body { font-family: var(--ds-font-spirit, 'Manrope', system-ui, sans-serif); background: var(--bg); color: var(--cream); line-height: 1.6; }
+        nav { background: linear-gradient(135deg, #d4af37 0%, #a8821f 100%); border-bottom: 1px solid rgba(23,19,7,0.25); padding: 0.6rem 0; }
+        .nav-wrap { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .nav-brand { display: flex; align-items: center; gap: 0.7rem; color: #171307; text-decoration: none; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.85rem; }
+        .nav-links { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .nav-links a { color: #171307; text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+        .nav-links a:hover { background: var(--lemon); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .header { margin-bottom: 2rem; }
+        .header h1 { font-family: var(--ds-font-display, 'Cormorant Garamond', serif); font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.5rem; }
+        .header p { color: var(--cream-dim); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: linear-gradient(145deg, var(--bg2), var(--bg3)); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem; }
+        .stat-label { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; }
+        .toolbar { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
+        .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.25rem; border-radius: 999px; border: 1px solid var(--line); background: linear-gradient(135deg, var(--gold), var(--gold-deep)); color: #171307; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+        .btn:hover { background: linear-gradient(135deg, var(--lemon), #c8ff65); }
+        .btn-ghost { background: transparent; color: var(--cream); }
+        .btn-ghost:hover { background: rgba(212,175,55,0.1); }
+        .filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .filter { padding: 0.4rem 0.9rem; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--cream-dim); cursor: pointer; font-size: 0.75rem; }
+        .filter.active { background: var(--gold); color: #171307; border-color: var(--gold); }
+        .comments { display: flex; flex-direction: column; gap: 1rem; }
+        .comment-card { background: linear-gradient(145deg, var(--bg2), var(--bg3)); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+        .comment-header { padding: 1.25rem; display: flex; gap: 1rem; border-bottom: 1px solid var(--line); }
+        .avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-deep)); display: flex; align-items: center; justify-content: center; color: #171307; font-weight: 800; flex-shrink: 0; }
+        .comment-meta { flex: 1; }
+        .comment-author { font-weight: 700; margin-bottom: 0.25rem; }
+        .comment-video { font-size: 0.85rem; color: var(--cream-dim); margin-bottom: 0.25rem; }
+        .comment-date { font-size: 0.8rem; color: var(--cream-dim); }
+        .comment-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .badge { padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.7rem; background: rgba(212,175,55,0.15); color: var(--gold); }
+        .comment-body { padding: 1.25rem; }
+        .comment-text { font-size: 0.95rem; line-height: 1.7; margin-bottom: 1rem; white-space: pre-wrap; }
+        .draft-section { background: rgba(141,252,0,0.05); border: 1px solid rgba(141,252,0,0.3); border-radius: 12px; padding: 1rem; margin-top: 1rem; }
+        .draft-header { display: flex; align-items: center; gap: 0.5rem; color: var(--lemon); font-weight: 700; margin-bottom: 0.75rem; }
+        .draft-textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--cream); padding: 0.75rem; border-radius: 8px; font-family: inherit; font-size: 0.9rem; resize: vertical; min-height: 80px; }
+        .draft-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+        .comment-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; padding: 1rem 1.25rem; border-top: 1px solid var(--line); background: rgba(0,0,0,0.2); }
+        .action-btn { padding: 0.5rem 0.9rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--cream); cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; gap: 0.4rem; }
+        .action-btn:hover { background: rgba(212,175,55,0.1); }
+        .action-btn.primary { background: var(--gold); color: #171307; border-color: var(--gold); }
+        .action-btn.primary:hover { background: var(--lemon); }
+        .empty { text-align: center; padding: 3rem; color: var(--cream-dim); }
+        @media (max-width: 768px) { .nav-links { display: none; } }
+    </style>
+    <script src="../auth.js" defer></script>
+</head>
+<body>
+    <nav>
+        <div class="nav-wrap">
+            <a class="nav-brand" href="../index.html">
+                <span style="width: 32px; height: 32px; border-radius: 50%; background: #171307; display: flex; align-items: center; justify-content: center;">
+                    <img src="../channels4_profile.jpg" alt="" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                </span>
+                SpiritFlow Sounds
+            </a>
+            <div class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../spiritflow-sounds-radio.html">Radio</a>
+                <a href="../spiritflow_creator_studio.html">Creator Studio</a>
+                <a href="./youtube-comments.html">YouTube Comments</a>
+                <a href="../omnicast-ai.html">Omnicast AI</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="header">
+            <h1>YouTube Comment Manager</h1>
+            <p>Manage your connected YouTube channel comments with AI-assisted replies • Human approval required</p>
+            <div class="toolbar" style="margin-top:1rem;">
+                <div id="omnicast-account-widget" aria-live="polite"></div>
+                <div id="youtube-channel-picker"></div>
+            </div>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Comments</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Unanswered</div>
+                <div class="stat-value" id="stat-unanswered">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">AI Drafts</div>
+                <div class="stat-value" id="stat-drafts">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Published</div>
+                <div class="stat-value" id="stat-published">0</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn" onclick="syncComments()">
+                <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+                Sync Now
+            </button>
+            <button class="btn btn-ghost" onclick="location.href='../api/youtube-auth'">
+                <i data-lucide="link" style="width: 16px; height: 16px;"></i>
+                Connect YouTube
+            </button>
+            <span style="color: var(--cream-dim); font-size: 0.85rem;" id="sync-status">Not synced yet</span>
+        </div>
+
+        <div class="filters">
+            <button class="filter active" data-filter="all">All</button>
+            <button class="filter" data-filter="unanswered">Unanswered</button>
+            <button class="filter" data-filter="draft">Drafts</button>
+            <button class="filter" data-filter="published">Published</button>
+            <button class="filter" data-filter="Prayer requests">Prayer requests</button>
+            <button class="filter" data-filter="Praise and appreciation">Praise</button>
+        </div>
+
+        <div class="comments" id="comments-list">
+            <div class="empty">
+                <i data-lucide="message-circle" style="width: 48px; height: 48px; margin: 0 auto 1rem; display: block; opacity: 0.5;"></i>
+                <p>No comments yet. Connect YouTube and sync to retrieve comments.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let allComments = [], allDrafts = [], allPublished = [];
+        const pendingCommentActions = new Set();
+
+        async function withCommentAction(commentId, action) {
+            if (pendingCommentActions.has(commentId)) return;
+            pendingCommentActions.add(commentId);
+            try { await action(); } finally { pendingCommentActions.delete(commentId); }
+        }
+
+        function showSessionExpired(response) {
+            if (response.status !== 401) return false;
+            showListNotice('Your Omnicast sign-in has expired. Sign in again to manage channel comments.', true);
+            setSyncStatus('Sign-in required');
+            return true;
+        }
+
+        function showListNotice(message, showSignIn) {
+            const list = document.getElementById('comments-list');
+            list.innerHTML = '';
+            const box = document.createElement('div');
+            box.className = 'empty';
+            const p = document.createElement('p');
+            p.textContent = message;
+            box.appendChild(p);
+            if (showSignIn) {
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.style.marginTop = '1rem';
+                btn.textContent = 'Sign in with Google';
+                btn.addEventListener('click', () => window.AuthStore?.login());
+                box.appendChild(btn);
+            }
+            list.appendChild(box);
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function setSyncStatus(message) {
+            const el = document.getElementById('sync-status');
+            if (el) el.textContent = message;
+        }
+
+        async function loadComments() {
+            try {
+                const res = await fetch('/api/youtube-comments-list', { credentials: 'same-origin', cache: 'no-store' });
+                let data = {};
+                try { data = await res.json(); } catch (_) {}
+                if ([401, 403].includes(res.status) || ['UNAUTHENTICATED', 'AUTH_EXPIRED', 'AUTH_INVALID'].includes(data.code)) {
+                    updateStats();
+                    showListNotice('Sign in with Google to manage the comments on your connected YouTube channel.', true);
+                    setSyncStatus('Not signed in');
+                    return;
+                }
+                if (!res.ok || !data.ok) {
+                    updateStats();
+                    showListNotice(data.error || 'Comments could not be loaded. Please try again.', false);
+                    setSyncStatus('Load failed');
+                    return;
+                }
+                allComments = data.comments || [];
+                allDrafts = data.drafts || [];
+                allPublished = data.published || [];
+                updateStats();
+                renderComments();
+                if (data.sync?.lastSync) {
+                    setSyncStatus('Last sync: ' + new Date(data.sync.lastSync).toLocaleString());
+                }
+            } catch (e) {
+                showListNotice('Network error: comments could not be loaded. Check your connection and try again.', false);
+                setSyncStatus('Network error');
+            }
+        }
+        
+        function updateStats() {
+            document.getElementById('stat-total').textContent = allComments.length;
+            document.getElementById('stat-unanswered').textContent = allComments.filter(c => c.status === 'unanswered').length;
+            document.getElementById('stat-drafts').textContent = allDrafts.length;
+            document.getElementById('stat-published').textContent = allPublished.length;
+        }
+        
+        function renderComments(filter = 'all') {
+            const list = document.getElementById('comments-list');
+            list.innerHTML = '';
+            let comments = allComments;
+            if (filter === 'unanswered') comments = comments.filter(c => c.status === 'unanswered');
+            else if (filter === 'draft') comments = comments.filter(c => c.status === 'draft');
+            else if (filter === 'published') comments = comments.filter(c => c.status === 'published');
+            else if (filter !== 'all') comments = comments.filter(c => c.category === filter);
+            
+            if (comments.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty';
+                const p = document.createElement('p');
+                p.textContent = 'No comments match this filter.';
+                empty.appendChild(p);
+                list.appendChild(empty);
+                return;
+            }
+            
+            comments.forEach(c => {
+                const draft = allDrafts.find(d => d.commentId === c.commentId);
+                const card = document.createElement('div');
+                card.className = 'comment-card';
+                
+                const header = document.createElement('div');
+                header.className = 'comment-header';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar';
+                avatar.textContent = (c.authorDisplayName || 'U')[0].toUpperCase();
+                
+                const meta = document.createElement('div');
+                meta.className = 'comment-meta';
+                
+                const author = document.createElement('div');
+                author.className = 'comment-author';
+                author.textContent = c.authorDisplayName || '';
+                
+                const video = document.createElement('div');
+                video.className = 'comment-video';
+                video.textContent = c.videoTitle || '';
+                
+                const date = document.createElement('div');
+                date.className = 'comment-date';
+                try { date.textContent = c.publishedAt ? new Date(c.publishedAt).toLocaleString() : ''; } catch(e) { date.textContent = ''; }
+                
+                const badges = document.createElement('div');
+                badges.className = 'comment-badges';
+                const cat = document.createElement('span');
+                cat.className = 'badge';
+                cat.textContent = c.category || 'Unclassified';
+                badges.appendChild(cat);
+                const status = document.createElement('span');
+                status.className = 'badge';
+                status.textContent = c.status || '';
+                badges.appendChild(status);
+                if (c.language) {
+                    const lang = document.createElement('span');
+                    lang.className = 'badge';
+                    lang.textContent = c.language;
+                    badges.appendChild(lang);
+                }
+                
+                meta.appendChild(author);
+                meta.appendChild(video);
+                meta.appendChild(date);
+                meta.appendChild(badges);
+                header.appendChild(avatar);
+                header.appendChild(meta);
+                card.appendChild(header);
+                
+                const body = document.createElement('div');
+                body.className = 'comment-body';
+                const textDiv = document.createElement('div');
+                textDiv.className = 'comment-text';
+                textDiv.textContent = c.text || '';
+                body.appendChild(textDiv);
+                
+                if (draft) {
+                    const draftSection = document.createElement('div');
+                    draftSection.className = 'draft-section';
+                    const draftHeader = document.createElement('div');
+                    draftHeader.className = 'draft-header';
+                    const spark = document.createElement('i');
+                    spark.setAttribute('data-lucide', 'sparkles');
+                    spark.style.width = '16px';
+                    spark.style.height = '16px';
+                    draftHeader.appendChild(spark);
+                    draftHeader.appendChild(document.createTextNode(' AI Draft'));
+                    const ta = document.createElement('textarea');
+                    ta.className = 'draft-textarea';
+                    ta.id = 'draft-' + c.commentId;
+                    ta.value = draft.text || '';
+                    const draftActions = document.createElement('div');
+                    draftActions.className = 'draft-actions';
+                    const saveBtn = document.createElement('button');
+                    saveBtn.className = 'action-btn';
+                    const saveIcon = document.createElement('i');
+                    saveIcon.setAttribute('data-lucide', 'save');
+                    saveIcon.style.width = '14px';
+                    saveIcon.style.height = '14px';
+                    saveBtn.appendChild(saveIcon);
+                    saveBtn.appendChild(document.createTextNode(' Save Draft'));
+                    saveBtn.addEventListener('click', () => withCommentAction(c.commentId, () => saveDraft(c.commentId)));
+                    const pubBtn = document.createElement('button');
+                    pubBtn.className = 'action-btn primary';
+                    const sendIcon = document.createElement('i');
+                    sendIcon.setAttribute('data-lucide', 'send');
+                    sendIcon.style.width = '14px';
+                    sendIcon.style.height = '14px';
+                    pubBtn.appendChild(sendIcon);
+                    pubBtn.appendChild(document.createTextNode(' Approve & Reply'));
+                    pubBtn.addEventListener('click', () => withCommentAction(c.commentId, () => publishReply(c.commentId)));
+                    draftActions.appendChild(saveBtn);
+                    draftActions.appendChild(pubBtn);
+                    draftSection.appendChild(draftHeader);
+                    draftSection.appendChild(ta);
+                    draftSection.appendChild(draftActions);
+                    body.appendChild(draftSection);
+                }
+                card.appendChild(body);
+                
+                const actions = document.createElement('div');
+                actions.className = 'comment-actions';
+                if (!draft) {
+                    const genBtn = document.createElement('button');
+                    genBtn.className = 'action-btn';
+                    const genIcon = document.createElement('i');
+                    genIcon.setAttribute('data-lucide', 'sparkles');
+                    genIcon.style.width = '14px';
+                    genIcon.style.height = '14px';
+                    genBtn.appendChild(genIcon);
+                    genBtn.appendChild(document.createTextNode(' Generate AI Reply'));
+                    genBtn.addEventListener('click', () => withCommentAction(c.commentId, () => generateDraft(c.commentId)));
+                    actions.appendChild(genBtn);
+                }
+                if (draft) {
+                    const regenBtn = document.createElement('button');
+                    regenBtn.className = 'action-btn';
+                    const regenIcon = document.createElement('i');
+                    regenIcon.setAttribute('data-lucide', 'refresh-cw');
+                    regenIcon.style.width = '14px';
+                    regenIcon.style.height = '14px';
+                    regenBtn.appendChild(regenIcon);
+                    regenBtn.appendChild(document.createTextNode(' Regenerate'));
+                    regenBtn.addEventListener('click', () => withCommentAction(c.commentId, () => regenerateDraft(c.commentId)));
+                    actions.appendChild(regenBtn);
+                }
+                const viewBtn = document.createElement('button');
+                viewBtn.className = 'action-btn';
+                const extIcon = document.createElement('i');
+                extIcon.setAttribute('data-lucide', 'external-link');
+                extIcon.style.width = '14px';
+                extIcon.style.height = '14px';
+                viewBtn.appendChild(extIcon);
+                viewBtn.appendChild(document.createTextNode(' View on YouTube'));
+                viewBtn.addEventListener('click', () => {
+                    if (c.videoId) window.open('https://www.youtube.com/watch?v=' + encodeURIComponent(c.videoId), '_blank');
+                });
+                actions.appendChild(viewBtn);
+                card.appendChild(actions);
+                list.appendChild(card);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function syncComments() {
+            setSyncStatus('Syncing...');
+            try {
+                const res = await fetch('/api/youtube-comments-sync', { method: 'POST', credentials: 'same-origin' });
+                if (showSessionExpired(res)) return;
+                const data = await res.json();
+                if (data.ok) {
+                    setSyncStatus(data.warning || `Synced ${data.synced} comment${data.synced === 1 ? '' : 's'}`);
+                    loadComments();
+                } else {
+                    setSyncStatus('Sync failed');
+                    alert(data.error || 'Comments could not be synced.');
+                }
+            } catch (e) {
+                setSyncStatus('Sync failed');
+                alert('Network error while syncing comments: ' + e.message);
+            }
+        }
+
+        async function requestDraft(commentId, regenerate) {
+            try {
+                const res = await fetch('/api/youtube-comments-generate', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(regenerate ? { commentId, regenerate: true } : { commentId })
+                });
+                if (showSessionExpired(res)) return;
+                const data = await res.json();
+                if (data.ok) { loadComments(); } else { alert(data.error || 'The AI reply could not be generated.'); }
+            } catch (e) { alert('Network error while generating a reply: ' + e.message); }
+        }
+
+        async function generateDraft(commentId) { return requestDraft(commentId, false); }
+
+        async function regenerateDraft(commentId) { return requestDraft(commentId, true); }
+
+        async function saveDraft(commentId) {
+            const field = document.getElementById('draft-' + commentId);
+            if (!field) return;
+            const text = field.value.trim();
+            if (!text) { alert('Write a reply before saving the draft.'); return; }
+            try {
+                const res = await fetch('/api/youtube-comments', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ action: 'draft', commentId, text })
+                });
+                if (showSessionExpired(res)) return;
+                const data = await res.json();
+                if (data.ok) { setSyncStatus('Draft saved'); loadComments(); }
+                else { alert(data.error || 'The draft could not be saved.'); }
+            } catch (e) { alert('Network error while saving the draft: ' + e.message); }
+        }
+
+        async function publishReply(commentId) {
+            if (!confirm('Publish this reply to YouTube now? This cannot be undone.')) return;
+            const field = document.getElementById('draft-' + commentId);
+            if (!field) return;
+            const text = field.value.trim();
+            if (!text) { alert('Write a reply before publishing.'); return; }
+            try {
+                const res = await fetch('/api/youtube-comments-publish', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ commentId, text })
+                });
+                if (showSessionExpired(res)) return;
+                const data = await res.json();
+                if (data.ok && data.published?.id) {
+                    alert('YouTube confirmed the reply was published.');
+                    loadComments();
+                    return;
+                }
+                if (data.code === 'PUBLISH_OUTCOME_UNCERTAIN') {
+                    alert('The connection to YouTube was interrupted, so publishing is unconfirmed. Do NOT retry immediately — check the video on YouTube first, then reconcile.');
+                    loadComments();
+                    return;
+                }
+                if (data.code === 'PUBLISH_RECONCILIATION_REQUIRED') {
+                    alert('YouTube accepted the reply, but the app could not save its record. Do not retry; contact the administrator to reconcile it.');
+                    loadComments();
+                    return;
+                }
+                if (data.code === 'PUBLISH_IN_PROGRESS_OR_COMPLETE') {
+                    alert('This reply is already publishing or has already been published.');
+                    loadComments();
+                    return;
+                }
+                alert(data.error || 'The reply was not published.');
+            } catch (e) {
+                alert('Network error: the reply status is unknown. Check the video on YouTube before retrying. ' + e.message);
+            }
+        }
+        
+        document.querySelectorAll('.filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderComments(btn.dataset.filter);
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            window.AuthStore?.mountAccountWidget('omnicast-account-widget');
+            window.AuthStore?.mountChannelSelector('youtube-channel-picker');
+            loadComments();
+            window.addEventListener('omnicast-channel-changed', loadComments);
+        });
+    </script>
+</body>
+</html>

@@ -16,6 +16,28 @@ signup/
 .env.production
 .env.development
 .env.vercel.production
+# Ignore environment files by default; only safe templates are trackable.
+.env.*
+.data/
+.backups/
+!.env.example
+!.env.vercel.example
+!.env.netlify.example
+# Local credentials and OAuth/token material must never be committed.
+.secrets/
+secrets/
+credentials/
+private/
+*.pem
+*.key
+*.p12
+*.pfx
+client_secret*.json
+credentials*.json
+token*.json
+tokens*.json
 *.log
 .codex-server-*.err.log
 .codex-server-*.out.log
+opencode-desktop-win-x64.exe
+Sammy-ai-church-broadcast-main/

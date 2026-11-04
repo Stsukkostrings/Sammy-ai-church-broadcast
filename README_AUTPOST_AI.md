@@ -34,7 +34,7 @@ AutoPost AI is a production-style MVP that lets users upload short videos, sched
 - Refresh-token-aware YouTube upload logic
 - Dashboard for pending and posted videos
 - Edit and delete scheduled posts
-- Optional OpenAI-generated caption support
+- Optional AI caption support is part of the separate standalone AutoPost AI project, not this repository's Omnicast Gemini service.
 - Optional S3-backed video storage
 - Docker and Docker Compose setup
 
@@ -72,7 +72,6 @@ AutoPost AI is a production-style MVP that lets users upload short videos, sched
    - `YOUTUBE_CLIENT_SECRET`: Google OAuth client secret
    - `YOUTUBE_REDIRECT_URI`: must match your Google OAuth redirect URI
    - `TOKEN_ENCRYPTION_SECRET`: long random string used to encrypt Google tokens
-   - `OPENAI_API_KEY`: optional, used for AI captions
    - `AWS_REGION`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET`: only required when `STORAGE_PROVIDER=s3`
    - `AWS_S3_PUBLIC_BASE_URL`: optional CDN or bucket public URL for viewing stored videos
 

@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
         return res.status(405).json({ ok: false, error: 'Method not allowed. Use GET to start YouTube OAuth.' });
     }
 
-    const result = authHandler(req);
+    const result = await authHandler(req);
     Object.entries(result.headers || {}).forEach(([key, value]) => res.setHeader(key, value));
     res.status(result.statusCode).send(result.body || '');
 };

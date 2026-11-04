@@ -1,4 +1,7 @@
 const crypto = require('crypto');
+const accountAuth = require('../lib/auth/supabase');
+const tenantStore = require('../lib/db/tenant-store');
+const { accountForRequest, channelForRequest } = require('../lib/auth/youtube-context');
 
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -6,6 +9,7 @@ const YOUTUBE_API = 'https://www.googleapis.com/youtube/v3';
 const YOUTUBE_ANALYTICS_API = 'https://youtubeanalytics.googleapis.com/v2/reports';
 
 const SCOPES = [
+    'https://www.googleapis.com/auth/youtube.force-ssl',
     'https://www.googleapis.com/auth/youtube.readonly',
     'https://www.googleapis.com/auth/yt-analytics.readonly'
 ].join(' ');
@@ -34,17 +38,36 @@ function redirect(location, headers = {}) {
     };
 }
 
+function getTrustedAppBase() {
+    const base = process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || process.env.PUBLIC_APP_URL;
+    if (!base) return null;
+    try {
+        const url = new URL(base);
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+        return url.origin;
+    } catch (_) {
+        return null;
+    }
+}
+
 function getOrigin(req) {
-    const host = req.headers['x-forwarded-host'] || req.headers.host;
-    const proto = req.headers['x-forwarded-proto'] || (/^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host || '') ? 'http' : 'https');
+    const trusted = getTrustedAppBase();
+    if (trusted) return trusted;
+    const host = req.headers.host;
+    if (!host) return 'http://localhost:8081';
+    const isLocal = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(host);
+    const proto = isLocal ? 'http' : 'https';
     return `${proto}://${host}`;
 }
 
 function isSecureCookie(req) {
-    return !getOrigin(req).startsWith('http://localhost') && !getOrigin(req).startsWith('http://127.0.0.1');
+    const origin = getOrigin(req);
+    return !origin.startsWith('http://localhost') && !origin.startsWith('http://127.0.0.1');
 }
 
 function getRedirectUri(req) {
+    const trusted = getTrustedAppBase();
+    if (trusted) return `${trusted}/api/youtube-callback`;
     return process.env.YOUTUBE_REDIRECT_URI
         || process.env.GOOGLE_REDIRECT_URI
         || `${getOrigin(req)}/api/youtube-callback`;
@@ -64,6 +87,7 @@ function assertConfig() {
     if (!config.clientId) missing.push('YOUTUBE_CLIENT_ID or GOOGLE_CLIENT_ID');
     if (!config.clientSecret) missing.push('YOUTUBE_CLIENT_SECRET or GOOGLE_CLIENT_SECRET');
     if (!config.sessionSecret) missing.push('SESSION_SECRET');
+    if (String(process.env.YOUTUBE_TOKEN_ENCRYPTION_KEY || '').length < 32) missing.push('YOUTUBE_TOKEN_ENCRYPTION_KEY (at least 32 characters)');
     return { config, missing };
 }
 
@@ -109,12 +133,9 @@ function frontEndRedirect(req, suffix = '') {
     return `${getOrigin(req)}/spiritflow_creator_studio.html${suffix}`;
 }
 
-function authHandler(req) {
-    console.log('[youtube-auth] Route hit', { method: req.method, url: req.url, origin: getOrigin(req) });
-
+async function authHandler(req) {
     const { config, missing } = assertConfig();
     if (missing.length) {
-        console.error('[youtube-auth] Missing env vars:', missing);
         return json(500, {
             ok: false,
             error: 'YouTube OAuth is not configured yet.',
@@ -122,6 +143,8 @@ function authHandler(req) {
             setup: 'Set YOUTUBE_CLIENT_ID (or GOOGLE_CLIENT_ID), YOUTUBE_CLIENT_SECRET (or GOOGLE_CLIENT_SECRET), SESSION_SECRET, and YOUTUBE_REDIRECT_URI (or GOOGLE_REDIRECT_URI) on Vercel.'
         });
     }
+    const account = await accountForRequest(req);
+    if (account.error) return redirect(frontEndRedirect(req, '?account=sign-in-required'), account.setCookie ? { 'Set-Cookie': [account.setCookie] } : {});
 
     const redirectUri = getRedirectUri(req);
     const state = crypto.randomBytes(24).toString('hex');
@@ -130,34 +153,36 @@ function authHandler(req) {
         redirect_uri: redirectUri,
         response_type: 'code',
         access_type: 'offline',
-        prompt: 'consent',
+        prompt: 'consent select_account',
         include_granted_scopes: 'true',
         scope: SCOPES,
         state
     });
 
     const authUrl = `${GOOGLE_AUTH_URL}?${params.toString()}`;
-    console.log('[youtube-auth] Redirect URI:', redirectUri);
-    console.log('[youtube-auth] Generated auth URL:', authUrl);
-
+    const stateCookie = accountAuth.seal({ state, userId: account.user.id, createdAt: Date.now() }, config.sessionSecret, 'youtube-oauth-state');
     return redirect(authUrl, {
-        'Set-Cookie': cookie('sf_youtube_state', state, { maxAge: 600, secure: isSecureCookie(req) })
+        'Set-Cookie': [cookie('sf_youtube_state', stateCookie, { maxAge: 600, secure: isSecureCookie(req) }), ...(account.setCookie ? [account.setCookie] : [])]
     });
 }
 
 async function callbackHandler(req) {
-    console.log('[youtube-callback] Route hit', { method: req.method, url: req.url });
-
     const { config, missing } = assertConfig();
     if (missing.length) return redirect(frontEndRedirect(req, '?youtube=missing-config'));
+    const account = await accountForRequest(req);
+    if (account.error) return redirect(frontEndRedirect(req, '?account=sign-in-required'), account.setCookie ? { 'Set-Cookie': [account.setCookie] } : {});
 
     const url = new URL(req.url, getOrigin(req));
     const code = url.searchParams.get('code');
     const state = url.searchParams.get('state');
     const cookies = parseCookies(req.headers.cookie || '');
-    if (!code || !state || cookies.sf_youtube_state !== state) {
-        console.error('[youtube-callback] Auth failed: invalid code/state');
-        return redirect(frontEndRedirect(req, '?youtube=auth-failed'));
+    const savedState = accountAuth.open(cookies.sf_youtube_state, config.sessionSecret, 'youtube-oauth-state');
+    const authCookies = account.setCookie ? [account.setCookie] : [];
+    const fail = (reason) => redirect(frontEndRedirect(req, `?youtube=${reason}`), {
+        'Set-Cookie': [cookie('sf_youtube_state', '', { maxAge: 1, secure: isSecureCookie(req) }), ...authCookies]
+    });
+    if (!code || !state || savedState?.state !== state || savedState.userId !== account.user.id || Date.now() - savedState.createdAt > 600_000) {
+        return fail('auth-failed');
     }
 
     const redirectUri = getRedirectUri(req);
@@ -174,24 +199,29 @@ async function callbackHandler(req) {
     });
 
     const token = await tokenResponse.json();
-    if (!tokenResponse.ok) {
-        console.error('[youtube-callback] Token exchange failed:', token.error || token);
-        return redirect(frontEndRedirect(req, '?youtube=auth-failed'));
-    }
+    if (!tokenResponse.ok || !token.access_token) return fail('auth-failed');
 
-    const session = {
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        expires_at: Date.now() + ((token.expires_in || 3600) - 60) * 1000
-    };
-
-    console.log('[youtube-callback] OAuth success, redirecting to studio');
-    return redirect(frontEndRedirect(req, '?youtube=connected'), {
-        'Set-Cookie': [
-            cookie('sf_youtube', sealSession(session, config.sessionSecret), { maxAge: 60 * 60 * 24 * 30, secure: isSecureCookie(req) }),
-            cookie('sf_youtube_state', '', { maxAge: 1, secure: isSecureCookie(req) })
-        ]
-    });
+    try {
+        const channelData = await googleGet(`${YOUTUBE_API}/channels?part=id,snippet&mine=true`, token.access_token);
+        const channel = channelData.items?.[0];
+        if (!channel?.id) return fail('auth-failed');
+        await tenantStore.saveChannel(account.user, account.accessToken, {
+            channelId: channel.id,
+            title: channel.snippet?.title,
+            accessToken: token.access_token,
+            refreshToken: token.refresh_token,
+            expiresAt: Date.now() + ((token.expires_in || 3600) - 60) * 1000
+        });
+        const selected = accountAuth.seal({ userId: account.user.id, channelId: channel.id }, config.sessionSecret, 'channel-selection');
+        const headers = {
+            'Set-Cookie': [
+                cookie('omni_channel', selected, { maxAge: 60 * 60 * 24 * 7, secure: isSecureCookie(req) }),
+                cookie('sf_youtube_state', '', { maxAge: 1, secure: isSecureCookie(req) }),
+                ...(account.setCookie ? [account.setCookie] : [])
+            ]
+        };
+        return redirect(frontEndRedirect(req, '?youtube=connected'), headers);
+    } catch (_) { return fail('connect-failed'); }
 }
 
 async function refreshSession(session, config) {
@@ -210,12 +240,14 @@ async function refreshSession(session, config) {
     });
     const token = await response.json();
     if (!response.ok) throw new Error(token.error_description || token.error || 'Unable to refresh YouTube token.');
+    if (!token.access_token) throw new Error('YouTube refresh response did not include an access token.');
 
     return {
         changed: true,
         session: {
             ...session,
             access_token: token.access_token,
+            refresh_token: token.refresh_token || session.refresh_token,
             expires_at: Date.now() + ((token.expires_in || 3600) - 60) * 1000
         }
     };
@@ -249,23 +281,22 @@ function scoreFromChannel(channel, videos, analytics) {
     const engagementScore = Math.round(Math.min(95, 40 + Math.min(35, avgViews / 100) + (analytics?.views ? 10 : 0)));
     const health = Math.round((brandingScore + consistencyScore + seoScore + engagementScore) / 4);
 
-    return { health, brandingScore, consistencyScore, seoScore, engagementScore };
+    // Preserve the response shape; these heuristics are not measured analytics.
+    return { health: null, brandingScore: null, consistencyScore: null, seoScore: null, engagementScore: null };
 }
 
 async function channelHandler(req) {
-    console.log('[youtube-channel] Route hit', { method: req.method, url: req.url });
-
     const { config, missing } = assertConfig();
     if (missing.length) return json(500, { ok: false, error: 'YouTube API is not configured.', missing });
+    const account = await channelForRequest(req);
+    const accountCookie = account.setCookie ? { 'Set-Cookie': account.setCookie } : {};
+    if (account.error) return json(account.error.status || 401, { ok: false, code: account.error.code, error: account.error.message }, accountCookie);
 
-    const cookies = parseCookies(req.headers.cookie || '');
-    let session;
-    try {
-        session = openSession(cookies.sf_youtube, config.sessionSecret);
-    } catch (error) {
-        return json(401, { ok: false, error: 'Invalid YouTube session. Connect your channel again.' });
-    }
-    if (!session) return json(401, { ok: false, error: 'No YouTube channel is connected yet.' });
+    let session = {
+        access_token: account.channel.accessToken,
+        refresh_token: account.channel.refreshToken,
+        expires_at: new Date(account.channel.token_expires_at).getTime()
+    };
 
     let changed = false;
     try {
@@ -273,16 +304,25 @@ async function channelHandler(req) {
         session = refreshed.session;
         changed = refreshed.changed;
     } catch (error) {
-        return json(401, { ok: false, error: error.message });
+        return json(401, { ok: false, code: 'YOUTUBE_RECONNECT_REQUIRED', error: error.message }, accountCookie);
+    }
+    if (changed) {
+        try {
+            await tenantStore.saveChannel(account.user, account.accessToken, {
+                channelId: account.channel.channel_id, title: account.channel.channel_title,
+                accessToken: session.access_token, refreshToken: session.refresh_token,
+                expiresAt: session.expires_at
+            });
+        } catch (_) { return json(503, { ok: false, error: 'Unable to securely update the connected channel session.' }, accountCookie); }
     }
 
     let channelData, channel;
     try {
         channelData = await googleGet(`${YOUTUBE_API}/channels?part=snippet,statistics,contentDetails,brandingSettings&mine=true`, session.access_token);
         channel = channelData.items?.[0];
-        if (!channel) return json(404, { ok: false, error: 'No YouTube channel was found on this Google account.' });
+        if (!channel) return json(404, { ok: false, error: 'No YouTube channel was found on this Google account.' }, accountCookie);
     } catch (error) {
-        return json(401, { ok: false, error: `Failed to fetch channel data: ${error.message}. Your YouTube token may be invalid or expired. Please reconnect your channel.` });
+        return json(401, { ok: false, code: 'YOUTUBE_RECONNECT_REQUIRED', error: `Failed to fetch channel data: ${error.message}. Your YouTube token may be invalid or expired. Please reconnect your channel.` }, accountCookie);
     }
 
     const uploadsPlaylist = channel.contentDetails?.relatedPlaylists?.uploads;
@@ -368,10 +408,7 @@ async function channelHandler(req) {
         }
     };
 
-    const headers = changed
-        ? { 'Set-Cookie': cookie('sf_youtube', sealSession(session, config.sessionSecret), { maxAge: 60 * 60 * 24 * 30, secure: isSecureCookie(req) }) }
-        : {};
-    return json(200, body, headers);
+    return json(200, body, accountCookie);
 }
 
-module.exports = { authHandler, callbackHandler, channelHandler };
+module.exports = { authHandler, callbackHandler, channelHandler, getClientConfig, openSession, parseCookies, sealSession, cookie, isSecureCookie, getOrigin, refreshSession };

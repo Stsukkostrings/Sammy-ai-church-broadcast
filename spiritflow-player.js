@@ -52,22 +52,8 @@ var SPIRITFLOW_CONFIG = {
     ],
     /* Editable programming config — NOT presented as live data.
        Replace or sync with AzuraCast scheduling when available. */
-    programs: [
-        { time: "06:00", name: "Morning Flow", desc: "A gentle Afro-Gospel rise — scripture, soft rhythms and first-light worship to start the day." },
-        { time: "10:00", name: "Afro Gospel Power", desc: "High-energy praise from across the continent. Drums, joy and unstoppable gratitude." },
-        { time: "13:00", name: "Worship & Prayer", desc: "Midday reflection. Deep worship sets and guided prayer for the heart of your day." },
-        { time: "16:00", name: "Afro-Rock Gospel", desc: "Where electric guitars meet heaven — bold African gospel rock with a message." },
-        { time: "19:00", name: "Evening Worship", desc: "Slow down with sunset worship, testimonies and songs of surrender." },
-        { time: "22:00", name: "SpiritFlow Night", desc: "Ambient worship and night-time inspiration to carry you into rest." }
-    ],
-    schedule: [
-        { time: "06:00", name: "Morning Flow", tag: "Weekdays" },
-        { time: "10:00", name: "Afro Gospel Power", tag: "Daily" },
-        { time: "13:00", name: "Worship & Prayer", tag: "Daily" },
-        { time: "16:00", name: "Afro-Rock Gospel", tag: "Mon / Wed / Fri" },
-        { time: "19:00", name: "Evening Worship", tag: "Daily" },
-        { time: "22:00", name: "SpiritFlow Night", tag: "Nightly" }
-    ]
+    programs: [],
+    schedule: []
 };
 
 function startSpiritFlow() {
@@ -250,8 +236,15 @@ function startSpiritFlow() {
                             row.className = "sfr-recent-item";
                             row.innerHTML =
                                 '<span class="sfr-idx" aria-hidden="true">' + (i + 1) + '</span>' +
-                                '<span class="sfr-rart">' + (h.art ? '<img src="' + h.art + '" alt="" loading="lazy">' : "") + '</span>' +
+                                '<span class="sfr-rart"></span>' +
                                 '<span class="sfr-rt"><b></b><span></span></span>';
+                            if (h.art) {
+                                var histImg = document.createElement("img");
+                                histImg.src = h.art;
+                                histImg.alt = "";
+                                histImg.loading = "lazy";
+                                row.querySelector(".sfr-rart").appendChild(histImg);
+                            }
                             row.querySelector("b").textContent = h.title;
                             row.querySelector(".sfr-rt span").textContent = h.artist;
                             recentEl.appendChild(row);
@@ -288,6 +281,7 @@ function startSpiritFlow() {
                 card.querySelector("p:last-child").textContent = p.desc;
                 progEl.appendChild(card);
             });
+            if (!SPIRITFLOW_CONFIG.programs.length) progEl.textContent = "Program information has not been configured.";
         }
 
         var schedEl = $("sfrSchedule");
@@ -301,6 +295,7 @@ function startSpiritFlow() {
                 row.querySelector(".sfr-sched-tag").textContent = s.tag;
                 schedEl.appendChild(row);
             });
+            if (!SPIRITFLOW_CONFIG.schedule.length) schedEl.textContent = "The station schedule has not been configured.";
         }
 
         /* ---- YouTube (no broken embeds, no stream keys, ever) ---- */
@@ -317,7 +312,16 @@ function startSpiritFlow() {
                     } else if (ytEmbed.indexOf("youtu.be/") !== -1) {
                         ytEmbed = ytEmbed.replace("youtu.be/", "www.youtube.com/embed/");
                     }
-                    ytFrame.innerHTML = '<iframe src="' + ytEmbed + '" title="SpiritFlow Sounds Radio live on YouTube" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+                    try {
+                        var parsedYt = new URL(ytEmbed);
+                        if (parsedYt.protocol === "https:" && ["youtube.com", "www.youtube.com", "youtu.be", "www.youtube-nocookie.com"].indexOf(parsedYt.hostname) !== -1) {
+                            var frame = document.createElement("iframe");
+                            frame.src = parsedYt.href; frame.title = "SpiritFlow Sounds on YouTube";
+                            frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                            frame.allowFullscreen = true; frame.loading = "lazy";
+                            ytFrame.replaceChildren(frame);
+                        }
+                    } catch (_) {}
                 }
             } else {
                 ytBtn.setAttribute("aria-disabled", "true");
@@ -343,13 +347,22 @@ function startSpiritFlow() {
                 // Try to embed common Rumble patterns if it's an embed URL or a video URL; otherwise leave graceful message
                 if (rUrl.indexOf("embed") !== -1 || rUrl.indexOf("/v") !== -1 || rUrl.indexOf("rumble.com") !== -1) {
                     // Rumble embed typically uses iframes; use as-is if it looks like an embed, else try to keep as provided
-                    rumbleFrame.innerHTML = '<iframe src="' + rUrl + '" title="SpiritFlow Sounds Radio live on Rumble" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+                    try {
+                        var parsedRumble = new URL(rUrl);
+                        if (parsedRumble.protocol === "https:" && (parsedRumble.hostname === "rumble.com" || parsedRumble.hostname.endsWith(".rumble.com"))) {
+                            var rumbleIframe = document.createElement("iframe");
+                            rumbleIframe.src = parsedRumble.href; rumbleIframe.title = "SpiritFlow Sounds on Rumble";
+                            rumbleIframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                            rumbleIframe.allowFullscreen = true; rumbleIframe.loading = "lazy";
+                            rumbleFrame.replaceChildren(rumbleIframe);
+                        }
+                    } catch (_) {}
                 }
             }
             if (rumbleStatus && rumbleStatusText) {
                 if (SPIRITFLOW_CONFIG.rumbleLiveUrl) {
-                    rumbleStatus.dataset.state = "live";
-                    rumbleStatusText.textContent = "Live";
+                    rumbleStatus.dataset.state = "connecting";
+                    rumbleStatusText.textContent = "Configured";
                 } else if (SPIRITFLOW_CONFIG.rumbleChannelUrl) {
                     rumbleStatus.dataset.state = "connecting";
                     rumbleStatusText.textContent = "Channel";

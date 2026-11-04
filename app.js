@@ -170,11 +170,7 @@ let displayClearTimer = null;
 let displayClearToken = 0;
 
 function createLiveOverlayChannel() {
-    try {
-        return typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(STORAGE_KEYS.liveOverlay) : null;
-    } catch (err) {
-        return null;
-    }
+    return window.OmnicastStorage?.channel(STORAGE_KEYS.liveOverlay) || null;
 }
 
 function createObsClient() {
@@ -1418,6 +1414,7 @@ function broadcastOverlay(reference, text) {
 
     writeStorage(STORAGE_KEYS.liveOverlay, payload);
     liveOverlayChannel?.postMessage(payload);
+    window.OmnicastOverlayRelay?.publish(isChurchStudioPage ? "church" : "lower-third", payload);
 }
 
 function setWorkspaceHeading() {
@@ -1571,14 +1568,16 @@ function shareToPlatform(platform) {
 
 function readStorage(key, fallback) {
     try {
-        return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+        const storage = window.OmnicastStorage;
+        if (!storage) return fallback;
+        return JSON.parse(storage.getItem(key) || JSON.stringify(fallback));
     } catch (err) {
         return fallback;
     }
 }
 
 function writeStorage(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
+    window.OmnicastStorage?.setItem(key, JSON.stringify(value));
 }
 
 function truncateText(text, maxLength) {

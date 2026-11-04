@@ -1,0 +1,276 @@
+<!--
+ OmniCast AI
+ © 2026 Samuel Olasunkanmi
+ Unauthorized use is prohibited
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="storage-scope.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure OBS Overlay Links | OmniCast AI</title>
+    <meta name="description" content="Generate, copy, rotate and revoke secure read-only OBS overlay links for your OmniCast AI account.">
+    <meta name="theme-color" content="#12100d">
+    <script src="auth.js"></script>
+    <link rel="stylesheet" href="design-tokens.css">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #080706;
+            --panel: rgba(28, 24, 17, 0.9);
+            --panel-strong: #1d1912;
+            --text: #f7f1e3;
+            --muted: #bdb39e;
+            --line: rgba(212, 175, 55, 0.28);
+            --gold: #d4af37;
+            --green: #8dfc00;
+            --danger: #ff8b7b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 0%, rgba(141, 252, 0, 0.09), transparent 34rem),
+                radial-gradient(circle at 90% 15%, rgba(212, 175, 55, 0.12), transparent 30rem),
+                var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+            line-height: 1.5;
+        }
+        a { color: var(--green); }
+        .overlay-settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 1.4rem 1.25rem;
+        }
+        .overlay-settings-brand {
+            color: var(--text);
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+        }
+        .overlay-settings-account {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .overlay-settings-shell {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0.75rem 1.25rem 4rem;
+        }
+        .overlay-settings-hero {
+            padding: 1rem 0 1.6rem;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 1.5rem;
+        }
+        .overlay-settings-eyebrow {
+            margin: 0 0 0.4rem;
+            color: var(--gold);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+        }
+        h1 {
+            margin: 0;
+            font-size: clamp(2rem, 4vw, 3.3rem);
+            line-height: 1.05;
+        }
+        .overlay-settings-hero p {
+            max-width: 760px;
+            margin: 0.8rem 0 0;
+            color: var(--muted);
+        }
+        .overlay-settings-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+        .overlay-panel {
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            background: linear-gradient(160deg, var(--panel), var(--panel-strong));
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+            padding: 1.2rem;
+        }
+        .overlay-panel h2 {
+            margin: 0.1rem 0 0.5rem;
+            font-size: 1.25rem;
+        }
+        .overlay-panel p { color: var(--muted); }
+        .overlay-panel label {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: var(--muted);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        select, input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0.7rem 0.75rem;
+            background: #0f0d09;
+            color: var(--text);
+            font: inherit;
+        }
+        input[readonly] { color: var(--green); }
+        .overlay-status {
+            margin: 1rem 0;
+            padding: 0.9rem 1rem;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.22);
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .overlay-status strong { color: var(--text); }
+        .overlay-status.is-active { border-color: rgba(141, 252, 0, 0.4); }
+        .overlay-status.is-error { border-color: rgba(255, 139, 123, 0.45); color: var(--danger); }
+        .overlay-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .overlay-button {
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 0.62rem 0.95rem;
+            background: var(--gold);
+            color: #171307;
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.86rem;
+            font-weight: 800;
+        }
+        .overlay-button:hover { filter: brightness(1.08); }
+        .overlay-button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+        .overlay-button.secondary {
+            background: transparent;
+            border-color: var(--line);
+            color: var(--text);
+        }
+        .overlay-button.danger {
+            background: transparent;
+            border-color: rgba(255, 139, 123, 0.45);
+            color: var(--danger);
+        }
+        .overlay-button:disabled { cursor: not-allowed; opacity: 0.4; }
+        .overlay-token-panel {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px dashed rgba(141, 252, 0, 0.5);
+            border-radius: 14px;
+            background: rgba(141, 252, 0, 0.05);
+        }
+        .overlay-token-panel[hidden] { display: none; }
+        .overlay-token-panel h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+        .overlay-token-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .overlay-token-row input { flex: 1 1 320px; }
+        .overlay-token-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.65rem;
+            font-size: 0.85rem;
+        }
+        .overlay-instructions { margin: 0; padding-left: 1.2rem; color: var(--muted); }
+        .overlay-instructions li { margin-bottom: 0.65rem; }
+        .overlay-note {
+            margin-top: 1rem;
+            border-left: 3px solid var(--gold);
+            padding-left: 0.8rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+        .overlay-message {
+            min-height: 1.4rem;
+            margin-top: 1rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .overlay-message.is-error { color: var(--danger); }
+        .overlay-message.is-ok { color: var(--green); }
+        @media (max-width: 820px) {
+            .overlay-settings-grid { grid-template-columns: 1fr; }
+            .overlay-settings-header { align-items: flex-start; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <header class="overlay-settings-header">
+        <a class="overlay-settings-brand" href="index.html">OMNICAST AI</a>
+        <div class="overlay-settings-account" id="omnicast-account-widget"></div>
+    </header>
+
+    <main class="overlay-settings-shell">
+        <section class="overlay-settings-hero">
+            <p class="overlay-settings-eyebrow">SECURE OBS RELAY</p>
+            <h1>Overlay links that work without your studio login.</h1>
+            <p>Each account owns its overlay channels. Generate a read-only token for OBS, then keep the generated URL private. Rotating or revoking a token takes effect on the next OBS poll.</p>
+        </section>
+
+        <div class="overlay-settings-grid">
+            <section class="overlay-panel" aria-labelledby="overlayChannelHeading">
+                <h2 id="overlayChannelHeading">Your OBS link</h2>
+                <label for="overlayKey">Overlay channel</label>
+                <select id="overlayKey">
+                    <option value="lower-third">Scripture lower third</option>
+                    <option value="church">Church scripture overlay</option>
+                </select>
+
+                <div class="overlay-status" id="overlayStatus" role="status">Checking your account...</div>
+
+                <div class="overlay-actions">
+                    <button class="overlay-button" id="createTokenButton" type="button" disabled>Generate secure link</button>
+                    <button class="overlay-button secondary" id="rotateTokenButton" type="button" disabled>Rotate token</button>
+                    <button class="overlay-button danger" id="revokeTokenButton" type="button" disabled>Revoke token</button>
+                </div>
+
+                <div class="overlay-token-panel" id="tokenPanel" hidden>
+                    <h3>Copy this URL now</h3>
+                    <p>This plaintext token is shown once. It cannot be retrieved again; rotate the token if you lose it.</p>
+                    <div class="overlay-token-row">
+                        <input id="overlayUrl" type="text" readonly aria-label="Secure OBS browser source URL">
+                        <button class="overlay-button" id="copyTokenButton" type="button">Copy URL</button>
+                    </div>
+                    <div class="overlay-token-links">
+                        <a id="previewOverlayLink" href="#" target="_blank" rel="noreferrer">Open overlay preview</a>
+                        <a href="studio.html">Open Main Studio</a>
+                        <a href="church_studio.html">Open Church Studio</a>
+                    </div>
+                </div>
+
+                <p class="overlay-message" id="overlayMessage" role="status"></p>
+            </section>
+
+            <aside class="overlay-panel">
+                <h2>Connect it to OBS</h2>
+                <ol class="overlay-instructions">
+                    <li>Generate the secure link for the overlay channel you use.</li>
+                    <li>In OBS, add a <strong>Browser</strong> source and paste the generated URL.</li>
+                    <li>Set width <strong>1920</strong> and height <strong>1080</strong> (or match your canvas).</li>
+                    <li>Keep the source background transparent. Do not add an opaque custom CSS background.</li>
+                    <li>Leave “Shutdown source when not visible” off if you want the overlay to stay current between scenes.</li>
+                </ol>
+                <p class="overlay-note">The overlay page polls the relay about once per second. OBS does not need the studio login session. A revoked token stops working immediately and the old URL cannot be restored.</p>
+                <p class="overlay-note">Only presentation data is public: reference, text, visibility and loading state. Comments, drafts, account details and unrelated settings are never sent to OBS.</p>
+            </aside>
+        </div>
+    </main>
+
+    <script src="overlay-settings.js"></script>
+</body>
+</html>

@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="storage-scope.js"></script>
+    <script src="overlay-relay.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Omnicast Lyrics</title>
     <link rel="stylesheet" href="design-tokens.css">
@@ -1257,7 +1259,11 @@
                 </div>
                 <div class="dropdown-item" onClick="copyOBSLink()">
                     <i class="fas fa-link"></i>
-                    <span>Copy OBS Link</span>
+                    <span>Copy Preview Link</span>
+                </div>
+                <div class="dropdown-item" onClick="openOverlaySettings()">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Secure OBS Link</span>
                 </div>
                 <div class="dropdown-divider"></div>
                 <div class="dropdown-item" onClick="openLyricsWindow()">
@@ -1369,8 +1375,8 @@
             <button class="nav-icon-btn" id="shareButton" title="Copy live lyrics" type="button"><i class="fas fa-share-nodes"></i></button>
             <button class="nav-icon-btn" id="settingsButton" title="Settings" type="button"><i class="fas fa-cog"></i></button>
             <button class="btn-back" id="copyObsNavbarButton" type="button">
-                <i class="fas fa-link" style="font-size: 10px;"></i>
-                OBS LINK
+                <i class="fas fa-shield-halved" style="font-size: 10px;"></i>
+                OBS SETUP
             </button>
             <a href="church_studio.html" class="btn-back">
                 <i class="fas fa-chevron-left" style="font-size: 10px;"></i>
@@ -1529,7 +1535,7 @@
                 zoom: 1
             };
             try {
-                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+                const saved = JSON.parse(window.OmnicastStorage?.getItem(STORAGE_KEY) || "null");
                 return saved && Array.isArray(saved.songs) ? { ...fallback, ...saved } : fallback;
             } catch (error) {
                 return fallback;
@@ -1538,7 +1544,7 @@
 
         function saveState() {
             state.selectedSongId = selectedSongId;
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            window.OmnicastStorage?.setItem(STORAGE_KEY, JSON.stringify(state));
         }
 
         function $(id) {
@@ -1823,8 +1829,9 @@
 
         function publishOverlay(reference, text) {
             const payload = { reference, text, visible: true, hidden: false, updatedAt: Date.now(), source: "omnicast_lyrics" };
-            localStorage.setItem(OVERLAY_KEY, JSON.stringify(payload));
+            window.OmnicastStorage?.setItem(OVERLAY_KEY, JSON.stringify(payload));
             overlayChannel?.postMessage(payload);
+            window.OmnicastOverlayRelay?.publish("lower-third", payload);
         }
 
         function displayDetectedLyricPhrase(line) {
@@ -1848,11 +1855,7 @@
         }
 
         function createOverlayChannel() {
-            try {
-                return "BroadcastChannel" in window ? new BroadcastChannel(OVERLAY_KEY) : null;
-            } catch (error) {
-                return null;
-            }
+            return window.OmnicastStorage?.channel(OVERLAY_KEY) || null;
         }
 
         function openLowerThird() {
@@ -1861,7 +1864,11 @@
         }
 
         function copyOBSLink() {
-            copyText(new URL("lower-third.html", window.location.href).toString(), "OBS browser source copied", "No OBS link available");
+            copyText(new URL("lower-third.html", window.location.href).toString(), "Preview link copied", "No preview link available");
+        }
+
+        function openOverlaySettings() {
+            window.location.href = "overlay-settings.html?key=lower-third";
         }
 
         async function toggleListening() {
@@ -2188,7 +2195,7 @@
         function selectAudioInput() { openAudioSettings(); }
         function showAudioOutput() { showToast("Audio output follows your browser or system output"); }
         function openBibleSettings() { showModal("Bible Settings", `<p>Selected Bible version: ${state.bibleVersion}. Scripture lookup uses the available web Bible API.</p>`, "Done"); }
-        function openDocumentation() { showModal("Documentation", "<p>Build a song library, cue a section, press Display, then use OBS LINK as a browser source for the lower third.</p>", "Done"); }
+        function openDocumentation() { showModal("Documentation", "<p>Build a song library, cue a section, press Display, then open OBS SETUP to generate a read-only browser source URL for the lower third. Keep that URL private.</p>", "Done"); }
         function showKeyboardShortcuts() { showModal("Keyboard Shortcuts", "<p>Ctrl+N new song, Ctrl+R recording, Ctrl+B Bible search, F11 fullscreen, Escape close menus.</p>", "Done"); }
         function openTutorials() { showModal("Video Tutorials", "<p>Tutorials are available from the main OmniCast help area.</p>", "Done"); }
         function contactSupport() { window.location.href = "index.html#contact"; }
@@ -2234,7 +2241,7 @@
         $("clearScheduleButton").addEventListener("click", () => { state.schedule = []; renderAll(); showToast("Schedule cleared"); });
         $("editSongButton").addEventListener("click", focusLyricsEditor);
         $("copyLyricsButton").addEventListener("click", () => copyText($("lyricsBox").value, "Lyrics copied", "No lyrics to copy"));
-        $("copyObsNavbarButton").addEventListener("click", copyOBSLink);
+        $("copyObsNavbarButton").addEventListener("click", openOverlaySettings);
         $("listenButton").addEventListener("click", toggleListening);
         $("startListenPanelButton").addEventListener("click", toggleListening);
         $("displayButton").addEventListener("click", displayCurrentSection);

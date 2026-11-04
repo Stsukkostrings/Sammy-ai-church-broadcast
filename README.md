@@ -1,215 +1,94 @@
-# AutoPost AI for Netlify
+# OmniCast AI
 
-This folder is a standalone Netlify-ready version of AutoPost AI.
+OmniCast AI is a static HTML, CSS and browser-JavaScript application with CommonJS Node.js API handlers. It includes SpiritFlow Creator Studio, separate Omnicast Google sign-in and YouTube channel OAuth, user-scoped Supabase storage, and a server-side Gemini service. It is not a Next.js application.
 
-Path: [autopost-ai-netlify](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify)
+## Local development
 
-## Important Netlify reality
+Use Node.js 20 or newer. Copy the required local environment variables into an ignored `.env.local` file, then run:
 
-This app cannot go live on Netlify with local uploads and a continuously running `node-cron` server.
-
-Why:
-
-- Netlify runs the backend as serverless functions, not a permanent Express server.
-- Netlify function file storage is not reliable for scheduled publishing later.
-- For a live YouTube autopost workflow, you should use:
-  - MongoDB Atlas for the database
-  - S3-compatible storage for uploaded videos
-  - Netlify Scheduled Functions instead of `node-cron`
-
-This project folder has already been adjusted for that model.
-
-## What changed in this Netlify version
-
-- Frontend uses relative `/api/*` calls for Netlify redirects.
-- Backend is exposed through a Netlify Function in [netlify/functions/api.cjs](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify\netlify\functions\api.cjs).
-- Scheduled posting runs through [netlify/functions/process-due-posts.cjs](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify\netlify\functions\process-due-posts.cjs).
-- Netlify routing is configured in [netlify.toml](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify\netlify.toml).
-- Admins can manually trigger scheduled publishing from the dashboard for testing.
-
-## Project structure
-
-```text
-/autopost-ai-netlify
-  /backend
-  /frontend
-  /netlify/functions
-  /uploads
-  netlify.toml
-  package.json
-  README.md
+```powershell
+node --env-file=.env.local server.js
 ```
 
-## Before you deploy
+Open `http://localhost:8081`. The local HTTP server serves the project root and dispatches API paths to the CommonJS handlers. Never commit `.env.local`.
 
-You need these external services:
+## Environment variables
 
-1. MongoDB Atlas
-2. Amazon S3 or any S3-compatible bucket
-3. Google Cloud project with YouTube Data API v3 enabled
-4. A Netlify site
+Required for Omnicast account sessions and Supabase-backed records:
 
-## Environment variables for Netlify
+- `APP_BASE_URL` — local or deployed app origin, with no path.
+- `SUPABASE_URL` — the selected Supabase project URL.
+- `SUPABASE_PUBLISHABLE_KEY` — publishable/legacy anon key; never use a service-role key here.
+- `SESSION_SECRET` — random secret of at least 32 characters, server-side only.
 
-Add these in Netlify Site configuration > Environment variables:
+Required to connect YouTube separately:
 
-- `MONGODB_URI`
-- `JWT_SECRET`
-- `ADMIN_EMAILS`
-- `FRONTEND_URL`
-- `APP_BASE_URL`
-- `STORAGE_PROVIDER`
-- `UPLOAD_MAX_FILE_SIZE_MB`
 - `YOUTUBE_CLIENT_ID`
 - `YOUTUBE_CLIENT_SECRET`
-- `YOUTUBE_REDIRECT_URI`
-- `TOKEN_ENCRYPTION_SECRET`
-- `OPENAI_API_KEY` (optional)
-- `AWS_REGION`
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-- `AWS_S3_BUCKET`
-- `AWS_S3_PUBLIC_BASE_URL`
+- `YOUTUBE_REDIRECT_URI` — normally `${APP_BASE_URL}/api/youtube-callback`.
+- `YOUTUBE_TOKEN_ENCRYPTION_KEY` — random secret of at least 32 characters.
 
-Use the values from [backend/.env.example](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify\backend\.env.example) as your template.
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` are legacy aliases for the YouTube OAuth settings. They are not Omnicast sign-in credentials. Configure Google account sign-in as a provider in the Supabase dashboard; store its OAuth client secret there, not in browser code.
 
-## Google OAuth setup for Netlify
+Optional AI:
 
-In Google Cloud Console:
+- `GEMINI_API_KEY` — server-only Google AI Studio key. Generation stops on missing configuration, errors, or quota exhaustion; there is no provider/model fallback.
 
-1. Create or open your project.
-2. Enable `YouTube Data API v3`.
-3. Open `OAuth consent screen` and configure the app.
-4. Create `OAuth client ID` for a web application.
-5. Add this redirect URI:
+Optional SpiritFlow configuration:
 
-```text
-https://YOUR-NETLIFY-SITE.netlify.app/.netlify/functions/api/youtube/callback
+- Public stream/channel URLs: `SPIRITFLOW_STREAM_URL`, `SPIRITFLOW_YOUTUBE_LIVE_URL`, `SPIRITFLOW_YOUTUBE_CHANNEL_URL`, `SPIRITFLOW_RUMBLE_LIVE_URL`, `SPIRITFLOW_RUMBLE_CHANNEL_URL`, and `SPIRITFLOW_SUBMIT_MUSIC_URL`.
+- Server-only station proxy settings: `SPIRITFLOW_AZURACAST_API_URL`, `SPIRITFLOW_AZURACAST_STATION_ID`, and optional `SPIRITFLOW_AZURACAST_API_KEY`.
+
+`PORT` optionally changes the local server port. Do not put any secret variable in frontend JavaScript or a committed file.
+
+## Authentication and data
+
+Omnicast Google sign-in uses Supabase Auth and establishes the Omnicast account identity. YouTube OAuth is a separate connection flow. Server API handlers validate the signed-in account and channel ownership. Supabase access uses the user's bearer token and database Row Level Security; browser-supplied user IDs are not authorization evidence.
+
+The SQL under `db/migrations` is not automatically applied. Before any database change, confirm the target is the development project, take a backup/export, review the migration and RLS policies, approve the mapping/duplicate/rollback plan, and test against a disposable development dataset. Production migration is not authorized by this repository workflow.
+
+Older `.data` or file-backed records are not automatically migrated. Preserve them until an approved export and migration plan is completed.
+
+## OBS overlay relay
+
+OBS can read account-scoped overlays without sharing the studio browser session. An
+authenticated owner creates a read-only token on `overlay-settings.html`; only a
+SHA-256 hash is stored in Postgres. OBS polls the public endpoint, which returns
+presentation data only. See [OBS_OVERLAY_RELAY.md](OBS_OVERLAY_RELAY.md) for the
+security model, OBS setup, API contract, and migration/verification gates.
+
+## Tests and checks
+
+```powershell
+npm test
+npm run test:tenant
+npm run test:api
+npm run test:migration
+npm run test:overlay
+npm run check
+npm run test:all
 ```
 
-6. Copy the client ID and secret into Netlify environment variables.
+Tenant and API hardening tests use mocked services; they do not prove live Supabase, Google, YouTube or Gemini connectivity. A real Gemini request requires a valid server-side key. Never include keys in command output, screenshots, commits or reports.
 
-## How to deploy to Netlify
+Migration validation is static SQL review only; it does not connect to Postgres. Supabase Free has no automatic daily backups. Do not apply a migration until the exact development project is verified against Production, a complete backup (including relevant Auth data) is secured and restore-tested, and execution is explicitly approved. The SQL at `db/migrations/001_tenant_schema.sql` and `db/migrations/002_overlay_relay.sql` is not automatically run by Vercel.
 
-### Option 1: Deploy with Git
+## Vercel deployment
 
-1. Push [autopost-ai-netlify](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify) to its own GitHub repository.
-2. In Netlify, click `Add new site`.
-3. Import that repository.
-4. Set:
-   - Base directory: leave blank if this folder is repo root
-   - Build command: `npm install`
-   - Publish directory: `frontend`
-5. Add all environment variables.
-6. Deploy the site.
+The repository uses static files at the project root and CommonJS functions under `/api`. `vercel.json` now explicitly selects the **Other** framework preset, project root, no Build Command, and Output Directory `.`. No production build script is required by the source layout; this configuration still needs Vercel Preview validation. Configure environment variables in Vercel Preview settings, with secrets restricted to server-side use, and register exact OAuth callback URLs in Supabase and Google Cloud.
 
-### Option 2: Deploy with Netlify CLI
+Deployment, production configuration changes and database migrations require owner approval. Keep the previous deployment available for rollback and verify authentication, RLS, channel isolation, comments, publishing, AI quota handling and static routes in Preview first.
 
-From [autopost-ai-netlify](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify):
+### Current development readiness (2026-11-03)
 
-```bash
-npm install
-<<<<<<< HEAD
-netlify login
-netlify init
-netlify deploy
-netlify deploy --prod
-=======
-npx netlify login
-npx netlify init
-npx netlify deploy
-npx netlify deploy --prod
->>>>>>> 383709a (Remove invalid netlify-cli dependency)
-```
+Latest local verification: `npm run test:all` passed (35 automated cases: 2 tenant, 8 API, 8 static migration checks, 3 OBS relay, 3 storage-scope, and 11 focused regressions; no failures/skips), smoke checks passed, page checks passed (15 pages/23 required files), and 60 JavaScript files passed syntax checks. These results do not constitute live Supabase/Google/YouTube/Gemini tests or a Vercel build. The tenant and overlay migrations have not been applied; no complete backup/restore rehearsal or Preview deployment has been completed. The local Supabase project reference matches the designated development reference, but separation from Production has not been independently confirmed. Do not migrate or deploy until the identity, backup, live isolation tests and owner approval gates in `OMNICAST_COMPLETION_REPORT.md` are satisfied.
 
-## How to test locally before going live
+For Vercel Preview, configure these server environment variables using the correct Preview-only values: `APP_BASE_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SESSION_SECRET`, `YOUTUBE_CLIENT_ID`, `YOUTUBE_CLIENT_SECRET`, `YOUTUBE_REDIRECT_URI`, `YOUTUBE_TOKEN_ENCRYPTION_KEY`, and `GEMINI_API_KEY`. The local ignored `.env.local` contained the first four at last inspection; secret values were not displayed. Vercel values and callbacks were not inspected. No `build` script exists; use the Other preset, blank Build Command, and `.` output only after validating those settings in a Preview build. Never commit `.env.local` or add secret keys to browser code.
 
-From [autopost-ai-netlify](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify):
+## Legacy Netlify functionality
 
-1. Install dependencies:
+Legacy Netlify files and dependencies remain in the repository for compatibility/reference. The active deployment configuration is Vercel (`vercel.json`); no Netlify deployment is claimed or required by the current architecture.
 
-```bash
-npm install
-```
+## Windows installer
 
-2. Create a local `.env` in [autopost-ai-netlify](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify) or use Netlify env syncing.
-
-3. Start Netlify local dev:
-
-```bash
-<<<<<<< HEAD
-netlify dev
-=======
-npx netlify dev
->>>>>>> 383709a (Remove invalid netlify-cli dependency)
-```
-
-4. Open the local URL Netlify prints, usually `http://localhost:8888`.
-
-5. Test this order:
-   - register a normal user
-   - register or log in with an email listed in `ADMIN_EMAILS`
-   - connect YouTube
-   - upload a short video under 60 seconds
-   - set schedule time a few minutes ahead
-   - confirm the post appears as `pending`
-   - as admin, click `Run scheduler now` to test immediate publishing
-
-## How to test live on Netlify
-
-After production deploy:
-
-1. Open your live site:
-
-```text
-https://YOUR-NETLIFY-SITE.netlify.app
-```
-
-2. Confirm health endpoint:
-
-```text
-https://YOUR-NETLIFY-SITE.netlify.app/api/health
-```
-
-3. Register an admin account using an email in `ADMIN_EMAILS`.
-4. Log in and confirm the analytics section appears.
-5. Connect YouTube and approve OAuth.
-6. Upload a test Short under 60 seconds.
-7. Schedule it 5 to 10 minutes ahead.
-8. Confirm the video file reaches S3.
-9. In the admin dashboard, click `Run scheduler now`.
-10. Confirm:
-   - the post changes from `pending` to `posted`
-   - a `youtubeVideoId` link appears
-   - the video shows on your YouTube channel
-
-## How scheduled posting works on Netlify
-
-- Netlify Scheduled Functions are configured in [netlify.toml](C:\xampp\htdocs\ai-church-broadcast\autopost-ai-netlify\netlify.toml).
-- This project is set to check due posts every 15 minutes.
-- For immediate testing, use the admin `Run scheduler now` button.
-
-Netlify scheduled-function note from the official docs:
-- scheduled functions only run on published deploys
-- you can manually run them from the Netlify UI Functions page
-
-Source:
-- [Netlify Scheduled Functions Docs](https://docs.netlify.com/build/functions/scheduled-functions/)
-
-## Recommended live-test checklist
-
-- MongoDB Atlas connection succeeds
-- S3 upload succeeds
-- `/api/health` returns `ok: true`
-- registration and login work
-- admin analytics loads
-- YouTube OAuth redirect works
-- scheduled post is saved
-- admin manual scheduler run works
-- video uploads to YouTube successfully
-
-## Notes
-
-- For live Netlify deployment, keep `STORAGE_PROVIDER=s3`.
-- Do not rely on local `/uploads` storage in production on Netlify.
-- If you want true minute-by-minute scheduling with longer-running workers, a VPS or Render/Railway-style backend is usually simpler than serverless.
+No genuine Windows installer is included. Do not link or distribute `downloads/OmniCast-AI.exe` until a reproducible desktop packaging and release process produces a verified installer.

@@ -1,12 +1,44 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": null,
+  "outputDirectory": ".",
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
     "api/youtube-auth.js": { "maxDuration": 10 },
     "api/youtube-callback.js": { "maxDuration": 15 },
-    "api/youtube-channel.js": { "maxDuration": 30 }
+    "api/youtube-channel.js": { "maxDuration": 30 },
+    "api/youtube-comments.js": { "maxDuration": 30 },
+    "api/youtube-comments-list.js": { "maxDuration": 30 },
+    "api/youtube-comments-sync.js": { "maxDuration": 30 },
+    "api/youtube-comments-generate.js": { "maxDuration": 30 },
+    "api/youtube-comments-publish.js": { "maxDuration": 30 },
+    "api/ai-generate.js": { "maxDuration": 30 },
+    "api/auth/*.js": { "maxDuration": 15 },
+    "api/youtube-channels.js": { "maxDuration": 15 },
+    "api/youtube-channel-select.js": { "maxDuration": 15 },
+    "api/user-settings.js": { "maxDuration": 15 },
+    "api/overlay-channel.js": { "maxDuration": 15 },
+    "api/overlay-publish.js": { "maxDuration": 15 },
+    "api/overlay-public.js": { "maxDuration": 10 },
+    "api/spiritflow-config.js": { "maxDuration": 10 },
+    "api/spiritflow/*.js": { "maxDuration": 10 },
+    "api/spiritflow/nowplaying.js": { "maxDuration": 10 },
+    "api/_youtubeCore.js": { "maxDuration": 30 },
+    "api/_youtubeCommentsCore.js": { "maxDuration": 30 },
+    "api/_spiritFlowCore.js": { "maxDuration": 10 }
   },
   "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(self), camera=()" }
+      ]
+    },
     {
       "source": "/sw.js",
       "headers": [

@@ -502,6 +502,7 @@
             .studio-main .text-3xl{font-size:1.32rem!important}
         }
     </style>
+    <script src="auth.js" defer></script>
 </head>
 <body class="min-h-screen">
     <div class="grid-pattern fixed inset-0 pointer-events-none z-0"></div>
@@ -524,6 +525,7 @@
                     <button onclick="showSection('dashboard')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-dashboard">Dashboard</button>
                     <button onclick="showSection('tools')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-tools">Tools</button>
                     <button onclick="showSection('analytics')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" id="nav-analytics">Analytics</button>
+                    <a href="creator-studio/youtube-comments.html" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg" style="text-decoration:none;">YouTube Comments</a>
                     <button onclick="showSection('ai-assistant')" class="nav-link px-4 py-2 text-sm font-medium text-gray-300 rounded-lg flex items-center gap-2" id="nav-ai-assistant">
                         <span class="w-2 h-2 rounded-full bg-lemon pulse-ring" id="ai-status-dot"></span>AI Assistant
                     </button>
@@ -541,6 +543,8 @@
                         </div>
                         <span class="text-sm font-medium text-gray-300">Creator</span>
                     </div>
+                    <div id="omnicast-account-widget" class="flex items-center gap-2 text-xs" aria-live="polite"></div>
+                    <div id="youtube-channel-picker" class="hidden lg:block text-xs"></div>
                     <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-gray-400">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
@@ -662,9 +666,9 @@
                             <i data-lucide="hash" class="w-7 h-7 text-lemon"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-2">Hashtag Generator</h3>
-                        <p class="text-sm text-gray-400 mb-4">Generate trending Christian and worship hashtags</p>
+                        <p class="text-sm text-gray-400 mb-4">Generate relevant Christian and worship hashtags</p>
                         <div class="flex items-center justify-between">
-                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Trending</span>
+                            <span class="tag px-3 py-1 rounded-full text-xs font-semibold">Relevant ideas</span>
                             <i data-lucide="arrow-up-right" class="w-5 h-5 text-lemon opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
@@ -707,9 +711,14 @@
                                 <p class="text-gray-400" id="youtube-channel-status">Connect your YouTube channel to unlock live AI-powered analytics</p>
                             </div>
                         </div>
-                        <button onclick="connectYouTube()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2">
-                            <i data-lucide="link" class="w-5 h-5"></i>Connect Channel
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="loadYouTubeChannel()" class="btn-outline px-5 py-3 rounded-xl flex items-center gap-2" type="button">
+                                <i data-lucide="refresh-cw" class="w-5 h-5"></i>Refresh analytics
+                            </button>
+                            <button onclick="connectYouTube()" class="btn-primary px-6 py-3 rounded-xl flex items-center gap-2" type="button">
+                                <i data-lucide="link" class="w-5 h-5"></i>Connect Channel
+                            </button>
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -775,7 +784,7 @@
                             <span class="badge-new">POPULAR</span>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-2">Title Optimizer</h3>
-                        <p class="text-sm text-gray-400 mb-4">Generate viral, SEO-optimized titles with CTR predictions</p>
+                        <p class="text-sm text-gray-400 mb-4">Generate title ideas; CTR is not measured</p>
                         <div class="flex items-center gap-2">
                             <span class="tag px-2 py-1 rounded text-xs">SEO</span>
                             <span class="tag px-2 py-1 rounded text-xs">CTR</span>
@@ -826,9 +835,9 @@
                             <i data-lucide="hash" class="w-6 h-6 text-lemon"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-2">Hashtag Generator</h3>
-                        <p class="text-sm text-gray-400 mb-4">Generate 15-30 trending Christian and worship hashtags</p>
+                        <p class="text-sm text-gray-400 mb-4">Generate 15-30 relevant Christian and worship hashtags</p>
                         <div class="flex items-center gap-2">
-                            <span class="tag px-2 py-1 rounded text-xs">Trending</span>
+                            <span class="tag px-2 py-1 rounded text-xs">Relevant</span>
                             <span class="tag px-2 py-1 rounded text-xs">Christian</span>
                         </div>
                     </div>
@@ -850,7 +859,7 @@
                             <i data-lucide="lightbulb" class="w-6 h-6 text-lemon"></i>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-2">Content Ideas</h3>
-                        <p class="text-sm text-gray-400 mb-4">AI-generated Bible stories, worship ideas, and viral topics</p>
+                        <p class="text-sm text-gray-400 mb-4">AI-generated Bible stories, worship ideas, and video topics</p>
                         <div class="flex items-center gap-2">
                             <span class="tag px-2 py-1 rounded text-xs">Creative</span>
                             <span class="tag px-2 py-1 rounded text-xs">Bible</span>
@@ -861,8 +870,8 @@
                         <div class="feature-icon w-12 h-12 rounded-xl flex items-center justify-center">
                             <i data-lucide="trending-up" class="w-6 h-6 text-lemon"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-white mb-2">Christian Trend Discovery</h3>
-                        <p class="text-sm text-gray-400 mb-4">Analyze current Christian, worship, and gospel music trends</p>
+                        <h3 class="text-lg font-bold text-white mb-2">Christian Topic Ideas</h3>
+                        <p class="text-sm text-gray-400 mb-4">Brainstorm Christian, worship, and gospel video topics; live trend data is not connected</p>
                         <div class="flex items-center gap-2">
                             <span class="tag px-2 py-1 rounded text-xs">Trends</span>
                             <span class="tag px-2 py-1 rounded text-xs">Analytics</span>
@@ -961,7 +970,7 @@
                             <span class="badge-new">VIDIQ-STYLE</span>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-2">Content Analyzer</h3>
-                        <p class="text-sm text-gray-400 mb-4">Deep video SEO audit, CTR predictor, title optimizer, comment sentiment & reply suggestions</p>
+                        <p class="text-sm text-gray-400 mb-4">Public video title review; metrics and comment data are not retrieved</p>
                         <div class="flex items-center gap-2">
                             <span class="tag px-2 py-1 rounded text-xs">SEO</span>
                             <span class="tag px-2 py-1 rounded text-xs">CTR</span>
@@ -1045,9 +1054,9 @@
                                 <tr class="text-left text-sm text-gray-400 border-b border-lemon/10">
                                     <th class="pb-3 font-semibold">Video</th>
                                     <th class="pb-3 font-semibold">Views</th>
-                                    <th class="pb-3 font-semibold">CTR</th>
-                                    <th class="pb-3 font-semibold">Avg Duration</th>
-                                    <th class="pb-3 font-semibold">SEO Score</th>
+                                    <th class="pb-3 font-semibold">Likes</th>
+                                    <th class="pb-3 font-semibold">Comments</th>
+                                    <th class="pb-3 font-semibold">Published</th>
                                 </tr>
                             </thead>
                             <tbody class="text-sm" id="analytics-top-videos">
@@ -1065,6 +1074,19 @@
                 <div class="mb-6">
                     <h1 class="text-4xl font-black text-white mb-2">SpiritFlow AI Assistant</h1>
                     <p class="text-gray-400">Your personal AI consultant for Christian content strategy</p>
+                </div>
+
+                <div class="glass-panel rounded-xl p-4 mb-5 text-sm" aria-label="AI service settings">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-gray-300">
+                        <div>Provider <strong class="block text-white" id="ai-provider">Google Gemini</strong></div>
+                        <div>Configuration <strong class="block text-white" id="ai-config-status">Checking…</strong></div>
+                        <div>Model / mode <strong class="block text-white" id="ai-model-status">—</strong></div>
+                        <div>Tracked requests / errors <strong class="block text-white" id="ai-usage-status">—</strong></div>
+                        <div>Quota status <strong class="block text-white" id="ai-quota-status">—</strong></div>
+                        <div>Last successful request <strong class="block text-white" id="ai-last-success">—</strong></div>
+                    </div>
+                    <button id="ai-connection-test" type="button" onclick="verifyGeminiConnection()" class="mt-3 px-3 py-2 rounded-lg bg-lemon/10 border border-lemon/20 text-lemon text-xs font-semibold">Test Gemini connection (uses 1 request)</button>
+                    <p class="text-xs text-gray-500 mt-3">Usage counts are local to this server instance. Google’s remaining quota is not exposed here; see your project’s active limits in AI Studio. Google may use free-tier API content to improve its products; avoid submitting sensitive information.</p>
                 </div>
 
                 <div class="flex-1 glass-panel rounded-2xl border border-lemon/10 flex flex-col overflow-hidden" style="min-height:500px;">
@@ -1091,7 +1113,7 @@
                         <button onclick="sendQuickMessage('Analyze my channel health')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Analyze Channel</button>
                         <button onclick="sendQuickMessage('Generate content ideas for this week')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Content Ideas</button>
                         <button onclick="sendQuickMessage('Help me optimize my latest video')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Optimize Video</button>
-                        <button onclick="sendQuickMessage('Trending Christian topics right now')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Trending Topics</button>
+                        <button onclick="sendQuickMessage('Brainstorm Christian video topics for this week. Do not claim these topics are currently trending.')" class="px-4 py-2 rounded-full bg-lemon/10 border border-lemon/20 text-lemon text-sm font-medium hover:bg-lemon/20 transition-colors whitespace-nowrap">Topic Ideas</button>
                     </div>
 
                     <div class="p-4 border-t border-lemon/5">
@@ -1211,7 +1233,7 @@
                         </div>
                         <div>
                             <h1 class="text-3xl font-black text-white">Thumbnail Analyzer</h1>
-                            <p class="text-gray-400">AI-powered analysis of your thumbnail quality and CTR potential</p>
+                            <p class="text-gray-400">AI feedback on composition, readability, and color; CTR and technical image measurements are not inferred.</p>
                         </div>
                     </div>
 
@@ -1230,11 +1252,11 @@
                             </div>
                             <div class="bg-blackLight rounded-2xl p-6 text-center border border-lemon/5">
                                 <div class="text-4xl font-black text-lemon mb-2" id="thumb-ctr">0%</div>
-                                <div class="text-sm text-gray-400">Estimated CTR</div>
+                                <div class="text-sm text-gray-400">Actual CTR</div>
                             </div>
                             <div class="bg-blackLight rounded-2xl p-6 text-center border border-lemon/5">
                                 <div class="text-4xl font-black text-lemon mb-2" id="thumb-mobile">0%</div>
-                                <div class="text-sm text-gray-400">Mobile Visibility</div>
+                                <div class="text-sm text-gray-400">Mobile Readability</div>
                             </div>
                         </div>
 
@@ -1347,7 +1369,7 @@
                         </div>
                         <div>
                             <h1 class="text-3xl font-black text-white">Hashtag Generator</h1>
-                            <p class="text-gray-400">Generate trending Christian and worship hashtags</p>
+                            <p class="text-gray-400">Generate relevant Christian and worship hashtags</p>
                         </div>
                     </div>
 
@@ -1701,7 +1723,7 @@
                         </div>
                         <div>
                             <h1 class="text-3xl font-black text-white">Content Analyzer</h1>
-                            <p class="text-gray-400">VidIQ-style deep video SEO audit, CTR prediction & comment intelligence</p>
+                            <p class="text-gray-400">Public video title review; CTR metrics and comments are not retrieved</p>
                         </div>
                     </div>
 
@@ -1720,7 +1742,7 @@
                     <div class="flex flex-wrap gap-2 mb-6 border-b border-lemon/10 pb-4">
                         <button onclick="switchAnalyzerTab('overview')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium transition-colors active" data-tab="overview" style="background:var(--lemon);color:#000">Overview</button>
                         <button onclick="switchAnalyzerTab('seo')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="seo">SEO Score</button>
-                        <button onclick="switchAnalyzerTab('ctr')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="ctr">CTR Predictor</button>
+                        <button onclick="switchAnalyzerTab('ctr')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="ctr">Unavailable metrics</button>
                         <button onclick="switchAnalyzerTab('title')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="title">Title Optimizer</button>
                         <button onclick="switchAnalyzerTab('comments')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="comments">Comment AI</button>
                         <button onclick="switchAnalyzerTab('competitor')" class="analyzer-tab px-4 py-2 rounded-lg text-sm font-medium text-gray-400 hover:text-lemon transition-colors" data-tab="competitor">Competitor Gap</button>
@@ -1841,7 +1863,7 @@
                                     <div class="text-5xl font-black text-lemon mb-2" id="ca-ctr-big">--%</div>
                                     <p class="text-sm text-gray-400 mb-4">Predicted Click-Through Rate</p>
                                     <div class="p-3 bg-lemon/5 border border-lemon/20 rounded-lg">
-                                        <p class="text-xs text-gray-300" id="ca-ctr-verdict">Enter a video to get CTR prediction</p>
+                                        <p class="text-xs text-gray-300" id="ca-ctr-verdict">Channel analytics are not retrieved for public videos.</p>
                                     </div>
                                 </div>
                             </div>
@@ -2063,8 +2085,10 @@
             const output = document.getElementById('fallback-output');
             if (!output) return;
 
-            const aiResponse = await callFreeAI(`Create a detailed ${label} production plan for: "${topic}". Include: 1) Hook strategy, 2) Content structure, 3) Production tips, 4) Publishing strategy. Be specific and actionable.`);
-            output.innerHTML = `<p class="text-gray-300 leading-relaxed whitespace-pre-line">${aiResponse.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>`;
+            try {
+                const aiResponse = await callFreeAI(`Create a detailed ${label} production plan for: "${topic}". Include: 1) Hook strategy, 2) Content structure, 3) Production tips, 4) Publishing strategy. Be specific and actionable.`);
+                output.textContent = aiResponse;
+            } catch (error) { output.textContent = error.message || 'AI is unavailable. Your prompt is still saved above.'; }
         }
 
         function showTool(toolId) {
@@ -2230,14 +2254,10 @@
             listDiv.innerHTML = titles.map((title, i) => `
                 <div class="result-card rounded-xl p-4 flex items-center justify-between group">
                     <div class="flex-1">
-                        <p class="text-white font-semibold">${title.text}</p>
-                        <div class="flex items-center gap-4 mt-2">
-                            <span class="text-xs text-lemon bg-lemon/10 px-2 py-1 rounded-full">SEO: ${title.seo}/100</span>
-                            <span class="text-xs text-lemon bg-lemon/10 px-2 py-1 rounded-full">CTR: ${title.ctr}/100</span>
-                            <span class="text-xs text-lemon bg-lemon/10 px-2 py-1 rounded-full">Rank: ${title.rank}%</span>
-                        </div>
+                        <p class="text-white font-semibold">${escapeAIOutput(title.text)}</p>
+                        <span class="text-xs text-gray-400">Title idea · not a measured SEO or CTR score</span>
                     </div>
-                    <button onclick="copyText(this, '${title.text.replace(/'/g, "\'")}')" class="copy-btn text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
+                    <button onclick="copyText(this, this.dataset.copy)" data-copy="${escapeAttr(title.text)}" class="copy-btn text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
                         <i data-lucide="copy" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -2248,7 +2268,7 @@
         }
 
         async function generateRealTitles(input, type) {
-            const prompt = `Generate 4 YouTube title options for a video about: "${input}". Style: ${type}. Return ONLY a JSON array of objects with keys: text, seo (0-100), ctr (0-100), rank (0-100). No markdown, no explanation.`;
+            const prompt = `Generate 4 YouTube title ideas for a video about: "${input}". Style: ${type}. Do not provide numeric SEO, search volume, ranking, or CTR claims. Return ONLY JSON: [{"text":"..."}].`;
             try {
                 const response = await callFreeAI(prompt);
                 const jsonMatch = response.match(/\[[\s\S]*?\]/);
@@ -2257,13 +2277,8 @@
                     if (Array.isArray(parsed) && parsed.length > 0) return parsed;
                 }
             } catch (e) { console.error('Title AI error:', e); }
-            // Smart fallback based on input
-            return [
-                { text: `${input} — Complete Guide for Christians`, seo: 92, ctr: 85, rank: 90 },
-                { text: `The Truth About ${input} (Biblical Perspective)`, seo: 88, ctr: 90, rank: 86 },
-                { text: `${input} Explained in 10 Minutes`, seo: 85, ctr: 88, rank: 84 },
-                { text: `Why ${input} Matters for Your Faith`, seo: 80, ctr: 92, rank: 82 }
-            ];
+            showToast('AI could not generate titles. Your topic is still available; please retry.');
+            return [];
         }
 
         // Thumbnail Analyzer
@@ -2276,40 +2291,42 @@
             // Read image as base64 for AI analysis
             const reader = new FileReader();
             reader.onload = async function(e) {
-                const base64 = e.target.result;
-                const prompt = `Analyze this YouTube thumbnail image (base64: ${base64.substring(0, 200)}...). Score: overall (0-100), estimated CTR (%), mobile visibility (%), resolution (0-100), brightness (0-100), text readability (0-100), color harmony (0-100). Provide 4 specific improvement suggestions. Return ONLY JSON: {overall: N, ctr: N, mobile: N, resolution: N, brightness: N, textReadability: N, colorHarmony: N, suggestions: ["...", "...", "...", "..."]}`;
+                const dataUrl = String(e.target.result || '');
+                const imageParts = dataUrl.match(/^data:(image\/(?:jpeg|png|webp));base64,([\s\S]+)$/i);
+                if (!imageParts || file.size > 4 * 1024 * 1024) { showToast('Use a JPEG, PNG, or WebP thumbnail under 4 MB.'); return; }
+                const prompt = `Analyze the supplied YouTube thumbnail image. Give qualitative visual scores for overall quality, mobile readability, text readability, and color harmony (0-100), plus 4 specific improvements. Do not claim an actual CTR or guarantee performance. Return ONLY JSON: {"overall": N, "mobile": N, "textReadability": N, "colorHarmony": N, "suggestions": ["...", "...", "...", "..."]}`;
 
                 try {
-                    const response = await callFreeAI(prompt);
+                    const response = await callFreeAI(prompt, false, { module: 'thumbnail', image: { mimeType: imageParts[1].toLowerCase(), data: imageParts[2] }, maxOutputTokens: 400 });
                     const jsonMatch = response.match(/\{[\s\S]*?\}/);
                     let data = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
 
                     // Validate and clamp values
-                    if (!data) data = {overall: 70, ctr: 8, mobile: 85, resolution: 80, brightness: 75, textReadability: 70, colorHarmony: 80, suggestions: ['Add more contrast', 'Include a face', 'Use brighter colors', 'Reduce text to 3-4 words']};
+                    if (!data || !['overall', 'mobile', 'textReadability', 'colorHarmony'].every(key => Number.isFinite(Number(data[key]))) || !Array.isArray(data.suggestions)) throw new Error('The image analysis returned an invalid result. Please retry.');
 
                     document.getElementById('thumbnail-results').classList.remove('hidden');
 
-                    animateValue('thumb-score', 0, Math.min(100, Math.max(0, data.overall || 70)), 1000);
-                    animateValue('thumb-ctr', 0, Math.min(50, Math.max(0, data.ctr || 8)), 1000, '%');
-                    animateValue('thumb-mobile', 0, Math.min(100, Math.max(0, data.mobile || 85)), 1000, '%');
+                    animateValue('thumb-score', 0, Math.min(100, Math.max(0, Number(data.overall))), 1000);
+                    document.getElementById('thumb-ctr').textContent = 'Not measured';
+                    animateValue('thumb-mobile', 0, Math.min(100, Math.max(0, Number(data.mobile))), 1000, '/100');
 
-                    animateValue('thumb-res-score', 0, Math.min(100, Math.max(0, data.resolution || 80)), 1000, '/100');
-                    animateValue('thumb-bright-score', 0, Math.min(100, Math.max(0, data.brightness || 75)), 1000, '/100');
-                    animateValue('thumb-text-score', 0, Math.min(100, Math.max(0, data.textReadability || 70)), 1000, '/100');
-                    animateValue('thumb-color-score', 0, Math.min(100, Math.max(0, data.colorHarmony || 80)), 1000, '/100');
+                    document.getElementById('thumb-res-score').textContent = 'Not measured';
+                    document.getElementById('thumb-bright-score').textContent = 'Not measured';
+                    animateValue('thumb-text-score', 0, Math.min(100, Math.max(0, Number(data.textReadability))), 1000, '/100');
+                    animateValue('thumb-color-score', 0, Math.min(100, Math.max(0, Number(data.colorHarmony))), 1000, '/100');
 
-                    document.getElementById('thumb-res-bar').style.width = Math.min(100, Math.max(0, data.resolution || 80)) + '%';
-                    document.getElementById('thumb-bright-bar').style.width = Math.min(100, Math.max(0, data.brightness || 75)) + '%';
-                    document.getElementById('thumb-text-bar').style.width = Math.min(100, Math.max(0, data.textReadability || 70)) + '%';
-                    document.getElementById('thumb-color-bar').style.width = Math.min(100, Math.max(0, data.colorHarmony || 80)) + '%';
+                    document.getElementById('thumb-res-bar').style.width = '0%';
+                    document.getElementById('thumb-bright-bar').style.width = '0%';
+                    document.getElementById('thumb-text-bar').style.width = Math.min(100, Math.max(0, Number(data.textReadability))) + '%';
+                    document.getElementById('thumb-color-bar').style.width = Math.min(100, Math.max(0, Number(data.colorHarmony))) + '%';
 
                     const suggestions = (data.suggestions || []).slice(0, 4);
                     document.getElementById('thumb-suggestions').innerHTML = suggestions.map(s =>
-                        `<li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>${s}</li>`
+                        `<li class="flex items-start gap-2"><i data-lucide="check" class="w-4 h-4 text-lemon mt-0.5"></i>${escapeAIOutput(s)}</li>`
                     ).join('');
                     safeRenderIcons();
                 } catch(err) {
-                    showToast('AI analysis failed. Please retry.');
+                    showToast(err.message || 'AI analysis failed. Please retry.');
                 }
             };
             reader.readAsDataURL(file);
@@ -2329,7 +2346,8 @@
                 const aiText = await callFreeAI(prompt);
                 document.getElementById('desc-output').textContent = aiText;
             } catch (e) {
-                document.getElementById('desc-output').textContent = `Welcome to this video about ${input}!\n\nIn this video, we explore the biblical meaning and spiritual significance of this topic.\n\nTIMESTAMPS:\n0:00 - Introduction\n2:15 - Biblical Foundation\n5:30 - Key Scripture Breakdown\n10:45 - Practical Application\n15:20 - Prayer & Worship\n18:00 - Closing Thoughts\n\nSCRIPTURE REFERENCES:\n- John 3:16\n- Psalm 23\n- Romans 8:28\n- Philippians 4:13\n\nFOLLOW US:\nSubscribe for more Christian content every week!\n\n#ChristianContent #BibleStudy #Worship #Faith #Jesus`;
+                showToast(e.message || 'AI could not write the description. Your topic is preserved.');
+                return;
             }
             document.getElementById('desc-results').classList.remove('hidden');
         }
@@ -2340,7 +2358,7 @@
             if (!input) { showToast('Please enter a topic'); return; }
             showToast('Generating hashtags with AI...');
 
-            const prompt = `Generate ${hashtagCount} trending ${hashtagType} hashtags for YouTube video about: "${input}". Return ONLY a JSON array of hashtag strings like ["#tag1", "#tag2"]. No explanation.`;
+            const prompt = `Generate ${hashtagCount} relevant ${hashtagType} hashtags for YouTube video about: "${input}". Do not claim they are trending. Return ONLY a JSON array of hashtag strings like ["#tag1", "#tag2"]. No explanation.`;
 
             let tags = [];
             try {
@@ -2352,20 +2370,11 @@
                 }
             } catch (e) { console.error('Hashtag AI error:', e); }
 
-            if (tags.length === 0) {
-                const defaults = {
-                    christian: ['#Christian', '#Faith', '#Jesus', '#Bible', '#Gospel', '#Christ', '#God', '#HolySpirit', '#ChristianLife', '#Believer', '#Scripture', '#Prayer', '#Worship', '#Church', '#Ministry', '#ChristianContent', '#BibleVerse', '#JesusSaves', '#GodsLove', '#ChristianCommunity', '#FaithOverFear', '#Blessed', '#Thankful', '#Grace', '#Salvation', '#BornAgain', '#ChristianCreator', '#GospelMusic', '#Testimony', '#BibleStudy'],
-                    worship: ['#Worship', '#Praise', '#WorshipMusic', '#PraiseAndWorship', '#WorshipLeader', '#WorshipTeam', '#SundayWorship', '#WorshipNight', '#LiveWorship', '#WorshipSession', '#GuitarWorship', '#PianoWorship', '#WorshipVocals', '#SpontaneousWorship', '#IntimateWorship', '#WorshipMoment', '#WorshipCulture', '#WorshipTogether', '#WorshipSong', '#WorshipCover'],
-                    gospel: ['#Gospel', '#GospelMusic', '#GospelArtist', '#GospelSong', '#GospelChoir', '#TraditionalGospel', '#ContemporaryGospel', '#GospelConcert', '#GospelRadio', '#GospelChart', '#GospelHits', '#GospelClassic', '#GospelLegend', '#GospelNewRelease', '#GospelAlbum', '#GospelSingle', '#GospelVibes', '#GospelSound', '#GospelCulture', '#GospelIndustry'],
-                    shorts: ['#Shorts', '#YouTubeShorts', '#ChristianShorts', '#BibleShorts', '#FaithShorts', '#WorshipShorts', '#GospelShorts', '#JesusShorts', '#PrayerShorts', '#MinistryShorts', '#ChurchShorts', '#TestimonyShorts', '#MotivationShorts', '#InspirationShorts', '#DailyShorts', '#ViralShorts', '#TrendingShorts', '#ShortsFeed', '#ShortsCreator', '#ShortsCommunity']
-                };
-                const selected = defaults[hashtagType] || defaults.christian;
-                tags = selected.slice(0, hashtagCount);
-            }
+            if (tags.length === 0) { showToast('AI could not generate hashtags. Your topic is preserved; please retry.'); return; }
 
-            const shuffled = tags.sort(() => 0.5 - Math.random()).slice(0, hashtagCount);
-            document.getElementById('hashtag-output').innerHTML = shuffled.map(tag => 
-                `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer hover:bg-lemon/20 transition-colors">${tag}</span>`
+            const selectedTags = tags.slice(0, hashtagCount);
+            document.getElementById('hashtag-output').innerHTML = selectedTags.map(tag =>
+                `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer hover:bg-lemon/20 transition-colors">${escapeAIOutput(tag)}</span>`
             ).join('');
             document.getElementById('hashtag-results').classList.remove('hidden');
         }
@@ -2377,7 +2386,7 @@
             showToast('Researching keywords with AI...');
             showLoading('keyword-results', 'AI is researching keywords...');
 
-            const prompt = `Find 8 high-opportunity YouTube keywords related to: "${input}". For each, estimate monthly search volume, difficulty (Low/Medium/High), and opportunity score (0-100). Return ONLY a JSON array: [{word: "...", volume: "...", difficulty: "...", opportunity: N}].`;
+            const prompt = `Brainstorm 8 keyword phrases related to "${input}". Do not invent search volume, trends, or measured opportunity scores. For each phrase, give a qualitative fit (Strong|Moderate|Exploratory) and one short reason. Return ONLY JSON: [{word: "...", fit: "Strong|Moderate|Exploratory", reason: "..."}].`;
 
             let keywords = [];
             try {
@@ -2389,31 +2398,20 @@
                 }
             } catch (e) { console.error('Keyword AI error:', e); }
 
-            if (keywords.length === 0) {
-                keywords = [
-                    { word: `${input} tutorial`, volume: '12K', difficulty: 'Low', opportunity: 92 },
-                    { word: `${input} for beginners`, volume: '8.5K', difficulty: 'Low', opportunity: 88 },
-                    { word: `best ${input}`, volume: '15K', difficulty: 'Medium', opportunity: 75 },
-                    { word: `${input} bible study`, volume: '6K', difficulty: 'Low', opportunity: 90 },
-                    { word: `${input} worship`, volume: '9K', difficulty: 'Medium', opportunity: 82 },
-                    { word: `how to ${input}`, volume: '22K', difficulty: 'Medium', opportunity: 78 },
-                    { word: `${input} explained`, volume: '4.5K', difficulty: 'Low', opportunity: 95 },
-                    { word: `${input} meaning`, volume: '7K', difficulty: 'Low', opportunity: 85 }
-                ];
-            }
+            if (keywords.length === 0) { showToast('AI could not generate keyword ideas. Your seed keyword is preserved.'); return; }
 
             document.getElementById('keyword-list').innerHTML = keywords.map(k => `
                 <div class="result-card rounded-xl p-4 flex items-center justify-between">
                     <div>
-                        <p class="text-white font-semibold">${k.word}</p>
+                        <p class="text-white font-semibold">${escapeAIOutput(k.word)}</p>
                         <div class="flex items-center gap-4 mt-1 text-xs text-gray-400">
-                            <span>Volume: ${k.volume}</span>
-                            <span>Difficulty: ${k.difficulty}</span>
+                            <span>Fit: ${escapeAIOutput(k.fit || 'Unrated')}</span>
+                            <span>${escapeAIOutput(k.reason || '')}</span>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="text-2xl font-black text-lemon">${k.opportunity}</div>
-                        <div class="text-xs text-gray-400">Opportunity</div>
+                        <div class="text-lg font-black text-lemon">—</div>
+                        <div class="text-xs text-gray-400">No search data</div>
                     </div>
                 </div>
             `).join('');
@@ -2425,7 +2423,7 @@
             const input = document.getElementById('hashtag-input')?.value || '';
             showToast('Generating content ideas with AI...');
 
-            const prompt = `Generate 5 YouTube video ideas for ${contentType} content${input ? ' about: "' + input + '"' : ''}. For each idea, provide: title, type (Long-form/Shorts/Tutorial/etc), and whether it is trending (true/false). Return ONLY a JSON array: [{title: "...", type: "...", trending: true/false}].`;
+            const prompt = `Generate 5 YouTube video ideas for ${contentType} content${input ? ' about: "' + input + '"' : ''}. For each idea, provide a title and format (Long-form/Shorts/Tutorial/etc). Do not claim whether a topic is currently trending. Return ONLY JSON: [{title: "...", type: "..."}].`;
 
             let selected = [];
             try {
@@ -2438,25 +2436,20 @@
             } catch (e) { console.error('Content ideas AI error:', e); }
 
             if (selected.length === 0) {
-                selected = [
-                    { title: `${input || 'Bible Study'} — Deep Dive for Believers`, type: 'Long-form', trending: true },
-                    { title: `5 Lessons from ${input || 'Scripture'}`, type: 'Shorts', trending: true },
-                    { title: `How to Apply ${input || 'Faith'} in Daily Life`, type: 'Tutorial', trending: false },
-                    { title: `${input || 'Worship'} Session — Live Prayer`, type: 'Long-form', trending: true },
-                    { title: `${input || 'Christian'} Tips in 60 Seconds`, type: 'Shorts', trending: true }
-                ];
+                showToast('AI could not generate content ideas. Your topic is preserved; please retry.');
+                return;
             }
 
             document.getElementById('content-ideas-list').innerHTML = selected.map(idea => `
                 <div class="result-card rounded-xl p-4 flex items-center justify-between group">
                     <div>
-                        <p class="text-white font-semibold">${idea.title}</p>
+                        <p class="text-white font-semibold">${escapeAIOutput(idea.title)}</p>
                         <div class="flex items-center gap-3 mt-1">
-                            <span class="text-xs text-gray-400">${idea.type}</span>
-                            ${idea.trending ? '<span class="badge-new">TRENDING</span>' : ''}
+                            <span class="text-xs text-gray-400">${escapeAIOutput(idea.type)}</span>
+                            <span class="text-xs text-gray-500">Trend status not retrieved</span>
                         </div>
                     </div>
-                    <button onclick="copyText(this, '${idea.title.replace(/'/g, "\'")}')" class="copy-btn text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
+                    <button onclick="copyText(this, this.dataset.copy)" data-copy="${escapeAttr(idea.title)}" class="copy-btn text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
                         <i data-lucide="copy" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -2485,12 +2478,13 @@
                         ideogram: parsed.ideogram || parsed.Ideogram
                     };
                 }
-            } catch (e) { console.error('Thumbnail prompt AI error:', e); }
+            } catch (e) { showToast(e.message || 'AI could not generate thumbnail prompts. Your topic is preserved.'); return; }
 
-            document.getElementById('prompt-dalle').textContent = prompts.dalle || `Create a high-contrast YouTube thumbnail featuring ${input}. Bold readable text overlay, max 3 words. Vibrant colors, dark background, professional lighting, cinematic composition, 16:9, eye-catching and clickable.`;
-            document.getElementById('prompt-midjourney').textContent = prompts.midjourney || `youtube thumbnail, ${input}, bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, professional photography, 16:9, eye-catching, clickable, viral style --ar 16:9 --v 6`;
-            document.getElementById('prompt-leonardo').textContent = prompts.leonardo || `YouTube thumbnail design, ${input}, bold typography, high contrast colors, dramatic lighting, professional quality, 1280x720, engaging composition, dark moody background with bright accents`;
-            document.getElementById('prompt-ideogram').textContent = prompts.ideogram || `A striking YouTube thumbnail showing ${input} with large bold text, high contrast, vibrant lemon and black colors, professional design, 16:9 format, instantly eye-catching`;
+            if (!prompts.dalle || !prompts.midjourney || !prompts.leonardo || !prompts.ideogram) { showToast('The thumbnail prompt response was incomplete. Please retry.'); return; }
+            document.getElementById('prompt-dalle').textContent = prompts.dalle;
+            document.getElementById('prompt-midjourney').textContent = prompts.midjourney;
+            document.getElementById('prompt-leonardo').textContent = prompts.leonardo;
+            document.getElementById('prompt-ideogram').textContent = prompts.ideogram;
             document.getElementById('thumb-prompt-results').classList.remove('hidden');
         }
 
@@ -2500,40 +2494,14 @@
             const artist = document.getElementById('artist-input').value;
             if (!song || !artist) { showToast('Please enter song title and artist name'); return; }
             showToast('Generating release kit with AI...');
-
-            document.getElementById('music-cover-prompt').textContent = 
-                `Album cover art for "${song}" by ${artist}. Christian worship music album, ethereal golden light, abstract spiritual design, cross silhouette, heavenly clouds, warm color palette with gold and deep blue, modern minimalist style, professional music artwork, 3000x3000`;
-
-            document.getElementById('music-yt-desc').textContent = 
-                `${song} - ${artist}
-
-Stream/Download: [Add your streaming links]
-
-This song is a heartfelt expression of worship and devotion. Recorded with love and prayer, my hope is that it draws you closer to God.
-
-FOLLOW ${artist}:
-Instagram: @artist_handle
-Facebook: facebook.com/artistpage
-Spotify: [Add Spotify link]
-
-CREDITS:
-Written by: ${artist}
-Produced by: [Producer Name]
-Mixed & Mastered: [Engineer Name]
-
-#NewMusic #ChristianMusic #Worship #Gospel #${song.replace(/\s/g, '')} #${artist.replace(/\s/g, '')}`;
-
-            document.getElementById('music-captions').innerHTML = `
-                <p class="text-gray-300 text-sm">NEW MUSIC OUT NOW! ${song} is now available everywhere you stream. This one means so much to me. Link in bio!</p>
-                <p class="text-gray-300 text-sm">Worship with me! My new single "${song}" just dropped. Let me know what you think in the comments!</p>
-                <p class="text-gray-300 text-sm">After months of prayer and preparation, ${song} is finally here. God is faithful!</p>
-            `;
-
-            document.getElementById('music-hashtags').innerHTML = 
-                ['#NewMusic', '#ChristianMusic', '#Worship', '#Gospel', '#MusicRelease', '#Spotify', '#AppleMusic', '#YouTubeMusic', '#DistroKid', '#WorshipMusic', '#Praise', '#HolySpirit', '#Faith', '#Jesus', '#GodsPlan']
-                .map(tag => `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium">${tag}</span>`).join('');
-
-            document.getElementById('music-results').classList.remove('hidden');
+            try {
+                const kit = await generateAIMusicRelease(song, artist, 'YouTube and social media');
+                document.getElementById('music-cover-prompt').textContent = kit.coverPrompt;
+                document.getElementById('music-yt-desc').textContent = kit.description;
+                document.getElementById('music-captions').innerHTML = kit.captions.map(caption => `<p class="text-gray-300 text-sm">${escapeAIOutput(caption)}</p>`).join('');
+                document.getElementById('music-hashtags').innerHTML = kit.hashtags.map(tag => `<span class="tag px-3 py-1.5 rounded-full text-sm font-medium">${escapeAIOutput(tag)}</span>`).join('');
+                document.getElementById('music-results').classList.remove('hidden');
+            } catch (error) { showToast(error.message || 'AI could not generate the release kit. Your entries are preserved.'); }
         }
 
         // Calendar Generator
@@ -2542,41 +2510,19 @@ Mixed & Mastered: [Engineer Name]
             const days = calendarFreq === 'daily' ? 30 : calendarFreq === '3x' ? 12 : 4;
             showToast('Generating calendar with AI...');
 
-            const contentTypes = ['Long-form Video', 'Shorts', 'Community Post', 'Music Release', 'Live Stream'];
-            const topics = [
-                'Bible Study: Genesis', 'Worship Session', 'Q&A with Pastor', 'Behind the Scenes',
-                'Testimony Tuesday', 'Worship Cover', 'Bible Story Animated', 'Prayer Guide',
-                'Church Vlog', 'Gospel Music Review', 'Scripture Meditation', 'Ministry Tips'
-            ];
-
-            let html = '';
-            for (let i = 1; i <= days; i++) {
-                const type = contentTypes[Math.floor(Math.random() * contentTypes.length)];
-                const topic = topics[Math.floor(Math.random() * topics.length)];
-                const color = type === 'Long-form Video' ? 'bg-lemon/20 border-lemon' : 
-                             type === 'Shorts' ? 'bg-blue-500/20 border-blue-500' :
-                             type === 'Community Post' ? 'bg-purple-500/20 border-purple-500' :
-                             'bg-red-500/20 border-red-500';
-
-                html += `
-                    <div class="result-card rounded-xl p-4 border ${color}">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <span class="text-xs text-gray-400">Day ${i}</span>
-                                <p class="text-white font-semibold">${topic}</p>
-                                <span class="text-xs text-lemon">${type}</span>
-                            </div>
-                            <button onclick="copyText(this, '${topic.replace(/'/g, "\'")}')" class="text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors">
-                                <i data-lucide="copy" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            document.getElementById('calendar-plan-list').innerHTML = html;
-            document.getElementById('calendar-plan-results').classList.remove('hidden');
-            safeRenderIcons();
+            try {
+                const plan = await generateAICalendarPlan(niche, calendarFreq, days);
+                const classes = { 'Long-form Video': 'bg-lemon/20 border-lemon', Shorts: 'bg-blue-500/20 border-blue-500', 'Community Post': 'bg-purple-500/20 border-purple-500', 'Music Release': 'bg-red-500/20 border-red-500' };
+                document.getElementById('calendar-plan-list').innerHTML = plan.map((item, index) => {
+                    const topic = escapeAIOutput(item.topic);
+                    const day = escapeAIOutput(item.day || `Day ${index + 1}`);
+                    const type = classes[item.type] ? item.type : 'Long-form Video';
+                    const copyTextValue = escapeAttr(item.topic || '');
+                    return `<div class="result-card rounded-xl p-4 border ${classes[type]}"><div class="flex items-center justify-between"><div><span class="text-xs text-gray-400">${day}</span><p class="text-white font-semibold">${topic}</p><span class="text-xs text-lemon">${type}</span></div><button onclick="copyText(this, this.dataset.copy)" data-copy="${copyTextValue}" class="text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors"><i data-lucide="copy" class="w-4 h-4"></i></button></div></div>`;
+                }).join('');
+                document.getElementById('calendar-plan-results').classList.remove('hidden');
+                safeRenderIcons();
+            } catch (error) { showToast(error.message || 'AI could not create the calendar. Your settings are preserved.'); }
         }
 
         // AI Chat
@@ -2616,7 +2562,8 @@ async function sendMessage() {
                 addChatMessage(response, 'ai');
             } catch (e) {
                 document.getElementById(typingId)?.remove();
-                addChatMessage('I am analyzing your request. For the best results, try asking about SEO strategy, content ideas, or channel optimization for Christian creators.', 'ai');
+                input.value = message;
+                showToast(e.message || 'AI is unavailable. Your message is still in the input; please retry later.');
             }
         }
 
@@ -2636,7 +2583,7 @@ async function sendMessage() {
                         <i data-lucide="flame" class="w-5 h-5 text-black"></i>
                     </div>
                     <div class="bg-blackLight rounded-2xl rounded-tl-none p-4 max-w-[80%]">
-                        <p class="text-white">${text}</p>
+                        <p class="text-white"></p>
                     </div>
                 `;
             } else {
@@ -2645,10 +2592,12 @@ async function sendMessage() {
                         <i data-lucide="user" class="w-5 h-5 text-white"></i>
                     </div>
                     <div class="bg-lemon/10 border border-lemon/20 rounded-2xl rounded-tr-none p-4 max-w-[80%]">
-                        <p class="text-white">${text}</p>
+                        <p class="text-white"></p>
                     </div>
                 `;
             }
+            /* AI output and visitor input are plain text, never HTML. */
+            div.querySelector('p').textContent = String(text ?? '');
 
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
@@ -2668,19 +2617,12 @@ async function sendMessage() {
                 grid.innerHTML += '<div></div>';
             }
 
-            const types = [
-                { color: 'bg-lemon/20 border-lemon', label: 'Video' },
-                { color: 'bg-blue-500/20 border-blue-500', label: 'Shorts' },
-                { color: 'bg-purple-500/20 border-purple-500', label: 'Post' },
-                { color: 'bg-red-500/20 border-red-500', label: 'Music' }
-            ];
-
+            /* Day cells only show the date. No content type is invented:
+             * planned items appear only after the AI calendar returns real data. */
             for (let day = 1; day <= daysInMonth; day++) {
-                const type = types[Math.floor(Math.random() * types.length)];
                 grid.innerHTML += `
-                    <div class="aspect-square rounded-xl border ${type.color} p-2 cursor-pointer hover:opacity-80 transition-opacity">
+                    <div class="aspect-square rounded-xl border border-white/10 p-2 cursor-pointer hover:opacity-80 transition-opacity">
                         <div class="text-xs text-gray-400">${day}</div>
-                        <div class="text-[10px] text-lemon mt-1">${type.label}</div>
                     </div>
                 `;
             }
@@ -2715,9 +2657,11 @@ async function sendMessage() {
                 }
             };
             const rows = youtubeChannelData?.analytics?.rows || [];
-            const labels = rows.length ? rows.map(row => row[0].slice(5)) : ['Connect', 'Your', 'YouTube', 'Channel'];
-            const viewsData = rows.length ? rows.map(row => Number(row[1] || 0)) : [0, 0, 0, 0];
-            const subscriberData = rows.length ? rows.map(row => Number(row[4] || 0)) : [0, 0, 0, 0];
+            /* No placeholder points: the chart stays empty until real YouTube
+             * Analytics rows arrive. */
+            const labels = rows.map(row => String(row[0] || '').slice(5));
+            const viewsData = rows.map(row => Number(row[1] || 0));
+            const subscriberData = rows.map(row => Number(row[4] || 0));
 
             viewsCtx.chart = new Chart(viewsCtx, {
                 type: 'line',
@@ -2828,7 +2772,7 @@ async function sendMessage() {
         function listItems(id, items) {
             const el = document.getElementById(id);
             if (!el) return;
-            el.innerHTML = (items || []).map(item => `<li>${item}</li>`).join('');
+            el.innerHTML = (items || []).map(item => `<li>${escapeAIOutput(item)}</li>`).join('');
         }
 
         function connectYouTube() {
@@ -2837,19 +2781,36 @@ async function sendMessage() {
 
         async function loadYouTubeChannel(silent = false) {
             if (!silent) showToast('Loading live YouTube channel data...');
-            const response = await fetch('/api/youtube-channel', { credentials: 'include' });
-            const data = await response.json();
+            let response;
+            try {
+                response = await fetch('/api/youtube-channel', { credentials: 'same-origin', cache: 'no-store' });
+            } catch (error) {
+                const message = 'Network error: YouTube channel data could not be loaded. Check your connection and try again.';
+                setText('youtube-channel-status', message);
+                if (!silent) showToast(message);
+                return null;
+            }
+            let data = {};
+            try { data = await response.json(); } catch (_) {}
 
             if (!response.ok || !data.ok) {
-                const message = data.error || 'YouTube channel is not connected yet.';
+                const message = data.error || (response.status === 401 ? 'Sign in with Google, then connect your YouTube channel.' : 'YouTube channel is not connected yet.');
                 setText('youtube-channel-status', message);
                 if (!silent) showToast(message);
                 return null;
             }
 
-            renderYouTubeChannel(data);
-            if (!silent) showToast('YouTube channel analysis updated.');
-            return data;
+            try {
+                await renderYouTubeChannel(data);
+                if (!silent) showToast('YouTube channel data refreshed.');
+                return data;
+            } catch (error) {
+                const message = 'Channel data was received but could not be displayed. Please refresh and try again.';
+                setText('youtube-channel-status', message);
+                if (!silent) showToast(message);
+                console.error('Unable to render YouTube channel data:', error);
+                return null;
+            }
         }
 
         async function renderYouTubeChannel(data) {
@@ -2858,12 +2819,13 @@ async function sendMessage() {
             const stats = channel.statistics || {};
             const analytics = data.analytics || {};
             const audit = data.audit || {};
+            const score = (value, suffix = '') => (value == null || value === '' || !Number.isFinite(Number(value)) ? 'Not measured' : `${value}${suffix}`);
 
             setText('youtube-channel-title', channel.title || 'Connected YouTube Channel');
             setText('youtube-channel-status', analytics.unavailable ? `Connected. Analytics limited: ${analytics.reason}` : 'Connected and analyzing live channel data.');
             setText('youtube-subscribers', channel.compact?.subscribers || stats.subscriberCount || '0');
             setText('youtube-views', channel.compact?.views || stats.viewCount || '0');
-            setText('youtube-watch-hours', formatHours(analytics.minutesWatched));
+            setText('youtube-watch-hours', analytics.unavailable ? '—' : formatHours(analytics.minutesWatched));
             setText('youtube-uploads', channel.compact?.videos || stats.videoCount || '0');
             setText('youtube-subscribers-note', 'Live from YouTube');
             setText('youtube-views-note', 'Lifetime channel views');
@@ -2872,35 +2834,38 @@ async function sendMessage() {
 
             setText('analytics-subscribers', channel.compact?.subscribers || '0');
             setText('analytics-views', channel.compact?.views || '0');
-            setText('analytics-watch-hours', formatHours(analytics.minutesWatched));
-            setText('analytics-health-score', `${audit.health || 0}/100`);
-            setText('analytics-subscribers-delta', analytics.subscribersGained ? `+${analytics.subscribersGained}` : 'Live');
-            setText('analytics-views-delta', analytics.views ? `${channel.compact?.views || analytics.views}` : 'Live');
+            setText('analytics-watch-hours', analytics.unavailable ? '—' : formatHours(analytics.minutesWatched));
+            setText('analytics-health-score', score(audit.health, '/100'));
+            setText('analytics-subscribers-delta', analytics.subscribersGained != null ? `+${analytics.subscribersGained} (28d)` : 'Unavailable');
+            setText('analytics-views-delta', analytics.unavailable ? 'Unavailable' : `${analytics.views || 0} views (28d)`);
             setText('analytics-watch-delta', analytics.unavailable ? 'Limited' : '28 days');
-            setText('analytics-health-note', audit.health >= 80 ? 'Strong' : audit.health >= 60 ? 'Improve' : 'Needs work');
+            setText('analytics-health-note', audit.health == null ? 'Not measured' : audit.health >= 80 ? 'Strong' : audit.health >= 60 ? 'Improve' : 'Needs work');
 
-            setText('audit-health-score', audit.health || 0);
-            setText('audit-branding-score', audit.brandingScore || 0);
-            setText('audit-seo-score', audit.seoScore || 0);
-            setText('audit-consistency-score', audit.consistencyScore || 0);
+            setText('audit-health-score', score(audit.health));
+            setText('audit-branding-score', score(audit.brandingScore));
+            setText('audit-seo-score', score(audit.seoScore));
+            setText('audit-consistency-score', score(audit.consistencyScore));
             listItems('audit-strengths', audit.strengths);
             listItems('audit-weaknesses', audit.weaknesses);
             listItems('audit-recommendations', audit.recommendations);
 
             const topVideos = document.getElementById('analytics-top-videos');
             if (topVideos) {
-                const rows = (data.videos || []).map(video => `
+                const rows = (data.videos || []).map(video => {
+                    const published = video.publishedAt ? escapeAIOutput(new Date(video.publishedAt).toLocaleDateString()) : '—';
+                    return `
                     <tr class="border-b border-lemon/5">
                         <td class="py-4 flex items-center gap-3">
                             <div class="w-12 h-8 rounded bg-lemon/20 flex items-center justify-center"><i data-lucide="play" class="w-4 h-4 text-lemon"></i></div>
-                            <span class="text-white font-medium">${video.title || 'Untitled video'}</span>
+                            <span class="text-white font-medium">${escapeAIOutput(video.title || 'Untitled video')}</span>
                         </td>
-                        <td class="py-4 text-gray-300">${video.compact?.views || 0}</td>
-                        <td class="py-4 text-lemon font-semibold">${video.compact?.likes || 0} likes</td>
-                        <td class="py-4 text-gray-300">${video.compact?.comments || 0} comments</td>
-                        <td class="py-4"><span class="bg-lemon/20 text-lemon px-2 py-1 rounded-full text-xs font-bold">${audit.health || 0}/100</span></td>
+                        <td class="py-4 text-gray-300">${escapeAIOutput(video.compact?.views ?? '0')}</td>
+                        <td class="py-4 text-lemon font-semibold">${escapeAIOutput(video.compact?.likes ?? '0')}</td>
+                        <td class="py-4 text-gray-300">${escapeAIOutput(video.compact?.comments ?? '0')}</td>
+                        <td class="py-4 text-gray-300">${published}</td>
                     </tr>
-                `).join('');
+                `;
+                }).join('');
                 topVideos.innerHTML = rows || '<tr><td colspan="5" class="py-4 text-gray-400">No recent upload data found.</td></tr>';
             }
 
@@ -2908,19 +2873,24 @@ async function sendMessage() {
             // Run AI audit on channel data
             if (data.channel && !data.audit) {
                 (async () => {
-                    const auditPrompt = `Analyze this YouTube channel and provide an audit. Channel: ${data.channel.title || 'Unknown'}. Subscribers: ${data.channel.statistics?.subscriberCount || 0}. Videos: ${data.channel.statistics?.videoCount || 0}. Return JSON: {health: 0-100, brandingScore: 0-100, seoScore: 0-100, consistencyScore: 0-100, strengths: ["..."], weaknesses: ["..."], recommendations: ["..."]}`;
+                    const auditContext = {
+                        channel: { title: data.channel.title, statistics: data.channel.statistics },
+                        analytics: data.analytics || { unavailable: true },
+                        videos: (data.videos || []).slice(0, 10).map(video => ({ title: video.title, publishedAt: video.publishedAt, statistics: video.statistics }))
+                    };
+                    const auditPrompt = `Review this actual retrieved YouTube channel context. Only describe patterns supported by these values; mark unavailable fields as unavailable and never invent statistics or score values. Context: ${JSON.stringify(auditContext)}. Return JSON with health, brandingScore, seoScore, consistencyScore set to null (not measured), plus strengths, weaknesses, and recommendations grounded in the supplied data.`;
                     try {
                         const auditResp = await callFreeAI(auditPrompt);
                         const jsonMatch = auditResp.match(/\{[\s\S]*?\}/);
                         if (jsonMatch) {
-                            const audit = JSON.parse(jsonMatch[0]);
-                            setText('audit-health-score', audit.health || 0);
-                            setText('audit-branding-score', audit.brandingScore || 0);
-                            setText('audit-seo-score', audit.seoScore || 0);
-                            setText('audit-consistency-score', audit.consistencyScore || 0);
-                            listItems('audit-strengths', audit.strengths || ['Analysis complete']);
-                            listItems('audit-weaknesses', audit.weaknesses || ['No major weaknesses found']);
-                            listItems('audit-recommendations', audit.recommendations || ['Keep creating great content']);
+                            const result = JSON.parse(jsonMatch[0]);
+                            setText('audit-health-score', result.health == null ? '—' : result.health);
+                            setText('audit-branding-score', result.brandingScore == null ? '—' : result.brandingScore);
+                            setText('audit-seo-score', result.seoScore == null ? '—' : result.seoScore);
+                            setText('audit-consistency-score', result.consistencyScore == null ? '—' : result.consistencyScore);
+                            listItems('audit-strengths', result.strengths || []);
+                            listItems('audit-weaknesses', result.weaknesses || []);
+                            listItems('audit-recommendations', result.recommendations || []);
                         }
                     } catch(e) {}
                 })();
@@ -2977,8 +2947,7 @@ async function analyzeVideoContent() {
     document.getElementById('analyzer-results').classList.add('hidden');
 
     try {
-        // Fetch video data from YouTube Data API (public, no key needed for basic info via oEmbed or we use AI to analyze from ID)
-        // Since we may not have API key, we construct what we know and let AI fill the rest
+        // Retrieve the public title and channel name; no performance analytics are available here.
         const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
         const thumbUrl = `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
 
@@ -2997,25 +2966,25 @@ async function analyzeVideoContent() {
         currentAnalyzerData = { videoId, title, author, thumbUrl, videoUrl };
 
         // Run AI analysis
-        const prompt = `Analyze this YouTube video for SEO and CTR. Title: "${title}". Channel: ${author}. Video ID: ${videoId}. 
+        const prompt = `Review only the supplied public metadata for title wording and channel positioning. Do not claim actual CTR, engagement, view counts, thumbnail quality, tags, description, audience sentiment, or comment themes because those data were not retrieved. Title: "${title}". Channel: ${author}. Video ID: ${videoId}.
 Return ONLY a JSON object with this exact structure:
 {
-  "overallScore": 0-100,
-  "seoScore": 0-100,
-  "ctrPrediction": "X.X%",
-  "engagement": "High|Medium|Low",
+  "overallScore": null,
+  "seoScore": null,
+  "ctrPrediction": "Unavailable: channel analytics not retrieved",
+  "engagement": "Unavailable: engagement data not retrieved",
   "strengths": ["...", "..."],
   "issues": ["...", "..."],
-  "titleSeo": { "score": 0-100, "analysis": "..." },
-  "descSeo": { "score": 0-100, "analysis": "..." },
-  "tagsSeo": { "score": 0-100, "analysis": "..." },
-  "thumbSeo": { "score": 0-100, "analysis": "..." },
-  "ctrBreakdown": { "titleHook": 0-100, "thumbnailAppeal": 0-100, "topicDemand": 0-100, "competition": 0-100, "verdict": "..." },
+  "titleSeo": { "score": null, "analysis": "..." },
+  "descSeo": { "score": null, "analysis": "Description data not retrieved" },
+  "tagsSeo": { "score": null, "analysis": "Tags data not retrieved" },
+  "thumbSeo": { "score": 0, "analysis": "Thumbnail data not retrieved" },
+  "ctrBreakdown": { "titleHook": 0, "thumbnailAppeal": 0, "topicDemand": 0, "competition": 0, "verdict": "Unavailable: CTR analytics not retrieved" },
   "titleAlternatives": ["...", "...", "..."],
   "titleTips": ["...", "..."],
-  "sentiment": { "positive": 0-100, "neutral": 0-100, "negative": 0-100 },
-  "commentThemes": ["...", "...", "..."],
-  "replySuggestions": ["...", "...", "..."]
+  "sentiment": { "positive": 0, "neutral": 0, "negative": 0 },
+  "commentThemes": [],
+  "replySuggestions": []
 }`;
 
         const aiResponse = await callFreeAI(prompt);
@@ -3038,44 +3007,38 @@ Return ONLY a JSON object with this exact structure:
 
 function renderAnalyzerResults(data, title) {
     // Overview
-    animateValue('ca-overall-score', 0, clamp(data.overallScore, 0, 100), 800);
-    animateValue('ca-seo-score', 0, clamp(data.seoScore, 0, 100), 800);
-    setText('ca-ctr-prediction', data.ctrPrediction || '--');
-    setText('ca-engagement', data.engagement || '--');
+    setText('ca-overall-score', 'Not measured');
+    setText('ca-seo-score', 'Not measured');
+    setText('ca-ctr-prediction', 'Unavailable');
+    setText('ca-engagement', 'Unavailable');
 
-    listItems('ca-strengths', data.strengths || ['Analysis complete']);
-    listItems('ca-issues', data.issues || ['No major issues']);
+    listItems('ca-strengths', data.strengths || []);
+    listItems('ca-issues', data.issues || []);
 
     // SEO Tab
-    setText('ca-title-seo-score', (data.titleSeo?.score || 0) + '/100');
+    setText('ca-title-seo-score', 'Not measured');
     setText('ca-title-analysis', data.titleSeo?.analysis || 'No data');
-    setText('ca-desc-seo-score', (data.descSeo?.score || 0) + '/100');
+    setText('ca-desc-seo-score', 'Not measured');
     setText('ca-desc-analysis', data.descSeo?.analysis || 'No data');
-    setText('ca-tags-seo-score', (data.tagsSeo?.score || 0) + '/100');
+    setText('ca-tags-seo-score', 'Not measured');
     setText('ca-tags-analysis', data.tagsSeo?.analysis || 'No data');
-    setText('ca-thumb-seo-score', (data.thumbSeo?.score || 0) + '/100');
+    setText('ca-thumb-seo-score', 'Not measured');
     setText('ca-thumb-analysis', data.thumbSeo?.analysis || 'No data');
 
     // CTR Tab
     const ctr = data.ctrBreakdown || {};
-    setText('ca-ctr-title', (ctr.titleHook || 0) + '%');
-    setText('ca-ctr-thumb', (ctr.thumbnailAppeal || 0) + '%');
-    setText('ca-ctr-demand', (ctr.topicDemand || 0) + '%');
-    setText('ca-ctr-comp', (ctr.competition || 0) + '%');
-    document.getElementById('ca-ctr-title-bar').style.width = clamp(ctr.titleHook, 0, 100) + '%';
-    document.getElementById('ca-ctr-thumb-bar').style.width = clamp(ctr.thumbnailAppeal, 0, 100) + '%';
-    document.getElementById('ca-ctr-demand-bar').style.width = clamp(ctr.topicDemand, 0, 100) + '%';
-    document.getElementById('ca-ctr-comp-bar').style.width = clamp(ctr.competition, 0, 100) + '%';
-    setText('ca-ctr-big', data.ctrPrediction || '--%');
-    setText('ca-ctr-verdict', ctr.verdict || 'Enter a video to get CTR prediction');
+    ['ca-ctr-title', 'ca-ctr-thumb', 'ca-ctr-demand', 'ca-ctr-comp'].forEach(id => setText(id, '—'));
+    ['ca-ctr-title-bar', 'ca-ctr-thumb-bar', 'ca-ctr-demand-bar', 'ca-ctr-comp-bar'].forEach(id => { document.getElementById(id).style.width = '0%'; });
+    setText('ca-ctr-big', 'Unavailable');
+    setText('ca-ctr-verdict', 'YouTube analytics were not retrieved for this public video.');
 
     // Title Tab
     document.getElementById('ca-current-title').textContent = title;
     const alts = data.titleAlternatives || [];
     document.getElementById('ca-title-alternatives').innerHTML = alts.map((alt, i) => `
         <div class="result-card rounded-xl p-3 flex items-center justify-between group">
-            <p class="text-white text-sm flex-1">${alt}</p>
-            <button onclick="copyText(this, '${alt.replace(/'/g, "\'")}')" class="text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100">
+            <p class="text-white text-sm flex-1">${escapeAIOutput(alt)}</p>
+            <button onclick="copyText(this, this.dataset.copy)" data-copy="${escapeAttr(alt)}" class="text-lemon p-2 rounded-lg hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100">
                 <i data-lucide="copy" class="w-4 h-4"></i>
             </button>
         </div>
@@ -3083,24 +3046,21 @@ function renderAnalyzerResults(data, title) {
     listItems('ca-title-tips', data.titleTips || ['Use numbers', 'Add emotional triggers', 'Keep under 60 chars']);
 
     // Comments Tab
-    const sent = data.sentiment || { positive: 70, neutral: 20, negative: 10 };
-    document.getElementById('ca-sent-pos').style.width = clamp(sent.positive, 0, 100) + '%';
-    document.getElementById('ca-sent-neu').style.width = clamp(sent.neutral, 0, 100) + '%';
-    document.getElementById('ca-sent-neg').style.width = clamp(sent.negative, 0, 100) + '%';
-    setText('ca-sent-pos-label', `Positive ${sent.positive}%`);
-    setText('ca-sent-neu-label', `Neutral ${sent.neutral}%`);
-    setText('ca-sent-neg-label', `Negative ${sent.negative}%`);
+    ['ca-sent-pos', 'ca-sent-neu', 'ca-sent-neg'].forEach(id => { document.getElementById(id).style.width = '0%'; });
+    setText('ca-sent-pos-label', 'Unavailable');
+    setText('ca-sent-neu-label', 'Unavailable');
+    setText('ca-sent-neg-label', 'Unavailable');
 
-    const themes = data.commentThemes || ['Encouragement', 'Questions', 'Testimonies'];
+    const themes = [];
     document.getElementById('ca-comment-themes').innerHTML = themes.map(t =>
         `<span class="tag px-2 py-1 rounded text-xs">${t}</span>`
     ).join('');
 
-    const replies = data.replySuggestions || [];
+    const replies = [];
     document.getElementById('ca-reply-suggestions').innerHTML = replies.map(r => `
         <div class="p-3 bg-blackLight rounded-xl border border-lemon/5 text-sm text-gray-300 relative group">
-            <p>${r}</p>
-            <button onclick="copyText(this, '${r.replace(/'/g, "\'")}')" class="absolute top-2 right-2 text-lemon p-1 rounded hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100">
+            <p>${escapeAIOutput(r)}</p>
+            <button onclick="copyText(this, this.dataset.copy)" data-copy="${escapeAttr(r)}" class="absolute top-2 right-2 text-lemon p-1 rounded hover:bg-lemon/10 transition-colors opacity-0 group-hover:opacity-100">
                 <i data-lucide="copy" class="w-3 h-3"></i>
             </button>
         </div>
@@ -3128,10 +3088,10 @@ async function analyzeCompetitorGap() {
             }
         } catch(e) {}
 
-        const prompt = `Compare these two YouTube videos and identify gaps/opportunities.
+        const prompt = `Compare only the following public video title metadata and suggest content positioning opportunities. Do not invent views, engagement, stats, or SEO scores. Identify unavailable facts explicitly.
 Video A (Your): "${currentAnalyzerData.title}" (ID: ${currentAnalyzerData.videoId})
 Video B (Competitor): "${compTitle}" (ID: ${compId})
-Return JSON: { yourStats: {views:"...",engagement:"...",seo:"..."}, competitorStats: {views:"...",engagement:"...",seo:"..."}, gaps: ["...","...","..."] }`;
+Return JSON: { yourStats: {views:"Unavailable",engagement:"Unavailable",seo:"Not measured"}, competitorStats: {views:"Unavailable",engagement:"Unavailable",seo:"Not measured"}, gaps: ["...","...","..."] }`;
 
         const aiResponse = await callFreeAI(prompt);
         let data = {};
@@ -3141,17 +3101,15 @@ Return JSON: { yourStats: {views:"...",engagement:"...",seo:"..."}, competitorSt
         } catch(e) {}
 
         document.getElementById('ca-competitor-results').classList.remove('hidden');
-        const ys = data.yourStats || {};
-        const cs = data.competitorStats || {};
         document.getElementById('ca-your-stats').innerHTML = `
-            <div class="flex justify-between"><span class="text-gray-400">Est. Views</span><span class="text-white">${ys.views || 'N/A'}</span></div>
-            <div class="flex justify-between"><span class="text-gray-400">Engagement</span><span class="text-white">${ys.engagement || 'N/A'}</span></div>
-            <div class="flex justify-between"><span class="text-gray-400">SEO Score</span><span class="text-lemon">${ys.seo || 'N/A'}</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">Views</span><span class="text-white">Not retrieved</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">Engagement</span><span class="text-white">Not retrieved</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">SEO score</span><span class="text-lemon">Not measured</span></div>
         `;
         document.getElementById('ca-competitor-stats').innerHTML = `
-            <div class="flex justify-between"><span class="text-gray-400">Est. Views</span><span class="text-white">${cs.views || 'N/A'}</span></div>
-            <div class="flex justify-between"><span class="text-gray-400">Engagement</span><span class="text-white">${cs.engagement || 'N/A'}</span></div>
-            <div class="flex justify-between"><span class="text-gray-400">SEO Score</span><span class="text-blue-400">${cs.seo || 'N/A'}</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">Views</span><span class="text-white">Not retrieved</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">Engagement</span><span class="text-white">Not retrieved</span></div>
+            <div class="flex justify-between"><span class="text-gray-400">SEO score</span><span class="text-blue-400">Not measured</span></div>
         `;
         listItems('ca-gap-analysis', data.gaps || ['Analyze competitor to see gaps']);
     } catch(err) {
@@ -3165,17 +3123,47 @@ function clamp(val, min, max) {
 
 // ============================================================
 // AI health check
+        async function verifyGeminiConnection() {
+            const button = document.getElementById('ai-connection-test');
+            const config = document.getElementById('ai-config-status');
+            button.disabled = true;
+            button.textContent = 'Testing…';
+            try {
+                await callFreeAI('Reply with exactly: Gemini connection verified.', false, { module: 'general', maxOutputTokens: 24, verifyConnection: true });
+                await checkAIHealth();
+                config.textContent = 'Connection verified';
+                showToast('Gemini connection verified.');
+            } catch (error) {
+                config.textContent = error.message || 'Connection failed';
+                showToast(error.message || 'Gemini connection test failed.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Test Gemini connection (uses 1 request)';
+            }
+        }
+
         async function checkAIHealth() {
             try {
-                const test = await callFreeAI('Say "AI Online" and nothing else.', false);
+                const response = await fetch('/api/ai-generate', { credentials: 'same-origin' });
+                const status = await response.json();
                 const dot = document.getElementById('ai-status-dot');
-                if (dot && test.toLowerCase().includes('online')) {
+                document.getElementById('ai-config-status').textContent = status.configured ? 'Key configured (not connection-tested)' : 'Missing server key';
+                document.getElementById('ai-model-status').textContent = `${status.model || '—'} · ${status.freeTierEligible ? 'Free-tier eligible; project billing unverified' : 'Unavailable'}`;
+                document.getElementById('ai-usage-status').textContent = `${status.usage?.requests ?? 0} / ${status.usage?.errors ?? 0}`;
+                document.getElementById('ai-quota-status').textContent = status.quotaExhausted ? 'Exhausted' : 'Available (Google quota not queried)';
+                document.getElementById('ai-last-success').textContent = status.usage?.lastRequest?.at ? new Date(status.usage.lastRequest.at).toLocaleString() : 'None on this instance';
+                if (dot && status.ok && status.configured && !status.quotaExhausted) {
                     dot.style.background = '#8dfc00';
                     dot.style.boxShadow = '0 0 8px #8dfc00';
+                    dot.title = `Google Gemini · ${status.model} · Free-tier eligible; project billing tier unverified · ${status.usage.requests} tracked requests on this server instance`;
+                } else if (dot) {
+                    dot.style.background = '#f59e0b';
+                    dot.style.boxShadow = 'none';
+                    dot.title = status.quotaExhausted ? 'Gemini free-tier quota exhausted' : 'Gemini is not configured';
                 }
             } catch(e) {
                 const dot = document.getElementById('ai-status-dot');
-                if (dot) { dot.style.background = '#f59e0b'; dot.style.boxShadow = 'none'; }
+                if (dot) { dot.style.background = '#f59e0b'; dot.style.boxShadow = 'none'; dot.title = 'Gemini status unavailable'; }
             }
         }
 
@@ -3235,6 +3223,8 @@ function clamp(val, min, max) {
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             safeRenderIcons();
+            window.AuthStore?.mountAccountWidget('omnicast-account-widget');
+            window.AuthStore?.mountChannelSelector('youtube-channel-picker');
             showSection('dashboard');
             checkAIHealth();
             const params = new URLSearchParams(window.location.search);
@@ -3252,102 +3242,27 @@ function clamp(val, min, max) {
         });
     
 
-// ============================================================
-// REAL FREE AI ENGINE — OVHcloud (No API key, no signup)
-// Fallback chain: OVHcloud → OpenRouter Free → Mistral Free
-// ============================================================
+// Shared server-side Gemini client; no provider fallback is permitted.
 
-const AI_CONFIG = {
-    // OVHcloud: FREE, no API key, no signup, 2 RPM per IP
-    ovhcloud: {
-        url: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions',
-        proxyUrl: 'https://api.allorigins.win/raw?url=https://oai.endpoints.kepler.ai.cloud.ovh.net/v1/chat/completions',
-        model: 'Meta-Llama-3_3-70B-Instruct',
-        headers: { 'Content-Type': 'application/json' }
-    },
-    // Pollinations: FREE, no key, no CORS issues, unlimited
-    pollinations: {
-        url: 'https://text.pollinations.ai/openai',
-        model: 'openai',
-        headers: { 'Content-Type': 'application/json' }
-    },
-    // OpenRouter Free: FREE tier, 50 req/day
-    openrouter: {
-        url: 'https://openrouter.ai/api/v1/chat/completions',
-        proxyUrl: 'https://api.allorigins.win/raw?url=https://openrouter.ai/api/v1/chat/completions',
-        model: 'openrouter/auto',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer sk-or-v1-demo' }
+async function callFreeAI(userPrompt, isChat = false, options = {}) {
+    const response = await fetch('/api/ai-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            prompt: userPrompt,
+            module: options.module || (isChat ? 'creator' : /thumbnail|visual|composition/i.test(userPrompt) ? 'thumbnail' : /analytics|ctr|impressions|watch time|competitor|channel audit/i.test(userPrompt) ? 'analytics' : /lyrics|songwriting|song concept/i.test(userPrompt) ? 'lyrics' : /script|production plan/i.test(userPrompt) ? 'script' : /title|description|hashtag|keyword|calendar|idea|seo/i.test(userPrompt) ? 'youtube' : 'content'),
+            ...(options.image ? { image: options.image } : {}),
+            ...(options.maxOutputTokens ? { maxOutputTokens: options.maxOutputTokens } : {}),
+            ...(options.verifyConnection ? { verifyConnection: true } : {})
+        })
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || !result.ok || !result.text) {
+        throw new Error(result.error || 'AI is temporarily unavailable. Your input is preserved; please retry later.');
     }
-};
-
-let aiProviderIndex = 0;
-const AI_PROVIDERS = ['pollinations', 'ovhcloud', 'openrouter'];
-
-async function callFreeAI(userPrompt, isChat = false) {
-    const systemPrompt = isChat
-        ? "You are SpiritFlow AI, a Christian content strategy assistant. Give concise, actionable advice for YouTube creators in the Christian/worship niche. Be encouraging and practical. Keep responses under 200 words."
-        : "You are an expert YouTube SEO and content strategist specializing in Christian, worship, and gospel content. Always return structured, practical output. Be concise.";
-
-    // Pollinations GET endpoint — no CORS, no key, no POST body needed
-    const encodedPrompt = encodeURIComponent(userPrompt);
-    const encodedSystem = encodeURIComponent(systemPrompt);
-
-    // Try Pollinations GET first (no CORS issues)
-    const pollinationsUrls = [
-        `https://text.pollinations.ai/${encodedPrompt}?model=openai&system=${encodedSystem}&seed=${Date.now()}`,
-        `https://text.pollinations.ai/${encodedPrompt}?model=mistral&system=${encodedSystem}&seed=${Date.now()}`,
-    ];
-
-    for (const url of pollinationsUrls) {
-        try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 20000);
-            const response = await fetch(url, { signal: controller.signal });
-            clearTimeout(timeout);
-            if (response.ok) {
-                const text = await response.text();
-                if (text && text.length > 10) return text.trim();
-            }
-        } catch (err) { console.warn('Pollinations GET failed:', err.message); }
-    }
-
-    // Fallback: try POST-based providers with CORS proxy
-    const messages = [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-    ];
-
-    const AI_PROVIDERS = ['pollinations', 'ovhcloud', 'openrouter'];
-    for (let attempt = 0; attempt < AI_PROVIDERS.length; attempt++) {
-        const providerKey = AI_PROVIDERS[(aiProviderIndex + attempt) % AI_PROVIDERS.length];
-        const cfg = AI_CONFIG[providerKey];
-        const urlsToTry = [cfg.url];
-        if (cfg.proxyUrl) urlsToTry.push(cfg.proxyUrl);
-        for (const url of urlsToTry) {
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 15000);
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: cfg.headers,
-                    body: JSON.stringify({ model: cfg.model, messages: messages, max_tokens: 1200, temperature: 0.7 }),
-                    signal: controller.signal
-                });
-                clearTimeout(timeout);
-                if (!response.ok) continue;
-                const data = await response.json();
-                const text = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || data.output || '';
-                if (text && text.length > 10) {
-                    aiProviderIndex = (aiProviderIndex + attempt) % AI_PROVIDERS.length;
-                    return text.trim();
-                }
-            } catch (err) { console.warn(`${providerKey} error:`, err.message); }
-        }
-    }
-
-    return isChat
-        ? "I am having trouble connecting to the AI servers. Please check your internet and try again."
-        : JSON.stringify([{text: "AI service temporarily unavailable. Please retry.", seo: 0, ctr: 0, rank: 0}]);
+    checkAIHealth();
+    return result.text;
 }
 
 // ============================================================
@@ -3361,56 +3276,62 @@ async function generateAIDescription(input, type) {
 }
 
 async function generateAIHashtags(input, type, count) {
-    const prompt = `Generate ${count} trending ${type} hashtags for YouTube video about: "${input}". Return ONLY a JSON array of hashtag strings like ["#tag1", "#tag2"]. No explanation.`;
+    const prompt = `Suggest ${count} relevant ${type} hashtags for a YouTube video about: "${input}". Do not claim they are trending. Return ONLY a JSON array of hashtag strings.`;
     const response = await callFreeAI(prompt);
     try {
         const jsonMatch = response.match(/\[[\s\S]*?\]/);
         if (jsonMatch) return JSON.parse(jsonMatch[0]);
     } catch(e) {}
-    return ['#' + type, '#Christian', '#YouTube'];
+    throw new Error('The hashtag response was invalid. Please retry.');
 }
 
 async function generateAIKeywords(input) {
-    const prompt = `Find 8 high-opportunity YouTube keywords related to: "${input}". For each, estimate monthly search volume, difficulty (Low/Medium/High), and opportunity score (0-100). Return ONLY a JSON array: [{word: "...", volume: "...", difficulty: "...", opportunity: N}].`;
+    const prompt = `Brainstorm 8 related YouTube keyword phrases for "${input}". Do not invent search volumes or measured scores. Return ONLY a JSON array of strings.`;
     const response = await callFreeAI(prompt);
     try {
         const jsonMatch = response.match(/\[[\s\S]*?\]/);
         if (jsonMatch) return JSON.parse(jsonMatch[0]);
     } catch(e) {}
-    return [{word: input, volume: 'Unknown', difficulty: 'Medium', opportunity: 75}];
+    throw new Error('The keyword response was invalid. Please retry.');
 }
 
 async function generateAIContentIdeas(type, input) {
-    const prompt = `Generate 5 YouTube video ideas for ${type} content about: "${input || 'Christian ministry'}". For each idea, provide: title, type (Long-form/Shorts/Tutorial/etc), and whether it's trending (true/false). Return ONLY a JSON array: [{title: "...", type: "...", trending: true/false}].`;
+    const prompt = `Generate 5 YouTube video ideas for ${type} content about: "${input || 'Christian ministry'}". Provide a title and format only; do not claim current trends. Return ONLY a JSON array: [{title: "...", type: "..."}].`;
     const response = await callFreeAI(prompt);
     try {
         const jsonMatch = response.match(/\[[\s\S]*?\]/);
         if (jsonMatch) return JSON.parse(jsonMatch[0]);
     } catch(e) {}
-    return [{title: input || 'Christian Content Idea', type: 'Long-form', trending: false}];
+    throw new Error('The content idea response was invalid. Please retry.');
 }
 
 async function generateAIThumbnailPrompts(input, style) {
-    const prompt = `Create 4 AI image generation prompts for a YouTube thumbnail about: "${input}". Style: ${style}. Return ONLY a JSON object with keys: dalle, midjourney, leonardo, ideogram. Each value is a detailed prompt string.`;
+    const prompt = `Create four text prompts for other image-generation tools for a YouTube thumbnail about: "${input}". Style: ${style}. Return ONLY a JSON object with keys: dalle, midjourney, leonardo, ideogram. This request creates prompts only; it does not create images.`;
     const response = await callFreeAI(prompt);
     try {
         const jsonMatch = response.match(/\{[\s\S]*?\}/);
         if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
-            return {
-                dalle: parsed.dalle || parsed.DALLE || parsed.dall_e || `YouTube thumbnail: ${input}`,
-                midjourney: parsed.midjourney || parsed.Midjourney || `youtube thumbnail, ${input}, bold text, high contrast --ar 16:9`,
-                leonardo: parsed.leonardo || parsed.Leonardo || `YouTube thumbnail design, ${input}, bold typography`,
-                ideogram: parsed.ideogram || parsed.Ideogram || `Striking YouTube thumbnail showing ${input}`
-            };
+            if (parsed.dalle && parsed.midjourney && parsed.leonardo && parsed.ideogram) return parsed;
         }
-    } catch(e) {}
-    return {
-        dalle: `YouTube thumbnail: ${input}. Bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, 16:9, eye-catching.`,
-        midjourney: `youtube thumbnail, ${input}, bold text overlay, high contrast, vibrant colors, dark background, cinematic lighting, professional photography, 16:9, eye-catching, viral style --ar 16:9 --v 6`,
-        leonardo: `YouTube thumbnail design, ${input}, bold typography, high contrast colors, dramatic lighting, professional quality, 1280x720, engaging composition`,
-        ideogram: `A striking YouTube thumbnail showing ${input} with large bold text, high contrast, vibrant colors, professional design, 16:9 format`
-    };
+    } catch(e) { throw e; }
+    throw new Error('The thumbnail prompt response was incomplete. Please retry.');
+}
+
+function escapeAIOutput(value) {
+    const node = document.createElement('div');
+    node.textContent = value === 0 ? '0' : String(value ?? '');
+    return node.innerHTML;
+}
+
+/* Escape a value before placing it inside a double-quoted HTML attribute.
+ * (escapeAIOutput only escapes text-node characters, not quotes.) */
+function escapeAttr(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 async function generateAIMusicRelease(song, artist, platform) {
@@ -3420,43 +3341,21 @@ async function generateAIMusicRelease(song, artist, platform) {
         const jsonMatch = response.match(/\{[\s\S]*?\}/);
         if (jsonMatch) {
             const parsed = JSON.parse(jsonMatch[0]);
-            return {
-                coverPrompt: parsed.coverPrompt || parsed.cover_prompt || `Album cover for "${song}" by ${artist}, Christian worship music, ethereal golden light`,
-                description: parsed.description || parsed.Description || `${song} - ${artist}\n\nStream now on all platforms!`,
-                captions: Array.isArray(parsed.captions) ? parsed.captions : ['New music out now!', 'Worship with me!', 'God is faithful!'],
-                hashtags: Array.isArray(parsed.hashtags) ? parsed.hashtags : ['#NewMusic', '#ChristianMusic', '#Worship']
-            };
+            if (!parsed.coverPrompt || !parsed.description || !Array.isArray(parsed.captions) || !Array.isArray(parsed.hashtags)) throw new Error('The release kit response was incomplete. Please retry.');
+            return { coverPrompt: String(parsed.coverPrompt), description: String(parsed.description), captions: parsed.captions.map(String).slice(0, 5), hashtags: parsed.hashtags.map(String).slice(0, 20) };
         }
-    } catch(e) {}
-    return {
-        coverPrompt: `Album cover art for "${song}" by ${artist}. Christian worship music, ethereal golden light, abstract spiritual design, cross silhouette, warm color palette with gold and deep blue, modern minimalist, 3000x3000`,
-        description: `${song} - ${artist}\n\nStream/Download: [Add your streaming links]\n\nThis song is a heartfelt expression of worship.\n\nFOLLOW ${artist}:\nInstagram: @artist_handle\n\n#NewMusic #ChristianMusic #Worship`,
-        captions: [`NEW MUSIC OUT NOW! ${song} is now available everywhere.`, `Worship with me! My new single "${song}" just dropped.`, `After months of prayer, ${song} is finally here.`],
-        hashtags: ['#NewMusic', '#ChristianMusic', '#Worship', '#Gospel', '#Spotify', '#AppleMusic', '#YouTubeMusic', '#DistroKid', '#WorshipMusic', '#Praise', '#HolySpirit', '#Faith', '#Jesus', '#GodsPlan', '#MusicRelease']
-    };
+    } catch(e) { throw e; }
+    throw new Error('The release kit response was incomplete. Please retry.');
 }
 
 async function generateAICalendarPlan(niche, freq, days) {
-    const prompt = `Create a ${days}-day YouTube content calendar for a ${freq} upload schedule in the "${niche}" niche. Return ONLY a JSON array of objects: [{day: "Day 1", topic: "...", type: "Long-form Video|Shorts|Community Post|Music Release", color: "bg-lemon/20 border-lemon"}]. Alternate content types realistically.`;
-    const response = await callFreeAI(prompt);
-    try {
-        const jsonMatch = response.match(/\[[\s\S]*?\]/);
-        if (jsonMatch) {
-            const parsed = JSON.parse(jsonMatch[0]);
-            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        }
-    } catch(e) {}
-    // Minimal fallback
-    const types = [
-        { color: 'bg-lemon/20 border-lemon', label: 'Long-form Video' },
-        { color: 'bg-blue-500/20 border-blue-500', label: 'Shorts' },
-        { color: 'bg-purple-500/20 border-purple-500', label: 'Community Post' },
-        { color: 'bg-red-500/20 border-red-500', label: 'Music Release' }
-    ];
-    return Array.from({length: days}, (_, i) => {
-        const t = types[i % types.length];
-        return { day: `Day ${i+1}`, topic: `${niche} Content ${i+1}`, type: t.label, color: t.color };
-    });
+    const prompt = `Create a ${days}-day YouTube content calendar for a ${freq} upload schedule in the "${niche}" niche. Return ONLY a JSON array of objects: [{day: "Day 1", topic: "...", type: "Long-form Video|Shorts|Community Post|Music Release"}].`;
+    const response = await callFreeAI(prompt, false, { module: 'content', maxOutputTokens: 1000 });
+    const jsonMatch = response.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) throw new Error('The calendar response was incomplete. Please retry.');
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('The calendar response was incomplete. Please retry.');
+    return parsed.slice(0, days).map((entry, index) => ({ day: String(entry.day || `Day ${index + 1}`).slice(0, 32), topic: String(entry.topic || '').slice(0, 180), type: String(entry.type || 'Long-form Video') }));
 }
 
 // ============================================================
@@ -3464,7 +3363,7 @@ async function generateAICalendarPlan(niche, freq, days) {
 // ============================================================
 
 async function generateRealTitles(input, type) {
-    const prompt = `Generate 4 viral YouTube title options for a video about: "${input}". Style: ${type}. Return ONLY a JSON array of objects with keys: text, seo (0-100), ctr (0-100), rank (0-100). No markdown, no explanation.`;
+    const prompt = `Generate 4 YouTube title ideas for a video about: "${input}". Style: ${type}. Do not provide numeric SEO, ranking, or CTR claims. Return ONLY JSON: [{"text":"..."}].`;
     try {
         const response = await callFreeAI(prompt);
         const jsonMatch = response.match(/\[[\s\S]*?\]/);
@@ -3473,7 +3372,7 @@ async function generateRealTitles(input, type) {
             if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
     } catch(e) { console.error('Title AI error:', e); }
-    return [{text: input, seo: 50, ctr: 50, rank: 50}];
+    throw new Error('The title response was invalid. Please retry.');
 }
 </script>
 </body>

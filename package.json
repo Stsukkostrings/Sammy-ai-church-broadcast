@@ -6,9 +6,14 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node -e \"const fs=require('fs'); for (const file of ['api/youtube-auth.js','api/youtube-callback.js','api/youtube-channel.js','api/_youtubeCore.js']) { if(!fs.existsSync(file)) throw new Error(file+' missing'); } const html=fs.readFileSync('spiritflow_creator_studio.html','utf8'); [...html.matchAll(/<script(?: [^>]*)?>([\\s\\S]*?)<\\/script>/g)].forEach((m,i)=>{ if(m[1].trim()) new Function(m[1]); }); console.log('Smoke checks passed');\"",
+    "test": "node test/smoke.js && node --test test/storage-scope.test.js test/recent-regressions.test.js",
+    "test:focused": "node --test test/storage-scope.test.js test/recent-regressions.test.js",
+    "test:tenant": "node --test test/tenant-isolation.test.js",
+    "test:api": "node --test test/api-hardening.test.js",
+    "test:migration": "node --test test/migration-validation.test.js",
+    "test:overlay": "node --test test/overlay-relay.test.js",
     "check": "node check-pages.js",
-    "test:all": "npm test && npm run check"
+    "test:all": "node test/smoke.js && node --test test/tenant-isolation.test.js && node --test test/api-hardening.test.js && node --test test/migration-validation.test.js && node --test test/overlay-relay.test.js && node --test test/storage-scope.test.js test/recent-regressions.test.js && node check-pages.js"
   },
   "keywords": [
     "ai",
