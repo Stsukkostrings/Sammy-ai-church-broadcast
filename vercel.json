@@ -24,7 +24,6 @@
     "api/overlay-public.js": { "maxDuration": 10 },
     "api/spiritflow-config.js": { "maxDuration": 10 },
     "api/spiritflow/*.js": { "maxDuration": 10 },
-    "api/spiritflow/nowplaying.js": { "maxDuration": 10 },
     "api/_youtubeCore.js": { "maxDuration": 30 },
     "api/_youtubeCommentsCore.js": { "maxDuration": 30 },
     "api/_spiritFlowCore.js": { "maxDuration": 10 }
